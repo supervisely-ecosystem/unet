@@ -1,0 +1,1 @@
+docker build -t supervisely/unet:1.0.0 .
