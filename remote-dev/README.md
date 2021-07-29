@@ -72,5 +72,10 @@ cd docker && ./step-01-build-local-image.sh
 
 ### 5. Start remote development (optional for development on remote server)
 ```sh
-cd remote-dev
+cd remote-dev && ./start.sh
+```
+
+### 6. test direct SSH connection into the running docker container on remote machine
+```sh
+ssh gpu1 -p 7777
 ```
