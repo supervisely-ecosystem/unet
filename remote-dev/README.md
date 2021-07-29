@@ -69,3 +69,8 @@ git status
 ```sh
 cd docker && ./step-01-build-local-image.sh
 ```
+
+### 5. Start remote development (optional for development on remote server)
+```sh
+cd remote-dev
+```
