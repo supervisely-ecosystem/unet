@@ -1,5 +1,6 @@
 import supervisely_lib as sly
 import sly_globals as g
+import ui
 
 
 def main():
@@ -13,6 +14,8 @@ def main():
     state = {}
     data["taskId"] = g.task_id
 
+    ui.init(data, state)  # init data for UI widgets
+    g.my_app.compile_template(g.root_source_dir)
     g.my_app.run(data=data, state=state)
 
 

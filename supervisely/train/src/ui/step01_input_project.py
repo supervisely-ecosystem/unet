@@ -3,7 +3,7 @@ from collections import namedtuple
 import shelve
 import supervisely_lib as sly
 import sly_globals as g
-from sly_train_progress import get_progress_cb, reset_progress, init_progress
+from sly_progress_utils import get_progress_cb, reset_progress, init_progress
 
 progress_index = 1
 _images_infos = None # dataset_name -> image_name -> image_info
