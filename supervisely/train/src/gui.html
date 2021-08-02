@@ -1,3 +1,7 @@
 <div id="unet-train">
-    123
+    <sly-stepper :active="state.activeStep">
+        <sly-stepper-item>
+            {% include 'supervisely/train/src/ui/step01_input_project.html' %}
+        </sly-stepper-item>
+    </sly-stepper>
 </div>
