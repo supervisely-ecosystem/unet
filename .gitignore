@@ -1,1 +1,3 @@
 .idea
+/supervisely/train/secret_debug.env
+/supervisely_lib
