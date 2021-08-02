@@ -1,4 +1,8 @@
 import supervisely_lib as sly
+import sly_globals as g
+
+
+selected_classes = None
 
 
 def init(api: sly.Api, data, state, project_id, project_meta: sly.ProjectMeta):
@@ -39,3 +43,18 @@ def init(api: sly.Api, data, state, project_id, project_meta: sly.ProjectMeta):
     data["done3"] = False
     state["collapsed3"] = True
     state["disabled3"] = True
+
+
+@g.my_app.callback("use_classes")
+@sly.timeit
+@g.my_app.ignore_errors_and_show_dialog_window()
+def use_classes(api: sly.Api, task_id, context, state, app_logger):
+    global selected_classes
+    selected_classes = state["selectedClasses"]
+    fields = [
+        {"field": "data.done3", "payload": True},
+        {"field": "state.collapsed4", "payload": False},
+        {"field": "state.disabled4", "payload": False},
+        {"field": "state.activeStep", "payload": 4},
+    ]
+    g.api.app.set_fields(g.task_id, fields)
