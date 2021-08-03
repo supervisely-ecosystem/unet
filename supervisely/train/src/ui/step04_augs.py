@@ -1,10 +1,9 @@
 import os
 import supervisely_lib as sly
 import sly_globals as g
-#from tags import get_random_image
 from supervisely_lib.app.widgets import CompareGallery
-import validate_training_data as td
-import train_config
+import step01_input_project
+import step03_classes
 
 
 _templates = [
@@ -30,7 +29,7 @@ _custom_pipeline_path = None
 custom_pipeline = None
 gallery1: CompareGallery = None
 gallery2: CompareGallery = None
-remote_preview_path = "/temp/preview_augs.jpg"
+remote_preview_path = "/temp/unet/preview_augs.jpg"
 
 augs_json_config = None
 augs_py_preview = None
@@ -96,9 +95,9 @@ def init(data, state):
     data["gallery1"] = gallery1.to_json()
     gallery2 = CompareGallery(g.task_id, g.api, "data.gallery2", g.project_meta)
     data["gallery2"] = gallery2.to_json()
-    state["collapsed5"] = True
-    state["disabled5"] = True
-    data["done5"] = False
+    state["collapsed4"] = True
+    state["disabled4"] = True
+    data["done4"] = False
 
 
 def restart(data, state):
@@ -126,7 +125,10 @@ def load_existing_pipeline(api: sly.Api, task_id, context, state, app_logger):
 @g.my_app.ignore_errors_and_show_dialog_window()
 def preview_augs(api: sly.Api, task_id, context, state, app_logger):
     global gallery1, gallery2
-    image_info = td.get_random_image()
+
+    ds_name, item_name = step01_input_project.get_random_item()
+    image_info = step01_input_project.get_image_info_from_cache(ds_name, item_name)
+
     if state["augsType"] == "template":
         gallery = gallery1
         augs_ppl = get_template_by_name(state["augsTemplateName"])
@@ -134,9 +136,20 @@ def preview_augs(api: sly.Api, task_id, context, state, app_logger):
         gallery = gallery2
         augs_ppl = custom_pipeline
 
-    img = api.image.download_np(image_info.id)
-    ann_json = api.annotation.download(image_info.id).annotation
-    ann = sly.Annotation.from_json(ann_json, g.project_meta)
+    # old implementation - download from server
+    #img = api.image.download_np(image_info.id)
+    #ann_json = api.annotation.download(image_info.id).annotation
+    #ann = sly.Annotation.from_json(ann_json, g.project_meta)
+    #ann = ann.filter_labels_by_classes(keep_classes=step03_classes.selected_classes)
+
+    # new implementation - read from local directory
+    dataset_fs: sly.Dataset = step01_input_project.project_fs.datasets.get(ds_name)
+    img_path = dataset_fs.get_img_path(item_name)
+    ann_path = dataset_fs.get_ann_path(item_name)
+    img = sly.image.read(img_path) # RGB
+    ann = sly.Annotation.load_json_file(ann_path, step01_input_project.project_fs.meta)
+    ann = ann.filter_labels_by_classes(keep_classes=step03_classes.selected_classes)
+
     gallery.set_left("before", image_info.full_storage_url, ann)
     _, res_img, res_ann = sly.imgaug_utils.apply(augs_ppl, g.project_meta, img, ann)
     local_image_path = os.path.join(g.my_app.data_dir, "preview_augs.jpg")
@@ -155,19 +168,19 @@ def use_augs(api: sly.Api, task_id, context, state, app_logger):
     global augs_config_path
 
     if state["useAugs"] is True:
-        augs_config_path = os.path.join(train_config.configs_dir, "augs_config.json")
+        augs_config_path = os.path.join(g.info_dir, "augs_config.json")
         sly.json.dump_json_file(augs_json_config, augs_config_path)
 
-        augs_py_path = os.path.join(train_config.configs_dir, "augs_preview.py")
+        augs_py_path = os.path.join(g.info_dir, "augs_preview.py")
         with open(augs_py_path, 'w') as f:
             f.write(augs_py_preview)
     else:
         augs_config_path = None
 
     fields = [
-        {"field": "data.done5", "payload": True},
-        {"field": "state.collapsed6", "payload": False},
-        {"field": "state.disabled6", "payload": False},
-        {"field": "state.activeStep", "payload": 6},
+        {"field": "data.done4", "payload": True},
+        {"field": "state.collapsed5", "payload": False},
+        {"field": "state.disabled5", "payload": False},
+        {"field": "state.activeStep", "payload": 5},
     ]
     g.api.app.set_fields(g.task_id, fields)

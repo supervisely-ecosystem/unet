@@ -1,9 +1,10 @@
 import os
 from collections import namedtuple
-import shelve
+import random
 import supervisely_lib as sly
 import sly_globals as g
 from sly_progress_utils import get_progress_cb, reset_progress, init_progress
+
 
 progress_index = 1
 _images_infos = None # dataset_name -> image_name -> image_info
@@ -67,3 +68,12 @@ def get_image_info_from_cache(dataset_name, item_name):
 
 def get_paths_by_image_id(image_id):
     return _image_id_to_paths[image_id]
+
+
+def get_random_item():
+    all_ds_names = project_fs.datasets.keys()
+    ds_name = random.choice(all_ds_names)
+    ds = project_fs.datasets.get(ds_name)
+    items = list(ds)
+    item_name = random.choice(items)
+    return ds_name, item_name
