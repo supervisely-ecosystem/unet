@@ -4,6 +4,7 @@ import step01_input_project
 import step02_splits
 import step03_classes
 import step04_augs
+import step05_models
 
 
 @sly.timeit
@@ -14,3 +15,4 @@ def init(data, state):
     step02_splits.init(g.project_info, g.project_meta, data, state)
     step03_classes.init(g.api, data, state, g.project_id, g.project_meta)
     step04_augs.init(data, state)
+    step05_models.init(data, state)
