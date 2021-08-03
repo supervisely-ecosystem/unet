@@ -31,7 +31,7 @@ if __name__ == '__main__':
         input_size=256,
     )
     from torch.utils.data import Dataset, DataLoader
-    dataloader = DataLoader(dataset, batch_size=7, shuffle=True, num_workers=0)
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0)
     inputs, masks = next(iter(dataloader))
     print(inputs.shape, masks.shape)
     for x in [inputs.numpy(), masks.numpy()]:

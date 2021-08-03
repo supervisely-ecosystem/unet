@@ -20,13 +20,13 @@ class SlySegDataset(Dataset):
         self.transforms_img = transforms.Compose([
             # step0 - sly_augs will be applied here
             transforms.ToTensor(),
-            transforms.Resize(size=input_size, interpolation=transforms.InterpolationMode.NEAREST),
+            transforms.Resize(size=[input_size, input_size], interpolation=transforms.InterpolationMode.NEAREST),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
         ])
         self.transforms_ann = transforms.Compose([
             # step0 - sly_augs will be applied here
             transforms.ToTensor(),
-            transforms.Resize(size=input_size, interpolation=transforms.InterpolationMode.NEAREST),
+            transforms.Resize(size=[input_size, input_size], interpolation=transforms.InterpolationMode.NEAREST),
         ])
 
     def __len__(self):
