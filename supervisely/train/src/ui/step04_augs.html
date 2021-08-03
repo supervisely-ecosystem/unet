@@ -33,7 +33,7 @@
                     </sly-editor>
                 </sly-copy-to-clipboard>
             </sly-field>
-            <el-button type="primary" class="regular" :plain="true" @click="command('preview_augs')">
+            <el-button type="primary" class="regular" :plain="true" @click="command('preview_augs')" :disabled="data.done4">
                 <i class="zmdi zmdi-play mr5"></i>Preview on random image
             </el-button>
             <sly-grid-gallery
@@ -62,7 +62,8 @@
                             style="margin-left: 5px;"
                             type="primary" class="regular" size="small"
                             :disabled="state.customAugsPath.length === 0 || data.done4"
-                            @click="command('load_existing_pipeline')">
+                            @click="command('load_existing_pipeline')"
+                            :disabled="data.done4">
                         Load
                     </el-button>
                 </div>
@@ -75,7 +76,7 @@
                 </sly-copy-to-clipboard>
             </sly-field>
             <div v-if="data.customAugsPy">
-                <el-button type="primary" class="regular" :plain="true" @click="command('preview_augs')">
+                <el-button type="primary" class="regular" :plain="true" @click="command('preview_augs')" :disabled="data.done4">
                     <i class="zmdi zmdi-play mr5"></i>Preview on random image
                 </el-button>
                 <sly-grid-gallery
