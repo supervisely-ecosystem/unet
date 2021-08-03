@@ -2,7 +2,7 @@ import os
 
 import step01_input_project
 import supervisely_lib as sly
-from sly_progress_utils import init_progress, get_progress_cb
+from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
 import step03_classes
 
@@ -42,15 +42,23 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         # convert project to segmentation masks
         global project_dir_seg
         project_dir_seg = os.path.join(g.my_app.data_dir, g.project_info.name + "_seg")
-        sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
 
-        progress_cb = get_progress_cb(
-            index="Train1",
-            message="Convert SLY annotations to segmentation masks",
-            total=step01_input_project.project_fs.total_items
-        )
-        sly.Project.to_segmentation_task(g.project_dir, project_dir_seg,
-                                         target_classes=step03_classes.selected_classes, progress_cb=progress_cb)
+        if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
+            sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
+            progress_cb = get_progress_cb(
+                index="Train1",
+                message="Convert SLY annotations to segmentation masks",
+                total=step01_input_project.project_fs.total_items
+            )
+            sly.Project.to_segmentation_task(
+                g.project_dir, project_dir_seg,
+                target_classes=step03_classes.selected_classes,
+                progress_cb=progress_cb
+            )
+            reset_progress(index="Train1")
+
+
+
 
 
 
