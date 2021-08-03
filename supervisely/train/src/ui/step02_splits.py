@@ -2,8 +2,13 @@ import os
 import supervisely_lib as sly
 import sly_globals as g
 
+import step01_input_project
+
 train_set = None
 val_set = None
+
+train_set_path = os.path.join(g.info_dir, "train_set.json")
+val_set_path = os.path.join(g.info_dir, "val_set.json")
 
 
 def init(project_info, project_meta: sly.ProjectMeta, data, state):
@@ -81,16 +86,6 @@ def verify_train_val_sets(train_set, val_set):
         raise ValueError("Val set is empty, check or change split configuration")
 
 
-# def save_set_to_json(path, items):
-#     res = []
-#     for item in items:
-#         res.append({
-#             "img_path": item.img_path,
-#             "ann_path": item.ann_path
-#         })
-#     sly.json.dump_json_file(res, path)
-
-
 @g.my_app.callback("create_splits")
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()
@@ -125,5 +120,21 @@ def create_splits(api: sly.Api, task_id, context, state, app_logger):
             ])
         g.api.app.set_fields(g.task_id, fields)
 
-    # save_set_to_json(os.path.join(g.project_dir, "train_set.json"), train_set)
-    # save_set_to_json(os.path.join(g.project_dir, "val_set.json"), val_set)
+    _save_set_to_json(step01_input_project.project_fs, train_set_path, train_set)
+    _save_set_to_json(step01_input_project.project_fs, val_set_path, val_set)
+
+
+def _save_set_to_json(project_fs, save_path, items):
+    res = []
+    for item in items:
+        dataset_fs = project_fs.datasets.get(item.dataset_name)
+        dataset_fs: sly.Dataset
+
+        res.append({
+            "dataset_name": item.dataset_name,
+            "item_name": item.name,
+            "img_path": item.img_path,
+            "sly_ann_path": item.ann_path,
+            "seg_mask_path": dataset_fs.get_seg_path(item.name)
+        })
+    sly.json.dump_json_file(res, save_path)
