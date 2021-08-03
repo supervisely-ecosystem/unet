@@ -71,6 +71,7 @@ def get_paths_by_image_id(image_id):
 
 
 def get_random_item():
+    global project_fs
     all_ds_names = project_fs.datasets.keys()
     ds_name = random.choice(all_ds_names)
     ds = project_fs.datasets.get(ds_name)

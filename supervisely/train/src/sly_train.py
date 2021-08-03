@@ -20,6 +20,7 @@ def main():
 
 
 #@TODO: change predefined augs
+#@TODO: disable rotate reflect - iaa.geometric.Rotate
 if __name__ == "__main__":
     sly.main_wrapper("main", main)
     main()
