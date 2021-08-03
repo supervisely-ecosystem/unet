@@ -5,7 +5,7 @@ from pathlib import Path
 
 import sly_globals as g
 import supervisely_lib as sly
-from sly_train_progress import get_progress_cb, reset_progress, init_progress
+from sly_progress_utils import get_progress_cb, reset_progress, init_progress
 
 
 local_weights_path = None

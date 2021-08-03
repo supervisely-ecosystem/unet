@@ -9,7 +9,7 @@
         <el-tab-pane name="random" :disabled="data.done5">
             <el-radio slot="label" v-model="state.weightsInitialization" label="random" :disabled="data.done5">
                 Start from scratch
-                <div>Initialize models with random weights. ResNet based models are initialized with weights from ImageNet</div>
+                <div>Initialize models with random weights, ResNet based models are initialized with weights from ImageNet</div>
             </el-radio>
             <table class="beautiful-table">
                 <thead>
@@ -41,6 +41,7 @@
         <el-tab-pane name="custom" :disabled="data.done5">
             <el-radio slot="label" v-model="state.weightsInitialization" label="custom" :disabled="data.done5">
                 Custom weights
+                <div>Define path in Team Files to your weights</div>
             </el-radio>
             <sly-field title="Path to weights file" description="Copy path in Team Files">
                 <el-input v-model="state.weightsPath" :disabled="data.done5" placeholder="Path to .pt file in Team Files"></el-input>
@@ -51,7 +52,7 @@
                @click="command('download_weights')"
                :loading="!!data.progress5"
                v-if="!data.done5">
-        Download model weights
+        Use selected model
     </el-button>
     <div v-if="data.progress5" class="mt10">
         <div style="color: #20a0ff">{{data.progress5}}: {{data.progressCurrent5}} / {{data.progressTotal5}}</div>
@@ -59,7 +60,7 @@
     </div>
     <div v-if="data.done5">
         <i class="zmdi zmdi-check-circle mr5 mt10" style="color: #13ce66"></i>
-        <span style="color: #5a6772;">Model init weights has been successfully downloaded</span>
+        <span style="color: #5a6772;">Model has been successfully defined</span>
     </div>
     <el-button type="warning" class="regular mt10" :plain="true"
                @click="state.restartFrom = 5;"
