@@ -34,8 +34,7 @@ def download(api: sly.Api, task_id, context, state, app_logger):
             sly.fs.mkdir(g.project_dir)
             download_progress = get_progress_cb(progress_index, "Download project", g.project_info.items_count * 2)
             sly.download_project(g.api, g.project_id, g.project_dir,
-                                 cache=g.my_app.cache, progress_cb=download_progress,
-                                 only_image_tags=True, save_image_info=True)
+                                 cache=g.my_app.cache, progress_cb=download_progress, save_image_info=True)
             reset_progress(progress_index)
 
         global project_fs
