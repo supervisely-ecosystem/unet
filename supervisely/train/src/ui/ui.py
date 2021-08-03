@@ -5,6 +5,7 @@ import step02_splits
 import step03_classes
 import step04_augs
 import step05_models
+import step06_hyperparameters
 
 
 @sly.timeit
@@ -16,3 +17,4 @@ def init(data, state):
     step03_classes.init(g.api, data, state, g.project_id, g.project_meta)
     step04_augs.init(data, state)
     step05_models.init(data, state)
+    step06_hyperparameters.init(data, state)
