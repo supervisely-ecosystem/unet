@@ -4,7 +4,6 @@ import sly_globals as g
 
 
 selected_classes = None
-model_classes_path = os.path.join(g.info_dir, "model_classes.json")
 
 
 def init(api: sly.Api, data, state, project_id, project_meta: sly.ProjectMeta):

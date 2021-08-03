@@ -1,13 +1,17 @@
 import os
 
 import step01_input_project
+import step02_splits
 import supervisely_lib as sly
 from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
 import step03_classes
+from sly_seg_dataset import SlySegDataset
+
 
 _open_lnk_name = "open_app.lnk"
 project_dir_seg = None
+model_classes_path = os.path.join(g.info_dir, "model_classes.json")
 
 
 def init(data, state):
@@ -43,7 +47,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         global project_dir_seg
         project_dir_seg = os.path.join(g.my_app.data_dir, g.project_info.name + "_seg")
 
-        if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
+        if True: #sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
             sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
             progress_cb = get_progress_cb(
                 index="Train1",
@@ -56,6 +60,13 @@ def train(api: sly.Api, task_id, context, state, app_logger):
                 progress_cb=progress_cb
             )
             reset_progress(index="Train1")
+
+            # model classes = selected_classes + bg
+            project_seg = sly.Project(project_dir_seg, sly.OpenMode.READ)
+            classes_json = project_seg.meta.obj_classes.to_json()
+
+            # save model classes info + classes order. Order is used to convert model predictions to correct masks for every class
+            sly.json.dump_json_file(classes_json, model_classes_path)
 
 
 
