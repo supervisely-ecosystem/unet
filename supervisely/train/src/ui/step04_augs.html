@@ -1,0 +1,127 @@
+<sly-card title="Training augmentations"
+          subtitle="Choose one of the prepared templates or provide custom pipeline. Only objects of selected classes
+          are shown in preview."
+          :options="{collapsable: true}"
+          :collapsed.sync="state.collapsed4"
+          :disabled="{disabled: state.disabled4, message: 'Select training classes at step 3 before configure augmentations'}"
+          ref="step4"
+>
+    <div class="fflex">
+        <el-switch v-model="state.useAugs" :disabled="data.done4"></el-switch>
+        <div class="ml10">Augmentations</div>
+    </div>
+    <el-tabs type="border-card" class="el-tabs-cards mt10" v-model="state.augsType" v-if="state.useAugs">
+        <el-tab-pane name="template" :disabled="data.done4">
+            <el-radio slot="label" v-model="state.augsType" label="template" :disabled="data.done4">
+                Default templates
+                <div>Choose one of the prepared templates</div>
+            </el-radio>
+            <sly-field title="Template">
+                <el-select v-model="state.augsTemplateName" placeholder="Select template" :disabled="data.done4">
+                    <el-option
+                            v-for="item in data.augTemplates"
+                            :key="item.name"
+                            :label="item.name"
+                            :value="item.name">
+                    </el-option>
+                </el-select>
+            </sly-field>
+            <sly-field title="Preview python representation">
+                <sly-copy-to-clipboard :data="data.augPythonCode[state.augsTemplateName]">
+                    <sly-editor v-model="data.augPythonCode[state.augsTemplateName]"
+                                :options="data.pyViewOptions">
+                    </sly-editor>
+                </sly-copy-to-clipboard>
+            </sly-field>
+            <el-button type="primary" class="regular" :plain="true" @click="command('preview_augs')">
+                <i class="zmdi zmdi-play mr5"></i>Preview on random image
+            </el-button>
+            <sly-grid-gallery
+                    v-if="data.gallery1 && state.augsType == 'template'"
+                    class="mt10"
+                    :content="data.gallery1.content"
+                    :options="data.gallery1.options">
+                <template v-slot:card-footer="{ annotation }">
+                    <div class="mt5" style="text-align: center">
+                        <el-tag type="primary">{{annotation.title}}</el-tag>
+                    </div>
+                </template>
+            </sly-grid-gallery>
+        </el-tab-pane>
+        <el-tab-pane name="custom" :disabled="data.done4">
+            <el-radio slot="label" v-model="state.augsType" label="custom" :disabled="data.done4">
+                Custom pipeline
+                <div>Use ImgAug Studio app to configure and save custom augmentations</div>
+            </el-radio>
+            <sly-field title="Path to JSON configuration" description="Copy path in Team Files">
+                <div class="fflex">
+                    <el-input v-model="state.customAugsPath"
+                              placeholder="Path to .json file in Team Files"
+                              :disabled="data.done4"></el-input>
+                    <el-button
+                            style="margin-left: 5px;"
+                            type="primary" class="regular" size="small"
+                            :disabled="state.customAugsPath.length === 0 || data.done4"
+                            @click="command('load_existing_pipeline')">
+                        Load
+                    </el-button>
+                </div>
+            </sly-field>
+            <sly-field title="Preview python representation" v-if="data.customAugsPy">
+                <sly-copy-to-clipboard :data="data.customAugsPy">
+                    <sly-editor v-model="data.customAugsPy"
+                                :options="data.pyViewOptions">
+                    </sly-editor>
+                </sly-copy-to-clipboard>
+            </sly-field>
+            <div v-if="data.customAugsPy">
+                <el-button type="primary" class="regular" :plain="true" @click="command('preview_augs')">
+                    <i class="zmdi zmdi-play mr5"></i>Preview on random image
+                </el-button>
+                <sly-grid-gallery
+                        v-if="data.gallery2 && state.augsType == 'custom'"
+                        class="mt10"
+                        :content="data.gallery2.content"
+                        :options="data.gallery2.options">
+                    <template v-slot:card-footer="{ annotation }">
+                        <div class="mt5" style="text-align: center">
+                            <el-tag type="primary">{{annotation.title}}</el-tag>
+                        </div>
+                    </template>
+                </sly-grid-gallery>
+            </div>
+        </el-tab-pane>
+    </el-tabs>
+
+    <div v-if="state.useAugs">
+        <div class="fflex mt10" v-if="!data.done4">
+            <el-button type="primary" class="regular" @click="command('use_augs')">Use {{state.augsType}} augs
+            </el-button>
+        </div>
+        <div v-if="data.done4">
+            <i class="zmdi zmdi-check-circle mr5 mt10" style="color: #13ce66"></i>
+            <span style="color: #5a6772;">Augmentations has been successfully defined</span>
+        </div>
+        <el-button type="warning" class="regular mt10" :plain="true"
+                   @click="state.restartFrom = 4;"
+                   v-if="data.done4">
+            <i class="zmdi zmdi-rotate-left mr5"></i> Select other augs
+        </el-button>
+    </div>
+    <div v-if="!state.useAugs">
+        <div class="fflex mt10" v-if="!data.done4">
+            <el-button type="primary" class="regular" @click="command('use_augs')">Next step</el-button>
+        </div>
+        <div v-if="data.done4">
+            <i class="zmdi zmdi-check-circle mr5 mt10" style="color: #13ce66"></i>
+            <span style="color: #5a6772;">You choose training without augmentations</span>
+        </div>
+        <el-button type="warning" class="regular mt10" :plain="true"
+                   @click="state.restartFrom = 4;"
+                   v-if="data.done5 && !state.started">
+            <i class="zmdi zmdi-rotate-left mr5"></i> Change
+        </el-button>
+    </div>
+
+
+</sly-card>

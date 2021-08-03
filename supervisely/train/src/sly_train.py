@@ -19,6 +19,7 @@ def main():
     g.my_app.run(data=data, state=state)
 
 
+#@TODO: change predefined augs
 if __name__ == "__main__":
-    #sly.main_wrapper("main", main)
+    sly.main_wrapper("main", main)
     main()
