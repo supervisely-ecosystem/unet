@@ -8,7 +8,7 @@ def init(data, state):
     state["gpusId"] = '0'
 
     state["imgSize"] = 256
-    state["batchSizePerGPU"] = 32
+    state["batchSizePerGPU"] = 8
     state["workersPerGPU"] = 0  #@TODO: 0 - for debug
     state["valInterval"] = 1
     state["metricsPeriod"] = 10
@@ -27,9 +27,11 @@ def init(data, state):
 
     state["lrPolicyEnabled"] = False
 
-    file_path = os.path.join(g.root_source_dir, "supervisely/train/configs/lr_policy.py")
-    with open(file_path) as f:
-        state["lrPolicyPyConfig"] = f.read()
+    #@TODO: LR policy
+    # file_path = os.path.join(g.root_source_dir, "supervisely/train/configs/lr_policy.py")
+    # with open(file_path) as f:
+    #     state["lrPolicyPyConfig"] = f.read()
+    state["lrPolicyPyConfig"] = ""
 
     state["collapsed6"] = True
     state["disabled6"] = True
