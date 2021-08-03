@@ -6,6 +6,7 @@ import step03_classes
 import step04_augs
 import step05_models
 import step06_hyperparameters
+import step07_train
 
 
 @sly.timeit
@@ -18,3 +19,4 @@ def init(data, state):
     step04_augs.init(data, state)
     step05_models.init(data, state)
     step06_hyperparameters.init(data, state)
+    step07_train.init(data, state)

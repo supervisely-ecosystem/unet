@@ -1,3 +1,25 @@
-<div>
-
-</div>
+<!--          :options="{collapsable: true}"-->
+<!--          :collapsed.sync="state.collapsed7"-->
+<!--          :disabled="{disabled: state.disabled7, message: 'Finish previous steps before run training'}"-->
+<sly-card title="Training progress"
+          subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
+          ref="step7"
+>
+    <sly-field title="Experiment name"
+               description="Training artifacts will be saved to the following directory in team files: /unet/<task_id>_<experiment name>">
+        <el-input v-model="state.expName" :disabled="state.started"></el-input>
+    </sly-field>
+    <el-button v-if="!state.done7"
+               type="primary" class="regular"
+               @click="state.started = true; command('train')"
+               :loading="state.started === true"
+    >
+        <i class="zmdi zmdi-play mr5"></i> Train
+    </el-button>
+    <div v-if="data.progressTrain1 && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressTrain1}}: {{data.progressCurrentTrain1}} / {{data.progressTotalTrain1}}
+        </div>
+        <el-progress :percentage="data.progressPercentTrain1"></el-progress>
+    </div>
+</sly-card>
