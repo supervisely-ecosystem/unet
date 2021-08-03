@@ -25,12 +25,16 @@ def main():
 # --data coco128.yaml --cfg yolov5s.yaml --weights yolov5s.pt --batch-size 64
 if __name__ == '__main__':
     dataset = SlySegDataset(
+        project_dir="/app_debug_data/data/Lemons (Annotated)_seg",
         model_classes_path="/app_debug_data/data/artifacts/info/model_classes.json",
         split_path="/app_debug_data/data/artifacts/info/train_set.json",
         input_size=256,
     )
     from torch.utils.data import Dataset, DataLoader
-    loader = DataLoader(dataset, batch_size=7, shuffle=True, num_workers=0)
-
+    dataloader = DataLoader(dataset, batch_size=7, shuffle=True, num_workers=0)
+    inputs, masks = next(iter(dataloader))
+    print(inputs.shape, masks.shape)
+    for x in [inputs.numpy(), masks.numpy()]:
+        print(x.min(), x.max(), x.mean(), x.std())
 
     #main()

@@ -6,7 +6,9 @@ import numpy as np
 
 
 class SlySegDataset(Dataset):
-    def __init__(self, model_classes_path, split_path, input_size, sly_augs=None):
+    def __init__(self, project_dir, model_classes_path, split_path, input_size, sly_augs=None):
+        self.project_fs = sly.Project(project_dir, sly.OpenMode.READ)
+
         self.input_items = sly.json.load_json_file(split_path)
         self.model_classes_path = model_classes_path
         model_classes_json = sly.json.load_json_file(model_classes_path)
@@ -17,36 +19,41 @@ class SlySegDataset(Dataset):
 
         self.transforms_img = transforms.Compose([
             # step0 - sly_augs will be applied here
-            transforms.Resize(size=input_size, interpolation=transforms.InterpolationMode.NEAREST),
             transforms.ToTensor(),
+            transforms.Resize(size=input_size, interpolation=transforms.InterpolationMode.NEAREST),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
         ])
         self.transforms_ann = transforms.Compose([
             # step0 - sly_augs will be applied here
-            transforms.Resize(size=input_size, interpolation=transforms.InterpolationMode.NEAREST),
             transforms.ToTensor(),
+            transforms.Resize(size=input_size, interpolation=transforms.InterpolationMode.NEAREST),
         ])
 
     def __len__(self):
         return len(self.input_items)
 
     def __getitem__(self, idx):
-        image_path = self.input_items[idx]["img_path"]
-        mask_path = self.input_items[idx]["mask_path"]
+        dataset_name = self.input_items[idx]["dataset_name"]
+        item_name = self.input_items[idx]["item_name"]
+
+        dataset_fs = self.project_fs.datasets.get(dataset_name)
+        dataset_fs: sly.Dataset
+
+        image_path = dataset_fs.get_img_path(item_name)
+        mask_path = dataset_fs.get_seg_path(item_name)
 
         image = sly.image.read(image_path)  # RGB
         mask = sly.image.read(mask_path)    # RGB
-        mask = self._convert_mask_to_tensor(mask)
+        mask = self._unpack_mask(mask)
 
         if self.sly_augs:
             image, mask = self.sly_augs(image, mask)
 
         image = self.transforms_img(image)
-        mask = self.transforms_ann(image)
-
+        mask = self.transforms_ann(mask)
         return [image, mask]
 
-    def _convert_mask_to_tensor(self, mask):
+    def _unpack_mask(self, mask):
         # output shape - [height, width, num_classes]
         height, width = mask.shape[:2]
         segmentation_mask = np.zeros((height, width, len(self.model_classes)), dtype=np.float32)

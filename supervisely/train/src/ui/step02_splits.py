@@ -120,21 +120,15 @@ def create_splits(api: sly.Api, task_id, context, state, app_logger):
             ])
         g.api.app.set_fields(g.task_id, fields)
 
-    _save_set_to_json(step01_input_project.project_fs, train_set_path, train_set)
-    _save_set_to_json(step01_input_project.project_fs, val_set_path, val_set)
+    _save_set_to_json(train_set_path, train_set)
+    _save_set_to_json(val_set_path, val_set)
 
 
-def _save_set_to_json(project_fs, save_path, items):
+def _save_set_to_json(save_path, items):
     res = []
     for item in items:
-        dataset_fs = project_fs.datasets.get(item.dataset_name)
-        dataset_fs: sly.Dataset
-
         res.append({
             "dataset_name": item.dataset_name,
-            "item_name": item.name,
-            "img_path": item.img_path,
-            "sly_ann_path": item.ann_path,
-            "seg_mask_path": dataset_fs.get_seg_path(item.name)
+            "item_name": item.name
         })
     sly.json.dump_json_file(res, save_path)
