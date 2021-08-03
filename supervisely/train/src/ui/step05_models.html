@@ -1,0 +1,69 @@
+<sly-card title="Model settings"
+          subtitle="Choose model architecture and how weights should be initialized"
+          :options="{collapsable: true}"
+          :collapsed.sync="state.collapsed5"
+          :disabled="{disabled: state.disabled5, message: 'Finish previous steps before choose NN architecture'}"
+          ref="step5"
+>
+    <el-tabs type="border-card" class="el-tabs-cards" v-model="state.weightsInitialization">
+        <el-tab-pane name="random" :disabled="data.done5">
+            <el-radio slot="label" v-model="state.weightsInitialization" label="random" :disabled="data.done5">
+                Start from scratch
+                <div>Initialize models with random weights. ResNet based models are initialized with weights from ImageNet</div>
+            </el-radio>
+            <table class="beautiful-table">
+                <thead>
+                <tr>
+                    <th v-for="row in data.modelColumns">
+                        <div v-html="row['title']"></div>
+                        <div style="color: #7f858e; font-weight: normal; font-size: 12px;">
+                            {{row["subtitle"]}}
+                        </div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="model in data.models">
+                    <td v-for="column in data.modelColumns">
+                        <div v-if="column.title === 'Model'">
+                            <el-radio class="radio" v-model="state.selectedModel" :label="model[column.key]" :disabled="data.done5">
+                                {{model[column.key]}}
+                            </el-radio>
+                        </div>
+                        <div v-else>
+                            {{model[column.key]}}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </el-tab-pane>
+        <el-tab-pane name="custom" :disabled="data.done5">
+            <el-radio slot="label" v-model="state.weightsInitialization" label="custom" :disabled="data.done5">
+                Custom weights
+            </el-radio>
+            <sly-field title="Path to weights file" description="Copy path in Team Files">
+                <el-input v-model="state.weightsPath" :disabled="data.done5" placeholder="Path to .pt file in Team Files"></el-input>
+            </sly-field>
+        </el-tab-pane>
+    </el-tabs>
+    <el-button type="primary" class="regular mt10"
+               @click="command('download_weights')"
+               :loading="!!data.progress5"
+               v-if="!data.done5">
+        Download model weights
+    </el-button>
+    <div v-if="data.progress5" class="mt10">
+        <div style="color: #20a0ff">{{data.progress5}}: {{data.progressCurrent5}} / {{data.progressTotal5}}</div>
+        <el-progress :percentage="data.progressPercent5"></el-progress>
+    </div>
+    <div v-if="data.done5">
+        <i class="zmdi zmdi-check-circle mr5 mt10" style="color: #13ce66"></i>
+        <span style="color: #5a6772;">Model init weights has been successfully downloaded</span>
+    </div>
+    <el-button type="warning" class="regular mt10" :plain="true"
+               @click="state.restartFrom = 5;"
+               v-if="data.done5 && !state.started">
+        <i class="zmdi zmdi-rotate-left mr5"></i> Select another model
+    </el-button>
+</sly-card>
