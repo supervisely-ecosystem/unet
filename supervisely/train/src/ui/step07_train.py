@@ -39,6 +39,50 @@ def restart(data, state):
     data["done7"] = False
 
 
+def init_chart(title, names, xs, ys, smoothing=None, yrange=None, decimals=None, xdecimals=None):
+    series = []
+    for name, x, y in zip(names, xs, ys):
+        series.append({
+            "name": name,
+            "data": [[px, py] for px, py in zip(x, y)]
+        })
+    result = {
+        "options": {
+            "title": title,
+            #"groupKey": "my-synced-charts",
+        },
+        "series": series
+    }
+    if smoothing is not None:
+        result["options"]["smoothingWeight"] = smoothing
+    if yrange is not None:
+        result["options"]["yaxisInterval"] = yrange
+    if decimals is not None:
+        result["options"]["decimalsInFloat"] = decimals
+    if xdecimals is not None:
+        result["options"]["xaxisDecimalsInFloat"] = xdecimals
+    return result
+
+# time
+# train: bce: 0.461035, dice: 0.679971, loss: 0.570503
+# val: bce: 0.449126, dice: 0.657913, loss: 0.553519
+
+
+def init_charts(data, state):
+    # demo_x = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+    # demo_y = [[0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001]]
+    data["chartLR"] = init_chart("LR", names=["LR"], xs=[[]], ys=[[]], smoothing=None,
+                                 yrange=[state["lr"] - state["lr"] / 2.0, state["lr"] + state["lr"] / 2.0],
+                                 decimals=6, xdecimals=2)
+    data["chartTrainLoss"] = init_chart("Train Loss", names=["train"], xs=[[]], ys=[[]], smoothing=0.6, xdecimals=2)
+    data["chartValAccuracy"] = init_chart("Val Acc", names=["top-1", "top-5"], xs=[[], []], ys=[[], []], smoothing=0.6)
+
+    data["chartTime"] = init_chart("Time", names=["time"], xs=[[]], ys=[[]], xdecimals=2)
+    data["chartDataTime"] = init_chart("Data Time", names=["data_time"], xs=[[]], ys=[[]], xdecimals=2)
+    data["chartMemory"] = init_chart("Memory", names=["memory"], xs=[[]], ys=[[]], xdecimals=2)
+    state["smoothing"] = 0.6
+
+
 @g.my_app.callback("train")
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()

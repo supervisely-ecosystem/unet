@@ -214,6 +214,7 @@ def train(opt):
 # test with inference apps
 # docs
 # train from custom weights
+# training ETA
 # video - how to fork and start debug on custom instance?
 
 if __name__ == '__main__':

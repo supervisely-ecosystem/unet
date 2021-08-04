@@ -22,4 +22,24 @@
         </div>
         <el-progress :percentage="data.progressPercentTrain1"></el-progress>
     </div>
+
+    <sly-field title="Training charts" description="Real-time training metrics">
+        <div class="fflex">
+            <sly-line-chart
+                    style="width: 33%;"
+                    :options.sync="data.chartLR.options"
+                    :content="data.chartLR.series">
+            </sly-line-chart>
+            <sly-line-chart
+                    style="width: 33%;"
+                    :options.sync="data.chartTrainLoss.options"
+                    :content="data.chartTrainLoss.series">
+            </sly-line-chart>
+            <sly-line-chart
+                    style="width: 33%;"
+                    :options.sync="data.chartValAccuracy.options"
+                    :content="data.chartValAccuracy.series">
+            </sly-line-chart>
+        </div>
+    </sly-field>
 </sly-card>
