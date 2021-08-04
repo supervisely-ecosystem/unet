@@ -1,11 +1,21 @@
 import argparse
+import torch
+import torch.nn as nn
+from collections import defaultdict
+import torch.nn.functional as F
 import supervisely_lib as sly
+import copy
+import time
 
 from sly_seg_dataset import SlySegDataset
+from loss import dice_loss
+from unet_classic import UNet
 
 
 def main():
     parser = argparse.ArgumentParser()
+    # model architecture
+    parser.add_argument('--model', default='UNet-classic', help='model architecture name')
 
     # for data loader
     parser.add_argument('--project-dir', default='', help='path to sly project with segmentation masks')
@@ -33,7 +43,7 @@ def main():
     parser.add_argument('--gamma-exp', type=float, default=0.9, help='used only with StepLR and ExponentialLR')
 
     # system
-    parser.add_argument('--gpus-id', default='cuda:0')
+    parser.add_argument('--gpu-id', default='cuda:0')
     parser.add_argument('--num-workers', type=int, default=0)
 
     # logging
@@ -55,27 +65,110 @@ def main():
     opt = parser.parse_args()
     print("Input arguments:", opt)
 
-
-# for debug
-# --data coco128.yaml --cfg yolov5s.yaml --weights yolov5s.pt --batch-size 64
-# https://stackoverflow.com/questions/21986194/how-to-pass-dictionary-items-as-function-arguments-in-python/21986301
+    train(opt)
 
 
-def f(a, b, c, d):
-    print(f"a={a}, b={b}, c={c}, d={d}")
+def calc_loss(pred, target, metrics, bce_weight=0.5):
+    bce = F.binary_cross_entropy_with_logits(pred, target)
+
+    pred = F.sigmoid(pred)
+    dice = dice_loss(pred, target)
+
+    loss = bce * bce_weight + dice * (1 - bce_weight)
+
+    metrics['bce'] += bce.data.cpu().numpy() * target.size(0)
+    metrics['dice'] += dice.data.cpu().numpy() * target.size(0)
+    metrics['loss'] += loss.data.cpu().numpy() * target.size(0)
+
+    return loss
+
+
+def print_metrics(metrics, epoch_samples, phase):
+    outputs = []
+    for k in metrics.keys():
+        outputs.append("{}: {:4f}".format(k, metrics[k] / epoch_samples))
+
+    print("{}: {}".format(phase, ", ".join(outputs)))
+
+
+def train_model(model, optimizer, scheduler, num_epochs=25):
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_loss = 1e10
+
+    for epoch in range(num_epochs):
+        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('-' * 10)
+
+        since = time.time()
+
+        # Each epoch has a training and validation phase
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                scheduler.step()
+                for param_group in optimizer.param_groups:
+                    print("LR", param_group['lr'])
+
+                model.train()  # Set model to training mode
+            else:
+                model.eval()  # Set model to evaluate mode
+
+            metrics = defaultdict(float)
+            epoch_samples = 0
+
+            # for inputs, labels in dataloaders[phase]:
+            #     inputs = inputs.to(device)
+            #     labels = labels.to(device)
+            #
+            #     # zero the parameter gradients
+            #     optimizer.zero_grad()
+            #
+            #     # forward
+            #     # track history if only in train
+            #     with torch.set_grad_enabled(phase == 'train'):
+            #         outputs = model(inputs)
+            #         loss = calc_loss(outputs, labels, metrics)
+            #
+            #         # backward + optimize only if in training phase
+            #         if phase == 'train':
+            #             loss.backward()
+            #             optimizer.step()
+            #
+            #     # statistics
+            #     epoch_samples += inputs.size(0)
+
+            print_metrics(metrics, epoch_samples, phase)
+            epoch_loss = metrics['loss'] / epoch_samples
+
+            # deep copy the model
+            if phase == 'val' and epoch_loss < best_loss:
+                print("saving best model")
+                best_loss = epoch_loss
+                best_model_wts = copy.deepcopy(model.state_dict())
+
+        time_elapsed = time.time() - since
+        print('{:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Best val loss: {:4f}'.format(best_loss))
+
+    # load best model weights
+    model.load_state_dict(best_model_wts)
+    return model
+
+
+def train(opt):
+    classes = sly.json.load_json_file(opt.classes_path)
+
+    model = None
+    if opt.model == "UNet-classic":
+        model = UNet(len(classes))
+    else:
+        raise RuntimeError(f"Unknown model architecture {opt.model}")
+    device = torch.device(opt.gpu_id)
+    model = model.to(device)
+    pass
 
 
 if __name__ == '__main__':
     main()
-    exit(0)
-
-    params = {
-        "b": 2,
-        "c": 3,
-        "d": 4
-    }
-    f(1, **params)
-
     exit(0)
     dataset = SlySegDataset(
         project_dir="/app_debug_data/data/Lemons (Annotated)_seg",

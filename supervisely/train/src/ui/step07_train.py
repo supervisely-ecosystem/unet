@@ -118,6 +118,9 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
 
 def set_train_arguments(state):
+    # model
+    sys.argv.extend(["--model", state["selectedModel"]])
+
     #for data loader
     sys.argv.extend(["--project-dir", project_dir_seg])
     sys.argv.extend(["--classes-path", model_classes_path])
@@ -148,7 +151,7 @@ def set_train_arguments(state):
         sys.argv.extend(["--lr-schedule", ''])
 
     # system
-    sys.argv.extend(["--gpus-id", f"cuda:{state['gpusId']}"])
+    sys.argv.extend(["--gpu-id", f"cuda:{state['gpusId']}"])
     sys.argv.extend(["--num-workers", str(state['numWorkers'])])
 
     # logging
