@@ -6,19 +6,46 @@ from sly_seg_dataset import SlySegDataset
 
 def main():
     parser = argparse.ArgumentParser()
-    #parser.add_argument('--weights', type=str, default='yolov5s.pt', help='initial weights path')
 
-    parser.add_argument('--project-dir', default='', help='path to sly project with masks')
+    # for data loader
+    parser.add_argument('--project-dir', default='', help='path to sly project with segmentation masks')
     parser.add_argument('--classes-path', default='', help='path to the list of classes (order matters)')
-    parser.add_argument('--train-set-path', default='', help='path to the list of classes (order matters)')
-    parser.add_argument('--val-set-path', default='', help='path to the list of classes (order matters)')
+    parser.add_argument('--train-set-path', default='', help='list of training items')
+    parser.add_argument('--val-set-path', default='', help='list of validation')
 
-
+    # basic hyperparameters
     parser.add_argument('--epochs', type=int, default=5)
-    parser.add_argument('--batch-size', type=int, default=8, help='total batch size for all GPUs')
-    parser.add_argument('--img-size', nargs='+', type=int, default=256, help='model input image size')
-    parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
-    parser.add_argument('--workers', type=int, default=0, help='number of dataloader workers')
+    parser.add_argument('--input-size', type=int, default=256, help='model input image size')
+    parser.add_argument('--batch-size', type=int, default=8)
+
+    # optimizer
+    parser.add_argument('--optimizer', default='SGD', help='SGD / Adam / AdamW')
+    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--momentum', type=float, default=0.9, help='used only with SGD')
+    parser.add_argument('--weight-decay', type=float, default=0.0001)
+    parser.add_argument('--nesterov', action='store_true', help='used only with SGD')
+
+    # lr schedule
+    parser.add_argument('--lr-schedule', default='', help='No schedule (default) / StepLR / ExponentialLR / MultiStepLR')
+    parser.add_argument('--step-size', type=int, default=5, help='used only with StepLR')
+    parser.add_argument('--gamma-step', type=float, default=0.1, help='used only with StepLR and MultiStepLR')
+    parser.add_argument('--milestones', default='[5, 10, 15]', help='used only with MultiStepLR')
+    parser.add_argument('--gamma-exp', type=float, default=0.9, help='used only with StepLR and ExponentialLR')
+
+    # system
+    parser.add_argument('--gpus-id', default='cuda:0')
+    parser.add_argument('--num-workers', type=int, default=0)
+
+    # logging
+    parser.add_argument('--metrics-period', type=int, default=10, help='How often (num of iteration) metrics should be logged')
+
+    # checkpoints
+    parser.add_argument('--val-interval', type=int, default=1, help='Evaluate val set every N epochs')
+    parser.add_argument('--checkpoint-interval', type=int, default=1, help='Save checkpoint every N epochs')
+    parser.add_argument('--save-last', action='store_true', help='save last checkpoint')
+    parser.add_argument('--save-best', action='store_true', help='save best checkpoint')
+
+    # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
 
     opt = parser.parse_args()

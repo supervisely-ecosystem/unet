@@ -103,7 +103,7 @@
         </sly-field>
         <sly-field title="Number of workers"
                    description="Maximum number of dataloader workers, use 0 for debug">
-            <el-input-number v-model="state.workersPerGPU" :min="0" :disabled="data.done6"></el-input-number>
+            <el-input-number v-model="state.numWorkers" :min="0" :disabled="data.done6"></el-input-number>
         </sly-field>
     </sly-field>
 
