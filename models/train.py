@@ -10,6 +10,10 @@ def main():
 
     parser.add_argument('--project-dir', default='', help='path to sly project with masks')
     parser.add_argument('--classes-path', default='', help='path to the list of classes (order matters)')
+    parser.add_argument('--train-set-path', default='', help='path to the list of classes (order matters)')
+    parser.add_argument('--val-set-path', default='', help='path to the list of classes (order matters)')
+
+
     parser.add_argument('--epochs', type=int, default=5)
     parser.add_argument('--batch-size', type=int, default=8, help='total batch size for all GPUs')
     parser.add_argument('--img-size', nargs='+', type=int, default=256, help='model input image size')
