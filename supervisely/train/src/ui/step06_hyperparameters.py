@@ -22,6 +22,7 @@ def init(data, state):
     state["weightDecay"] = 0.0001
     state["nesterov"] = False
 
+    state["lrSchedule"] = "StepLR"
     #state["gradClipEnabled"] = False
     #state["maxNorm"] = 1
 
