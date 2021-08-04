@@ -3,6 +3,10 @@ import torch
 import torch.nn as nn
 from collections import defaultdict
 import torch.nn.functional as F
+from torchsummary import summary
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from torch.optim import lr_scheduler
 import supervisely_lib as sly
 import copy
 import time
@@ -91,7 +95,7 @@ def print_metrics(metrics, epoch_samples, phase):
     print("{}: {}".format(phase, ", ".join(outputs)))
 
 
-def train_model(model, optimizer, scheduler, num_epochs=25):
+def train_model(device, model, dataloaders, optimizer, scheduler=None, num_epochs=25):
     best_model_wts = copy.deepcopy(model.state_dict())
     best_loss = 1e10
 
@@ -104,7 +108,8 @@ def train_model(model, optimizer, scheduler, num_epochs=25):
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
             if phase == 'train':
-                scheduler.step()
+                if scheduler is not None:
+                    scheduler.step()
                 for param_group in optimizer.param_groups:
                     print("LR", param_group['lr'])
 
@@ -115,26 +120,26 @@ def train_model(model, optimizer, scheduler, num_epochs=25):
             metrics = defaultdict(float)
             epoch_samples = 0
 
-            # for inputs, labels in dataloaders[phase]:
-            #     inputs = inputs.to(device)
-            #     labels = labels.to(device)
-            #
-            #     # zero the parameter gradients
-            #     optimizer.zero_grad()
-            #
-            #     # forward
-            #     # track history if only in train
-            #     with torch.set_grad_enabled(phase == 'train'):
-            #         outputs = model(inputs)
-            #         loss = calc_loss(outputs, labels, metrics)
-            #
-            #         # backward + optimize only if in training phase
-            #         if phase == 'train':
-            #             loss.backward()
-            #             optimizer.step()
-            #
-            #     # statistics
-            #     epoch_samples += inputs.size(0)
+            for inputs, labels in dataloaders[phase]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+
+                # zero the parameter gradients
+                optimizer.zero_grad()
+
+                # forward
+                # track history if only in train
+                with torch.set_grad_enabled(phase == 'train'):
+                    outputs = model(inputs)
+                    loss = calc_loss(outputs, labels, metrics)
+
+                    # backward + optimize only if in training phase
+                    if phase == 'train':
+                        loss.backward()
+                        optimizer.step()
+
+                # statistics
+                epoch_samples += inputs.size(0)
 
             print_metrics(metrics, epoch_samples, phase)
             epoch_loss = metrics['loss'] / epoch_samples
@@ -164,23 +169,44 @@ def train(opt):
         raise RuntimeError(f"Unknown model architecture {opt.model}")
     device = torch.device(opt.gpu_id)
     model = model.to(device)
-    pass
+    summary(model, input_size=(3, opt.input_size, opt.input_size))
+
+    optimizer_ft = None
+    if opt.optimizer == "SGD":
+        optimizer_ft = optim.SGD(
+            model.parameters(),
+            lr=opt.lr,
+            momentum=opt.momentum,
+            weight_decay=opt.weight_decay,
+            nesterov=opt.nesterov
+        )
+    elif opt.optimizer == "Adam":
+        optimizer_ft = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+    elif opt.optimizer == "AdamW":
+        optimizer_ft = optim.AdamW(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+    else:
+        raise RuntimeError(f"Unknown optimizer {opt.optimizer}")
+
+    exp_lr_scheduler = None
+    if opt.lr_schedule == "":
+        pass
+    elif opt.lr_schedule == "StepLR":
+        exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=opt.step_size, gamma=opt.gamma_step)
+    elif opt.optimizer == "ExponentialLR":
+        exp_lr_scheduler = lr_scheduler.ExponentialLR(optimizer_ft, gamma=opt.gamma_exp)
+    elif opt.optimizer == "MultiStepLR":
+        exp_lr_scheduler = lr_scheduler.MultiStepLR(optimizer_ft, milestones=opt.milestones, gamma=opt.gamma_step)
+    else:
+        raise RuntimeError(f"Unknown lr_schedule {opt.lr_schedule}")
+
+    train_set = SlySegDataset(opt.project_dir, opt.classes_path, opt.train_set_path, input_size=opt.input_size)
+    val_set = SlySegDataset(opt.project_dir, opt.classes_path, opt.val_set_path, input_size=opt.input_size)
+    dataloaders = {
+        'train': DataLoader(train_set, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers),
+        'val': DataLoader(val_set, batch_size=opt.batch_size, num_workers=opt.num_workers)
+    }
+    model = train_model(device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=opt.epochs)
 
 
 if __name__ == '__main__':
     main()
-    exit(0)
-    dataset = SlySegDataset(
-        project_dir="/app_debug_data/data/Lemons (Annotated)_seg",
-        model_classes_path="/app_debug_data/data/artifacts/info/model_classes.json",
-        split_path="/app_debug_data/data/artifacts/info/train_set.json",
-        input_size=256,
-    )
-    from torch.utils.data import Dataset, DataLoader
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0)
-    inputs, masks = next(iter(dataloader))
-    print(inputs.shape, masks.shape)
-    for x in [inputs.numpy(), masks.numpy()]:
-        print(x.min(), x.max(), x.mean(), x.std())
-
-    #main()
