@@ -75,7 +75,7 @@ def main():
 def calc_loss(pred, target, metrics, bce_weight=0.5):
     bce = F.binary_cross_entropy_with_logits(pred, target)
 
-    pred = F.sigmoid(pred)
+    pred = torch.sigmoid(pred)
     dice = dice_loss(pred, target)
 
     loss = bce * bce_weight + dice * (1 - bce_weight)
@@ -205,7 +205,7 @@ def train(opt):
         'train': DataLoader(train_set, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers),
         'val': DataLoader(val_set, batch_size=opt.batch_size, num_workers=opt.num_workers)
     }
-    model = train_model(device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=opt.epochs)
+    model = train_model(device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=200) #opt.epochs)
 
 
 if __name__ == '__main__':
