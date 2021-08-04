@@ -62,10 +62,6 @@ def main():
     # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
 
-    #@TODO: artifacts dir
-    #@TODO: model architecture
-    #@TODO: augs path
-
     opt = parser.parse_args()
     print("Input arguments:", opt)
 
@@ -205,8 +201,20 @@ def train(opt):
         'train': DataLoader(train_set, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers),
         'val': DataLoader(val_set, batch_size=opt.batch_size, num_workers=opt.num_workers)
     }
-    model = train_model(device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=200) #opt.epochs)
+    model = train_model(device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=opt.epochs)
 
+#@TODOs:
+# augs
+# charts
+# save checkpoints
+# copypaster new archs
+# logging
+# upload artifacts dir
+# serve
+# test with inference apps
+# docs
+# train from custom weights
+# video - how to fork and start debug on custom instance?
 
 if __name__ == '__main__':
     main()
