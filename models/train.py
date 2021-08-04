@@ -48,6 +48,10 @@ def main():
     # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
 
+    #@TODO: artifacts dir
+    #@TODO: model architecture
+    #@TODO: augs path
+
     opt = parser.parse_args()
     print("Input arguments:", opt)
 
@@ -62,6 +66,8 @@ def f(a, b, c, d):
 
 
 if __name__ == '__main__':
+    main()
+    exit(0)
 
     params = {
         "b": 2,

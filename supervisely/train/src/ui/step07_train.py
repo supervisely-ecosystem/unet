@@ -1,4 +1,5 @@
 import os
+import sys
 
 import step01_input_project
 import step02_splits
@@ -46,8 +47,9 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         # convert project to segmentation masks
         global project_dir_seg
         project_dir_seg = os.path.join(g.my_app.data_dir, g.project_info.name + "_seg")
+        sly.fs.remove_dir(project_dir_seg)  # @TODO: for debug
 
-        if True: #sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
+        if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
             sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
             progress_cb = get_progress_cb(
                 index="Train1",
@@ -61,12 +63,16 @@ def train(api: sly.Api, task_id, context, state, app_logger):
             )
             reset_progress(index="Train1")
 
-            # model classes = selected_classes + bg
-            project_seg = sly.Project(project_dir_seg, sly.OpenMode.READ)
-            classes_json = project_seg.meta.obj_classes.to_json()
+        # model classes = selected_classes + bg
+        project_seg = sly.Project(project_dir_seg, sly.OpenMode.READ)
+        classes_json = project_seg.meta.obj_classes.to_json()
 
-            # save model classes info + classes order. Order is used to convert model predictions to correct masks for every class
-            sly.json.dump_json_file(classes_json, model_classes_path)
+        # save model classes info + classes order. Order is used to convert model predictions to correct masks for every class
+        sly.json.dump_json_file(classes_json, model_classes_path)
+
+        set_train_arguments(state)
+        import train
+        train.main()
 
 
 
@@ -109,3 +115,52 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
     # stop application
     g.my_app.stop()
+
+
+def set_train_arguments(state):
+    #for data loader
+    sys.argv.extend(["--project-dir", project_dir_seg])
+    sys.argv.extend(["--classes-path", model_classes_path])
+    sys.argv.extend(["--train-set-path", step02_splits.train_set_path])
+    sys.argv.extend(["--val-set-path", step02_splits.val_set_path])
+
+    # basic hyperparameters
+    sys.argv.extend(["--epochs", str(state["epochs"])])
+    sys.argv.extend(["--input-size", str(state["imgSize"])])
+    sys.argv.extend(["--batch-size", str(state["batchSizePerGPU"])])
+
+    # # optimizer
+    sys.argv.extend(["--optimizer", state["optimizer"]])
+    sys.argv.extend(["--lr", str(state["lr"])])
+    sys.argv.extend(["--momentum", str(state["momentum"])])
+    sys.argv.extend(["--weight-decay", str(state["weightDecay"])])
+    if state["nesterov"]:
+        sys.argv.append("--nesterov")
+
+    # lr schedule
+    if state["lrPolicyEnabled"]:
+        sys.argv.extend(["--lr-schedule", state["lrSchedule"]])
+        sys.argv.extend(["--step-size", str(state["stepSize"])])
+        sys.argv.extend(["--gamma-step", str(state["gammaStep"])])
+        sys.argv.extend(["--milestones", str(state["milestones"])])
+        sys.argv.extend(["--gamma-exp", str(state["gammaExp"])])
+    else:
+        sys.argv.extend(["--lr-schedule", ''])
+
+    # system
+    sys.argv.extend(["--gpus-id", f"cuda:{state['gpusId']}"])
+    sys.argv.extend(["--num-workers", str(state['numWorkers'])])
+
+    # logging
+    sys.argv.extend(["--metrics-period", str(state['metricsPeriod'])])
+
+    # checkpoints
+    sys.argv.extend(["--val-interval", str(state['valInterval'])])
+    sys.argv.extend(["--checkpoint-interval", str(state['checkpointInterval'])])
+    if state["saveLast"]:
+        sys.argv.append("--save-last")
+    if state["saveBest"]:
+        sys.argv.append("--save-best")
+
+    sys.argv.append("--sly")
+

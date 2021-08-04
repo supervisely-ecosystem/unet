@@ -24,7 +24,7 @@ def init(data, state):
 
     state["lrSchedule"] = "StepLR"
     state["stepSize"] = 5
-    state["milestones"] = "5, 10, 15"
+    state["milestones"] = "[5, 10, 15]"
     state["gammaStep"] = 0.1
     state["gammaExp"] = 0.9
 
