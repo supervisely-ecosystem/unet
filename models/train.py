@@ -27,7 +27,23 @@ def main():
 
 # for debug
 # --data coco128.yaml --cfg yolov5s.yaml --weights yolov5s.pt --batch-size 64
+# https://stackoverflow.com/questions/21986194/how-to-pass-dictionary-items-as-function-arguments-in-python/21986301
+
+
+def f(a, b, c, d):
+    print(f"a={a}, b={b}, c={c}, d={d}")
+
+
 if __name__ == '__main__':
+
+    params = {
+        "b": 2,
+        "c": 3,
+        "d": 4
+    }
+    f(1, **params)
+
+    exit(0)
     dataset = SlySegDataset(
         project_dir="/app_debug_data/data/Lemons (Annotated)_seg",
         model_classes_path="/app_debug_data/data/artifacts/info/model_classes.json",

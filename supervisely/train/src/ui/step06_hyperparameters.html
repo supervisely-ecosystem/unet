@@ -65,17 +65,11 @@
             </a>
         </div>
         <el-switch v-model="state.lrPolicyEnabled" on-color="#13ce66" off-color="#B8B8B8" :disabled="data.done6"></el-switch>
-
-        <div v-if="state.lrPolicyEnabled">
-            <el-select class=mt10 v-model="state.lrSchedule" :disabled="data.done6">
-                <el-option key="StepLR" label="StepLR" value="StepLR"></el-option>
-                <el-option key="ExponentialLR" label="ExponentialLR" value="ExponentialLR"></el-option>
-                <el-option key="MultiStepLR" label="MultiStepLR" value="MultiStepLR"></el-option>
-            </el-select>
-        </div>
-
-
-
+        <el-select class=mt10 v-model="state.lrSchedule" :disabled="data.done6">
+            <el-option key="StepLR" label="StepLR" value="StepLR"></el-option>
+            <el-option key="ExponentialLR" label="ExponentialLR" value="ExponentialLR"></el-option>
+            <el-option key="MultiStepLR" label="MultiStepLR" value="MultiStepLR"></el-option>
+        </el-select>
 <!--        <sly-copy-to-clipboard class="mt10" v-if="state.lrPolicyEnabled" :data="state.lrPolicyPyConfig">-->
 <!--            <sly-editor v-model="state.lrPolicyPyConfig"-->
 <!--                        :options="{'mode': 'ace/mode/python', 'readOnly': !!data.done6, 'maxLines': 100}">-->
