@@ -33,7 +33,7 @@
                 pytorch documentation
             </a>
         </div>
-        <el-select class=mt10 v-model="state.optimizer" :disabled="data.done6">
+        <el-select class="mt10 mb10" v-model="state.optimizer" :disabled="data.done6">
             <el-option key="SGD" label="SGD" value="SGD"></el-option>
             <el-option key="Adam" label="Adam" value="Adam"></el-option>
             <el-option key="AdamW" label="AdamW" value="AdamW"></el-option>
@@ -66,27 +66,27 @@
                 pytorch documentation
             </a>
         </div>
-        <el-switch v-model="state.lrPolicyEnabled" on-color="#13ce66" off-color="#B8B8B8"
-                   :disabled="data.done6"></el-switch>
+        <el-switch v-model="state.lrPolicyEnabled" on-color="#13ce66" off-color="#B8B8B8" :disabled="data.done6"></el-switch>
         <div v-if="state.lrPolicyEnabled">
-            <el-select class=mt10 v-model="state.lrSchedule" :disabled="data.done6">
+            <el-select class="mt10 mb10" v-model="state.lrSchedule" :disabled="data.done6">
                 <el-option key="StepLR" label="StepLR" value="StepLR"></el-option>
                 <el-option key="ExponentialLR" label="ExponentialLR" value="ExponentialLR"></el-option>
                 <el-option key="MultiStepLR" label="MultiStepLR" value="MultiStepLR"></el-option>
             </el-select>
-            <sly-field title="Learning rate">
-                <el-input-number v-model="state.lr" :min="0" :step="0.0005" :debounce="1000"
-                                 :disabled="data.done6"></el-input-number>
+            <sly-field title="Step size" v-if="state.lrSchedule === 'StepLR'">
+                <el-input-number v-model="state.stepSize" :min="0" :max="state.epochs" :debounce="1000" :disabled="data.done6"></el-input-number>
+            </sly-field>
+            <sly-field title="Milestones" v-if="state.lrSchedule === 'MultiStepLR'">
+                <el-input v-model="state.milestones" :disabled="data.done6"></el-input>
+            </sly-field>
+            <sly-field title="Gamma" v-if="state.lrSchedule !== 'ExponentialLR'">
+                <el-input-number v-model="state.gammaStep" :min="0" :max="1" :step="0.01" :debounce="1000" :disabled="data.done6"></el-input-number>
+            </sly-field>
+            <sly-field title="Gamma" v-if="state.lrSchedule === 'ExponentialLR'">
+                <el-input-number v-model="state.gammaExp" :min="0" :max="1" :step="0.01" :debounce="1000" :disabled="data.done6"></el-input-number>
             </sly-field>
         </div>
-
     </sly-field>
-
-    <!--        <sly-copy-to-clipboard class="mt10" v-if="state.lrPolicyEnabled" :data="state.lrPolicyPyConfig">-->
-    <!--            <sly-editor v-model="state.lrPolicyPyConfig"-->
-    <!--                        :options="{'mode': 'ace/mode/python', 'readOnly': !!data.done6, 'maxLines': 100}">-->
-    <!--            </sly-editor>-->
-    <!--        </sly-copy-to-clipboard>-->
 
     <sly-field title="System" description="Select hardware, single- and multi-process data loading">
         <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
@@ -157,7 +157,7 @@
         </sly-field>
     </sly-field>
 
-    <el-button type="primary" class="regular mt10"
+    <el-button type="primary" class="regular"
                @click="command('use_hyp')"
                v-if="!data.done6">
         Finish step

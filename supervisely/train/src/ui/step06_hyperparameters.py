@@ -23,8 +23,10 @@ def init(data, state):
     state["nesterov"] = False
 
     state["lrSchedule"] = "StepLR"
-    #state["gradClipEnabled"] = False
-    #state["maxNorm"] = 1
+    state["stepSize"] = 5
+    state["milestones"] = "5, 10, 15"
+    state["gammaStep"] = 0.1
+    state["gammaExp"] = 0.9
 
     state["lrPolicyEnabled"] = False
 
