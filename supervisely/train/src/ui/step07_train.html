@@ -23,23 +23,51 @@
         <el-progress :percentage="data.progressPercentTrain1"></el-progress>
     </div>
 
-    <sly-field title="Training charts" description="Real-time training metrics">
-        <div class="fflex">
-            <sly-line-chart
-                    style="width: 33%;"
-                    :options.sync="data.chartLR.options"
-                    :content="data.chartLR.series">
-            </sly-line-chart>
-            <sly-line-chart
-                    style="width: 33%;"
-                    :options.sync="data.chartTrainLoss.options"
-                    :content="data.chartTrainLoss.series">
-            </sly-line-chart>
-            <sly-line-chart
-                    style="width: 33%;"
-                    :options.sync="data.chartValAccuracy.options"
-                    :content="data.chartValAccuracy.series">
-            </sly-line-chart>
-        </div>
-    </sly-field>
+    <div class="mt15" v-if="state.started === true || state.done7">
+        <hr class="mt10 mb10" style="border: 0; border-top: 1px solid rgba(0,0,0,.12);"/>
+        <sly-field title="Smoothing" description="Change the smoothing of line charts">
+            <sly-icon slot="icon" :options="{ color: '#006ad4', bgColor: '#bbe2ff', rounded: false }">
+                <i class="zmdi zmdi-trending-up"></i>
+            </sly-icon>
+            <el-slider
+                    :value="state.smoothing"
+                    :min="0" :max="0.95" :step="0.05" show-input
+                    style="width: 450px;"
+                    @input="(val)=>{
+                                state.smoothing = val;
+                                data.chartBCE.options.smoothingWeight = val;
+                                data.chartDICE.options.smoothingWeight = val;
+                                data.chartLoss.options.smoothingWeight = val;
+                            }"
+            >
+            </el-slider>
+        </sly-field>
+
+        <sly-field title="Training charts" description="Real-time training metrics">
+            <div class="fflex">
+                <sly-line-chart
+                        style="width: 50%;"
+                        :options.sync="data.chartLR.options"
+                        :content="data.chartLR.series">
+                </sly-line-chart>
+                <sly-line-chart
+                        style="width: 50%;"
+                        :options.sync="data.chartBCE.options"
+                        :content="data.chartBCE.series">
+                </sly-line-chart>
+            </div>
+            <div class="fflex">
+                <sly-line-chart
+                        style="width: 50%;"
+                        :options.sync="data.chartDICE.options"
+                        :content="data.chartDICE.series">
+                </sly-line-chart>
+                <sly-line-chart
+                        style="width: 50%;"
+                        :options.sync="data.chartLoss.options"
+                        :content="data.chartLoss.series">
+                </sly-line-chart>
+            </div>
+        </sly-field>
+    </div>
 </sly-card>

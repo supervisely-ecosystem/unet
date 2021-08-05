@@ -14,6 +14,10 @@ _open_lnk_name = "open_app.lnk"
 project_dir_seg = None
 model_classes_path = os.path.join(g.info_dir, "model_classes.json")
 
+chart_lr = None
+chart_bce = None
+chart_dice = None
+chart_loss = None
 
 def init(data, state):
     init_progress("Train1", data)
@@ -21,7 +25,7 @@ def init(data, state):
     # init_progress("UploadDir", data)
     # data["eta"] = None
 
-    #init_charts(data, state)
+    init_charts(data, state)
 
     state["collapsed7"] = True
     state["disabled7"] = True
@@ -39,48 +43,32 @@ def restart(data, state):
     data["done7"] = False
 
 
-def init_chart(title, names, xs, ys, smoothing=None, yrange=None, decimals=None, xdecimals=None):
-    series = []
-    for name, x, y in zip(names, xs, ys):
-        series.append({
-            "name": name,
-            "data": [[px, py] for px, py in zip(x, y)]
-        })
-    result = {
-        "options": {
-            "title": title,
-            #"groupKey": "my-synced-charts",
-        },
-        "series": series
-    }
-    if smoothing is not None:
-        result["options"]["smoothingWeight"] = smoothing
-    if yrange is not None:
-        result["options"]["yaxisInterval"] = yrange
-    if decimals is not None:
-        result["options"]["decimalsInFloat"] = decimals
-    if xdecimals is not None:
-        result["options"]["xaxisDecimalsInFloat"] = xdecimals
-    return result
-
 # time
 # train: bce: 0.461035, dice: 0.679971, loss: 0.570503
 # val: bce: 0.449126, dice: 0.657913, loss: 0.553519
 
 
 def init_charts(data, state):
-    # demo_x = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
-    # demo_y = [[0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001]]
-    data["chartLR"] = init_chart("LR", names=["LR"], xs=[[]], ys=[[]], smoothing=None,
-                                 yrange=[state["lr"] - state["lr"] / 2.0, state["lr"] + state["lr"] / 2.0],
-                                 decimals=6, xdecimals=2)
-    data["chartTrainLoss"] = init_chart("Train Loss", names=["train"], xs=[[]], ys=[[]], smoothing=0.6, xdecimals=2)
-    data["chartValAccuracy"] = init_chart("Val Acc", names=["top-1", "top-5"], xs=[[], []], ys=[[], []], smoothing=0.6)
-
-    data["chartTime"] = init_chart("Time", names=["time"], xs=[[]], ys=[[]], xdecimals=2)
-    data["chartDataTime"] = init_chart("Data Time", names=["data_time"], xs=[[]], ys=[[]], xdecimals=2)
-    data["chartMemory"] = init_chart("Memory", names=["memory"], xs=[[]], ys=[[]], xdecimals=2)
+    global chart_lr, chart_bce, chart_dice, chart_loss
+    chart_lr = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLR",
+                                     title="LR", series_names=["LR"],
+                                     yrange=[state["lr"] - state["lr"] / 2.0, state["lr"] + state["lr"] / 2.0],
+                                     ydecimals=6, xdecimals=2)
+    chart_bce = sly.app.widgets.Chart(g.task_id, g.api, "data.chartBCE",
+                                      title="BCE", series_names=["train", "val"],
+                                      smoothing=0.6, xdecimals=2)
+    chart_dice = sly.app.widgets.Chart(g.task_id, g.api, "data.chartDICE",
+                                      title="DICE", series_names=["train", "val"],
+                                      smoothing=0.6, xdecimals=2)
+    chart_loss = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLoss",
+                                       title="Loss", series_names=["train", "val"],
+                                       smoothing=0.6, xdecimals=2)
     state["smoothing"] = 0.6
+
+    chart_lr.init_data(data)
+    chart_bce.init_data(data)
+    chart_dice.init_data(data)
+    chart_loss.init_data(data)
 
 
 @g.my_app.callback("train")
