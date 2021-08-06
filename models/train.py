@@ -14,6 +14,7 @@ import time
 from sly_seg_dataset import SlySegDataset
 from loss import dice_loss
 from unet_classic import UNet
+from unet_resnet import UNetResNet
 from step07_train import update_charts
 
 
@@ -166,7 +167,8 @@ def train(opt):
 
     model = None
     if opt.model == "UNet-classic":
-        model = UNet(len(classes))
+        #model = UNet(len(classes))
+        model = UNetResNet(len(classes))
     else:
         raise RuntimeError(f"Unknown model architecture {opt.model}")
     device = torch.device(opt.gpu_id)
