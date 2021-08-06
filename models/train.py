@@ -167,17 +167,17 @@ def train(opt):
 
     model = None
     if opt.model == "UNet-classic":
-        model = UNet(len(classes))
-        #model = UNetResNet(len(classes))
+        #model = UNet(len(classes))
+        model = UNetResNet(len(classes))
     else:
         raise RuntimeError(f"Unknown model architecture {opt.model}")
     device = torch.device(opt.gpu_id)
     model = model.to(device)
     summary(model, input_size=(3, opt.input_size, opt.input_size))
 
-    optimizer_ft = None
+    my_optimizer = None
     if opt.optimizer == "SGD":
-        optimizer_ft = optim.SGD(
+        my_optimizer = optim.SGD(
             model.parameters(),
             lr=opt.lr,
             #@TODO:
@@ -186,21 +186,21 @@ def train(opt):
             #nesterov=opt.nesterov
         )
     elif opt.optimizer == "Adam":
-        optimizer_ft = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+        my_optimizer = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
     elif opt.optimizer == "AdamW":
-        optimizer_ft = optim.AdamW(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+        my_optimizer = optim.AdamW(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
     else:
         raise RuntimeError(f"Unknown optimizer {opt.optimizer}")
 
-    exp_lr_scheduler = None
+    my_lr_scheduler = None
     if opt.lr_schedule == "":
         pass
     elif opt.lr_schedule == "StepLR":
-        exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=opt.step_size, gamma=opt.gamma_step)
+        my_lr_scheduler = lr_scheduler.StepLR(my_optimizer, step_size=opt.step_size, gamma=opt.gamma_step)
     elif opt.optimizer == "ExponentialLR":
-        exp_lr_scheduler = lr_scheduler.ExponentialLR(optimizer_ft, gamma=opt.gamma_exp)
+        my_lr_scheduler = lr_scheduler.ExponentialLR(my_optimizer, gamma=opt.gamma_exp)
     elif opt.optimizer == "MultiStepLR":
-        exp_lr_scheduler = lr_scheduler.MultiStepLR(optimizer_ft, milestones=opt.milestones, gamma=opt.gamma_step)
+        my_lr_scheduler = lr_scheduler.MultiStepLR(my_optimizer, milestones=opt.milestones, gamma=opt.gamma_step)
     else:
         raise RuntimeError(f"Unknown lr_schedule {opt.lr_schedule}")
 
@@ -210,7 +210,7 @@ def train(opt):
         'train': DataLoader(train_set, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers),
         'val': DataLoader(val_set, batch_size=opt.batch_size, num_workers=opt.num_workers)
     }
-    model = train_model(opt, device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=opt.epochs)
+    model = train_model(opt, device, model, dataloaders, my_optimizer, my_lr_scheduler, num_epochs=opt.epochs)
 
 #@TODOs:
 # augs
@@ -226,5 +226,13 @@ def train(opt):
 # training ETA
 # video - how to fork and start debug on custom instance?
 
+# carvana - https://github.com/lyakaap/Kaggle-Carvana-3rd-Place-Solution
+# unet repo - https://github.com/milesial/Pytorch-UNet 4.2k stars
+# https://www.kaggle.com/learn-forum/114661
+# https://github.com/ternaus/robot-surgery-segmentation
+# https://github.com/ternaus/angiodysplasia-segmentation
+# mmdetection usecase https://github.com/amirassov/kaggle-imaterialist
+# smp https://www.kaggle.com/balraj98/unet-resnet50-for-cloth-parsing-pytorch
+# https://github.com/asanakoy/kaggle_carvana_segmentation
 if __name__ == '__main__':
     main()
