@@ -225,6 +225,7 @@ def train(opt):
 # train from custom weights
 # training ETA
 # video - how to fork and start debug on custom instance?
+# TODO RMsProp
 
 # carvana - https://github.com/lyakaap/Kaggle-Carvana-3rd-Place-Solution
 # unet repo - https://github.com/milesial/Pytorch-UNet 4.2k stars
@@ -234,5 +235,7 @@ def train(opt):
 # mmdetection usecase https://github.com/amirassov/kaggle-imaterialist
 # smp https://www.kaggle.com/balraj98/unet-resnet50-for-cloth-parsing-pytorch
 # https://github.com/asanakoy/kaggle_carvana_segmentation
+# endovis 17 https://github.com/Finspire13/AGSD-Surgical-Instrument-Segmentation
+
 if __name__ == '__main__':
     main()
