@@ -12,10 +12,10 @@ import torch.backends.cudnn
 
 from models import UNet11, LinkNet34, UNet, UNet16, AlbuNet
 from loss import LossBinary, LossMulti
-from dataset import RoboticsDataset
+#from dataset import RoboticsDataset
 import utils
 import sys
-from prepare_train_val import get_split
+#from prepare_train_val import get_split
 
 from albumentations import (
     HorizontalFlip,
@@ -35,24 +35,79 @@ moddel_list = {'UNet11': UNet11,
 
 
 def main():
+
+    # parser = argparse.ArgumentParser()
+    # arg = parser.add_argument
+    # arg('--jaccard-weight', default=0.5, type=float)
+    # arg('--device-ids', type=str, default='0', help='For example 0,1 to run on two GPUs')
+    # arg('--fold', type=int, help='fold', default=0)
+    # arg('--root', default='runs/debug', help='checkpoint root')
+    # arg('--batch-size', type=int, default=1)
+    # arg('--n-epochs', type=int, default=100)
+    # arg('--lr', type=float, default=0.0001)
+    # arg('--workers', type=int, default=12)
+    # arg('--train_crop_height', type=int, default=1024)
+    # arg('--train_crop_width', type=int, default=1280)
+    # arg('--val_crop_height', type=int, default=1024)
+    # arg('--val_crop_width', type=int, default=1280)
+    # arg('--type', type=str, default='binary', choices=['binary', 'parts', 'instruments'])
+    # arg('--model', type=str, default='UNet', choices=moddel_list.keys())
+
+    # device - ids -> gpu-id
+    # n - epochs -> epochs
+    # workers - > num-workers
+
     parser = argparse.ArgumentParser()
-    arg = parser.add_argument
-    arg('--jaccard-weight', default=0.5, type=float)
-    arg('--device-ids', type=str, default='0', help='For example 0,1 to run on two GPUs')
-    arg('--fold', type=int, help='fold', default=0)
-    arg('--root', default='runs/debug', help='checkpoint root')
-    arg('--batch-size', type=int, default=1)
-    arg('--n-epochs', type=int, default=100)
-    arg('--lr', type=float, default=0.0001)
-    arg('--workers', type=int, default=12)
-    arg('--train_crop_height', type=int, default=1024)
-    arg('--train_crop_width', type=int, default=1280)
-    arg('--val_crop_height', type=int, default=1024)
-    arg('--val_crop_width', type=int, default=1280)
-    arg('--type', type=str, default='binary', choices=['binary', 'parts', 'instruments'])
-    arg('--model', type=str, default='UNet', choices=moddel_list.keys())
+    # model architecture
+    parser.add_argument('--model', default='UNet-classic', help='model architecture name')
+
+    # for data loader
+    parser.add_argument('--project-dir', default='', help='path to sly project with segmentation masks')
+    parser.add_argument('--classes-path', default='', help='path to the list of classes (order matters)')
+    parser.add_argument('--train-set-path', default='', help='list of training items')
+    parser.add_argument('--val-set-path', default='', help='list of validation')
+
+    # basic hyperparameters
+    parser.add_argument('--epochs', type=int, default=5)
+    parser.add_argument('--input-size', type=int, default=256, help='model input image size')
+    parser.add_argument('--batch-size', type=int, default=8)
+    parser.add_argument('--jaccard-weight', default=0.5, type=float)
+
+    # optimizer
+    parser.add_argument('--optimizer', default='SGD', help='SGD / Adam / AdamW')
+    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--momentum', type=float, default=0.9, help='used only with SGD')
+    parser.add_argument('--weight-decay', type=float, default=0.0001)
+    parser.add_argument('--nesterov', action='store_true', help='used only with SGD')
+
+    # lr schedule
+    parser.add_argument('--lr-schedule', default='',
+                        help='No schedule (default) / StepLR / ExponentialLR / MultiStepLR')
+    parser.add_argument('--step-size', type=int, default=5, help='used only with StepLR')
+    parser.add_argument('--gamma-step', type=float, default=0.1, help='used only with StepLR and MultiStepLR')
+    parser.add_argument('--milestones', default='[5, 10, 15]', help='used only with MultiStepLR')
+    parser.add_argument('--gamma-exp', type=float, default=0.9, help='used only with StepLR and ExponentialLR')
+
+    # system
+    parser.add_argument('--gpu-id', default='cuda:0')
+    parser.add_argument('--num-workers', type=int, default=0)
+
+    # logging
+    parser.add_argument('--metrics-period', type=int, default=10,
+                        help='How often (num of iteration) metrics should be logged')
+
+    # checkpoints
+    parser.add_argument('--val-interval', type=int, default=1, help='Evaluate val set every N epochs')
+    parser.add_argument('--checkpoint-interval', type=int, default=1, help='Save checkpoint every N epochs')
+    parser.add_argument('--save-last', action='store_true', help='save last checkpoint')
+    parser.add_argument('--save-best', action='store_true', help='save best checkpoint')
+    parser.add_argument('--root', default='', help='checkpoint dir')
+
+    # integration with dashboard (ignore flag during local dev)
+    parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
 
     args = parser.parse_args()
+    print("Input arguments:", args)
 
     root = Path(args.root)
     root.mkdir(exist_ok=True, parents=True)
