@@ -193,6 +193,7 @@ def set_train_arguments(state):
         sys.argv.append("--save-last")
     if state["saveBest"]:
         sys.argv.append("--save-best")
+    sys.argv.extend(["--checkpoints-dir", g.checkpoints_dir])
 
     sys.argv.append("--sly")
 

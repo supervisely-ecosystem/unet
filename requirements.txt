@@ -2,3 +2,4 @@ supervisely==6.1.93
 python-dotenv==0.19.0
 torch-summary==1.4.5
 albumentations==0.0.10
+tqdm==4.62.0 #@TODO: remove

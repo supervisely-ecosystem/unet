@@ -17,6 +17,8 @@ import utils
 import sys
 #from prepare_train_val import get_split
 
+import supervisely_lib as sly
+
 from albumentations import (
     HorizontalFlip,
     VerticalFlip,
@@ -101,7 +103,7 @@ def main():
     parser.add_argument('--checkpoint-interval', type=int, default=1, help='Save checkpoint every N epochs')
     parser.add_argument('--save-last', action='store_true', help='save last checkpoint')
     parser.add_argument('--save-best', action='store_true', help='save best checkpoint')
-    parser.add_argument('--root', default='', help='checkpoint dir')
+    parser.add_argument('--checkpoints-dir', default='', help='checkpoint dir')
 
     # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
@@ -109,45 +111,44 @@ def main():
     args = parser.parse_args()
     print("Input arguments:", args)
 
-    root = Path(args.root)
-    root.mkdir(exist_ok=True, parents=True)
+    checkpoints_dir = Path(args.checkpoints_dir)
+    checkpoints_dir.mkdir(exist_ok=True, parents=True)
 
-    if not utils.check_crop_size(args.train_crop_height, args.train_crop_width):
-        print('Input image sizes should be divisible by 32, but train '
-              'crop sizes ({train_crop_height} and {train_crop_width}) '
-              'are not.'.format(train_crop_height=args.train_crop_height, train_crop_width=args.train_crop_width))
-        sys.exit(0)
+    #@TODO: check later
+    # if not utils.check_crop_size(args.train_crop_height, args.train_crop_width):
+    #     print('Input image sizes should be divisible by 32, but train '
+    #           'crop sizes ({train_crop_height} and {train_crop_width}) '
+    #           'are not.'.format(train_crop_height=args.train_crop_height, train_crop_width=args.train_crop_width))
+    #     sys.exit(0)
+    #
+    # if not utils.check_crop_size(args.val_crop_height, args.val_crop_width):
+    #     print('Input image sizes should be divisible by 32, but validation '
+    #           'crop sizes ({val_crop_height} and {val_crop_width}) '
+    #           'are not.'.format(val_crop_height=args.val_crop_height, val_crop_width=args.val_crop_width))
+    #     sys.exit(0)
 
-    if not utils.check_crop_size(args.val_crop_height, args.val_crop_width):
-        print('Input image sizes should be divisible by 32, but validation '
-              'crop sizes ({val_crop_height} and {val_crop_width}) '
-              'are not.'.format(val_crop_height=args.val_crop_height, val_crop_width=args.val_crop_width))
-        sys.exit(0)
+    classes = sly.json.load_json_file(args.classes_path)
+    num_classes = len(classes)
 
-    if args.type == 'parts':
-        num_classes = 4
-    elif args.type == 'instruments':
-        num_classes = 8
-    else:
-        num_classes = 1
-
-    if args.model == 'UNet':
-        model = UNet(num_classes=num_classes)
-    else:
-        model_name = moddel_list[args.model]
-        model = model_name(num_classes=num_classes, pretrained=True)
+    #@TODO: model selector later
+    #if args.model == 'UNet':
+    model = UNet(num_classes=num_classes)
+    # else:
+    #     model_name = moddel_list[args.model]
+    #     model = model_name(num_classes=num_classes, pretrained=True)
 
     if torch.cuda.is_available():
-        if args.device_ids:
-            device_ids = list(map(int, args.device_ids.split(',')))
+        if args.gpu_id:
+            device_ids = [args.gpu_id] #list(map(int, args.gpu_id.split(',')))
         else:
             device_ids = None
         model = nn.DataParallel(model, device_ids=device_ids).cuda()
     else:
         raise SystemError('GPU device not found')
 
-    if args.type == 'binary':
-        loss = LossBinary(jaccard_weight=args.jaccard_weight)
+    if num_classes == 1:
+        raise RuntimeError("Train dashboard always gives min 2 classes (x + gb)")
+        #loss = LossBinary(jaccard_weight=args.jaccard_weight)
     else:
         loss = LossMulti(num_classes=num_classes, jaccard_weight=args.jaccard_weight)
 
@@ -187,7 +188,7 @@ def main():
     valid_loader = make_loader(val_file_names, transform=val_transform(p=1), problem_type=args.type,
                                batch_size=len(device_ids))
 
-    root.joinpath('params.json').write_text(
+    checkpoints_dir.joinpath('params.json').write_text(
         json.dumps(vars(args), indent=True, sort_keys=True))
 
     if args.type == 'binary':

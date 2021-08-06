@@ -9,8 +9,8 @@ import torch
 import tqdm
 
 
-def cuda(x):
-    return x.cuda(async=True) if torch.cuda.is_available() else x
+# def cuda(x):
+#     return x.cuda() if torch.cuda.is_available() else x
 
 
 def write_event(log, step, **data):
@@ -37,6 +37,8 @@ def check_crop_size(image_height, image_width):
 
 def train(args, model, criterion, train_loader, valid_loader, validation, init_optimizer, n_epochs=None, fold=None,
           num_classes=None):
+    device = torch.device(args.gpu_id)
+
     lr = args.lr
     n_epochs = n_epochs or args.n_epochs
     optimizer = init_optimizer(lr)
@@ -72,10 +74,10 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
         try:
             mean_loss = 0
             for i, (inputs, targets) in enumerate(tl):
-                inputs = cuda(inputs)
+                inputs = inputs.to(device)
 
                 with torch.no_grad():
-                    targets = cuda(targets)
+                    targets = targets.to(device)
 
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
