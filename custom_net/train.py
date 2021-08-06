@@ -18,6 +18,9 @@ import sys
 #from prepare_train_val import get_split
 
 import supervisely_lib as sly
+from sly_seg_dataset import SlySegDataset
+import sly_ui_utils
+
 
 from albumentations import (
     HorizontalFlip,
@@ -37,27 +40,14 @@ moddel_list = {'UNet11': UNet11,
 
 
 def main():
-
-    # parser = argparse.ArgumentParser()
-    # arg = parser.add_argument
-    # arg('--jaccard-weight', default=0.5, type=float)
-    # arg('--device-ids', type=str, default='0', help='For example 0,1 to run on two GPUs')
-    # arg('--fold', type=int, help='fold', default=0)
-    # arg('--root', default='runs/debug', help='checkpoint root')
-    # arg('--batch-size', type=int, default=1)
     # arg('--n-epochs', type=int, default=100)
-    # arg('--lr', type=float, default=0.0001)
-    # arg('--workers', type=int, default=12)
     # arg('--train_crop_height', type=int, default=1024)
     # arg('--train_crop_width', type=int, default=1280)
     # arg('--val_crop_height', type=int, default=1024)
     # arg('--val_crop_width', type=int, default=1280)
-    # arg('--type', type=str, default='binary', choices=['binary', 'parts', 'instruments'])
     # arg('--model', type=str, default='UNet', choices=moddel_list.keys())
 
-    # device - ids -> gpu-id
     # n - epochs -> epochs
-    # workers - > num-workers
 
     parser = argparse.ArgumentParser()
     # model architecture
@@ -92,6 +82,7 @@ def main():
 
     # system
     parser.add_argument('--gpu-id', default='cuda:0')
+    # arg('--device-ids', type=str, default='0', help='For example 0,1 to run on two GPUs') #@TODO: later
     parser.add_argument('--num-workers', type=int, default=0)
 
     # logging
@@ -149,52 +140,57 @@ def main():
     if num_classes == 1:
         raise RuntimeError("Train dashboard always gives min 2 classes (x + gb)")
         #loss = LossBinary(jaccard_weight=args.jaccard_weight)
+        #valid = validation_binary
     else:
         loss = LossMulti(num_classes=num_classes, jaccard_weight=args.jaccard_weight)
+        valid = validation_multi
 
     cudnn.benchmark = True
 
-    def make_loader(file_names, shuffle=False, transform=None, problem_type='binary', batch_size=1):
-        return DataLoader(
-            dataset=RoboticsDataset(file_names, transform=transform, problem_type=problem_type),
-            shuffle=shuffle,
-            num_workers=args.workers,
-            batch_size=batch_size,
-            pin_memory=torch.cuda.is_available()
-        )
+    train_set = SlySegDataset(args.project_dir, args.classes_path, args.train_set_path, input_size=args.input_size)
+    val_set = SlySegDataset(args.project_dir, args.classes_path, args.val_set_path, input_size=args.input_size)
+    print('num_train = {}, num_val = {}'.format(len(train_set), len(val_set)))
 
-    train_file_names, val_file_names = get_split(args.fold)
+    train_loader = DataLoader(
+        train_set,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
+        pin_memory=torch.cuda.is_available()
+    )
+    valid_loader = DataLoader(
+        val_set,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=torch.cuda.is_available()
+    )
 
-    print('num train = {}, num_val = {}'.format(len(train_file_names), len(val_file_names)))
+    # def train_transform(p=1):
+    #     return Compose([
+    #         PadIfNeeded(min_height=args.train_crop_height, min_width=args.train_crop_width, p=1),
+    #         RandomCrop(height=args.train_crop_height, width=args.train_crop_width, p=1),
+    #         VerticalFlip(p=0.5),
+    #         HorizontalFlip(p=0.5),
+    #         Normalize(p=1)
+    #     ], p=p)
+    #
+    # def val_transform(p=1):
+    #     return Compose([
+    #         PadIfNeeded(min_height=args.val_crop_height, min_width=args.val_crop_width, p=1),
+    #         CenterCrop(height=args.val_crop_height, width=args.val_crop_width, p=1),
+    #         Normalize(p=1)
+    #     ], p=p)
 
-    def train_transform(p=1):
-        return Compose([
-            PadIfNeeded(min_height=args.train_crop_height, min_width=args.train_crop_width, p=1),
-            RandomCrop(height=args.train_crop_height, width=args.train_crop_width, p=1),
-            VerticalFlip(p=0.5),
-            HorizontalFlip(p=0.5),
-            Normalize(p=1)
-        ], p=p)
-
-    def val_transform(p=1):
-        return Compose([
-            PadIfNeeded(min_height=args.val_crop_height, min_width=args.val_crop_width, p=1),
-            CenterCrop(height=args.val_crop_height, width=args.val_crop_width, p=1),
-            Normalize(p=1)
-        ], p=p)
-
-    train_loader = make_loader(train_file_names, shuffle=True, transform=train_transform(p=1), problem_type=args.type,
-                               batch_size=args.batch_size)
-    valid_loader = make_loader(val_file_names, transform=val_transform(p=1), problem_type=args.type,
-                               batch_size=len(device_ids))
+    # train_loader = make_loader(train_file_names, shuffle=True, transform=train_transform(p=1), problem_type=args.type,
+    #                            batch_size=args.batch_size)
+    # valid_loader = make_loader(val_file_names, transform=val_transform(p=1), problem_type=args.type,
+    #                            batch_size=len(device_ids))
 
     checkpoints_dir.joinpath('params.json').write_text(
         json.dumps(vars(args), indent=True, sort_keys=True))
 
-    if args.type == 'binary':
-        valid = validation_binary
-    else:
-        valid = validation_multi
+    optimizer = sly_ui_utils.get_optimizer(args, model)
+    lr_schedule = sly_ui_utils.get_schedule(args, optimizer)
 
     utils.train(
         init_optimizer=lambda lr: Adam(model.parameters(), lr=lr),

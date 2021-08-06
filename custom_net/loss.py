@@ -3,6 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 import utils
 import numpy as np
+# nice picture - https://www.jeremyjordan.me/semantic-segmentation/#loss
 
 
 class LossBinary:
