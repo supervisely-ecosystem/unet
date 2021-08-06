@@ -52,13 +52,13 @@ def init_charts(data, state):
                                      ydecimals=6, xdecimals=2)
     chart_bce = sly.app.widgets.Chart(g.task_id, g.api, "data.chartBCE",
                                       title="BCE", series_names=["train", "val"],
-                                      smoothing=0.6, xdecimals=2)
+                                      smoothing=0.6, ydecimals=6, xdecimals=2)
     chart_dice = sly.app.widgets.Chart(g.task_id, g.api, "data.chartDICE",
                                       title="DICE", series_names=["train", "val"],
-                                      smoothing=0.6, xdecimals=2)
+                                      smoothing=0.6, ydecimals=6, xdecimals=2)
     chart_loss = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLoss",
                                        title="Total loss", series_names=["train", "val"],
-                                       smoothing=0.6, xdecimals=2)
+                                       smoothing=0.6, ydecimals=6, xdecimals=2)
     state["smoothing"] = 0.6
 
     chart_lr.init_data(data)
