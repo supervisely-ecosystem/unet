@@ -14,6 +14,7 @@ import time
 from sly_seg_dataset import SlySegDataset
 from loss import dice_loss
 from unet_classic import UNet
+from step07_train import update_charts
 
 
 def main():
@@ -91,7 +92,7 @@ def print_metrics(metrics, epoch_samples, phase):
     print("{}: {}".format(phase, ", ".join(outputs)))
 
 
-def train_model(device, model, dataloaders, optimizer, scheduler=None, num_epochs=25):
+def train_model(opt, device, model, dataloaders, optimizer, scheduler=None, num_epochs=25):
     best_model_wts = copy.deepcopy(model.state_dict())
     best_loss = 1e10
 
@@ -114,6 +115,8 @@ def train_model(device, model, dataloaders, optimizer, scheduler=None, num_epoch
                 model.eval()  # Set model to evaluate mode
 
             metrics = defaultdict(float)
+            metrics["lr"] = param_group['lr']
+
             epoch_samples = 0
 
             for inputs, labels in dataloaders[phase]:
@@ -138,6 +141,9 @@ def train_model(device, model, dataloaders, optimizer, scheduler=None, num_epoch
                 epoch_samples += inputs.size(0)
 
             print_metrics(metrics, epoch_samples, phase)
+            if opt.sly:
+                update_charts(phase, epoch, metrics)
+
             epoch_loss = metrics['loss'] / epoch_samples
 
             # deep copy the model
@@ -201,7 +207,7 @@ def train(opt):
         'train': DataLoader(train_set, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers),
         'val': DataLoader(val_set, batch_size=opt.batch_size, num_workers=opt.num_workers)
     }
-    model = train_model(device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=opt.epochs)
+    model = train_model(opt, device, model, dataloaders, optimizer_ft, exp_lr_scheduler, num_epochs=opt.epochs)
 
 #@TODOs:
 # augs

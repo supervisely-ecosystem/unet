@@ -14,10 +14,11 @@ _open_lnk_name = "open_app.lnk"
 project_dir_seg = None
 model_classes_path = os.path.join(g.info_dir, "model_classes.json")
 
-chart_lr = None
-chart_bce = None
-chart_dice = None
-chart_loss = None
+chart_lr: sly.app.widgets.Chart = None
+chart_bce: sly.app.widgets.Chart = None
+chart_dice: sly.app.widgets.Chart = None
+chart_loss: sly.app.widgets.Chart = None
+
 
 def init(data, state):
     init_progress("Train1", data)
@@ -43,11 +44,6 @@ def restart(data, state):
     data["done7"] = False
 
 
-# time
-# train: bce: 0.461035, dice: 0.679971, loss: 0.570503
-# val: bce: 0.449126, dice: 0.657913, loss: 0.553519
-
-
 def init_charts(data, state):
     global chart_lr, chart_bce, chart_dice, chart_loss
     chart_lr = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLR",
@@ -61,7 +57,7 @@ def init_charts(data, state):
                                       title="DICE", series_names=["train", "val"],
                                       smoothing=0.6, xdecimals=2)
     chart_loss = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLoss",
-                                       title="Loss", series_names=["train", "val"],
+                                       title="Total loss", series_names=["train", "val"],
                                        smoothing=0.6, xdecimals=2)
     state["smoothing"] = 0.6
 
@@ -69,6 +65,16 @@ def init_charts(data, state):
     chart_bce.init_data(data)
     chart_dice.init_data(data)
     chart_loss.init_data(data)
+
+
+def update_charts(phase, epoch, metrics):
+    fields = [
+        chart_lr.get_append_field(epoch, metrics['lr']),
+        chart_bce.get_append_field(epoch, metrics['bce'], phase),
+        chart_dice.get_append_field(epoch, metrics['dice'], phase),
+        chart_loss.get_append_field(epoch, metrics['loss'], phase),
+    ]
+    g.api.app.set_fields(g.task_id, fields)
 
 
 @g.my_app.callback("train")
