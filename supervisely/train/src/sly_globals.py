@@ -7,7 +7,7 @@ root_source_dir = str(Path(sys.argv[0]).parents[3])
 print(f"Root source directory: {root_source_dir}")
 sys.path.append(root_source_dir)
 
-models_source_dir = os.path.join(root_source_dir, "models")
+models_source_dir = os.path.join(root_source_dir, "custom_net")
 print(f"Models source directory: {models_source_dir}")
 sys.path.append(models_source_dir)
 
