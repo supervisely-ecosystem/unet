@@ -67,12 +67,12 @@ def init_charts(data, state):
     chart_loss.init_data(data)
 
 
-def update_charts(phase, epoch, metrics):
+def update_charts(phase, epoch, epoch_samples, metrics):
     fields = [
         chart_lr.get_append_field(epoch, metrics['lr']),
-        chart_bce.get_append_field(epoch, metrics['bce'], phase),
-        chart_dice.get_append_field(epoch, metrics['dice'], phase),
-        chart_loss.get_append_field(epoch, metrics['loss'], phase),
+        chart_bce.get_append_field(epoch, metrics['bce'] / epoch_samples, phase),
+        chart_dice.get_append_field(epoch, metrics['dice'] / epoch_samples, phase),
+        chart_loss.get_append_field(epoch, metrics['loss']  / epoch_samples, phase),
     ]
     g.api.app.set_fields(g.task_id, fields)
 

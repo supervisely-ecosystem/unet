@@ -143,7 +143,7 @@ def train_model(opt, device, model, dataloaders, optimizer, scheduler=None, num_
 
             print_metrics(metrics, epoch_samples, phase)
             if opt.sly:
-                update_charts(phase, epoch, metrics)
+                update_charts(phase, epoch, epoch_samples, metrics)
 
             epoch_loss = metrics['loss'] / epoch_samples
 
@@ -167,8 +167,8 @@ def train(opt):
 
     model = None
     if opt.model == "UNet-classic":
-        #model = UNet(len(classes))
-        model = UNetResNet(len(classes))
+        model = UNet(len(classes))
+        #model = UNetResNet(len(classes))
     else:
         raise RuntimeError(f"Unknown model architecture {opt.model}")
     device = torch.device(opt.gpu_id)
@@ -180,9 +180,10 @@ def train(opt):
         optimizer_ft = optim.SGD(
             model.parameters(),
             lr=opt.lr,
-            momentum=opt.momentum,
-            weight_decay=opt.weight_decay,
-            nesterov=opt.nesterov
+            #@TODO:
+            #momentum=opt.momentum,
+            #weight_decay=opt.weight_decay,
+            #nesterov=opt.nesterov
         )
     elif opt.optimizer == "Adam":
         optimizer_ft = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
