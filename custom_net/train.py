@@ -98,6 +98,10 @@ def main():
     parser.add_argument('--save-best', action='store_true', help='save best checkpoint')
     parser.add_argument('--checkpoints-dir', default='', help='checkpoint dir')
 
+    # visualization settings
+    parser.add_argument('--train-vis-count', type=int, default=1, help='Number of random images from TRAIN to visualize predictions over time')
+    parser.add_argument('--val-vis-count', type=int, default=1, help='Number of random images from VAL to visualize predictions over time')
+
     # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
 

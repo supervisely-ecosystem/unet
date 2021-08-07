@@ -41,6 +41,10 @@ def init(data, state):
     #     state["lrPolicyPyConfig"] = f.read()
     state["lrPolicyPyConfig"] = ""
 
+    # visualization settings
+    state["trainVisCount"] = 1
+    state["valVisCount"] = 1
+
     state["collapsed6"] = True
     state["disabled6"] = True
     state["done6"] = False

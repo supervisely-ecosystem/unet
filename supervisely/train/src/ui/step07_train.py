@@ -36,6 +36,9 @@ def init(data, state):
     data["outputUrl"] = None
 
     state["expName"] = g.project_info.name
+    state["visEpoch"] = 0
+    data["gallery"] = sly.app.widgets.EmptyGridGallery().to_json()
+    state["visSets"] = ["train", "val"]
 
 
 def restart(data, state):
@@ -196,6 +199,10 @@ def set_train_arguments(state):
     if state["saveBest"]:
         sys.argv.append("--save-best")
     sys.argv.extend(["--checkpoints-dir", g.checkpoints_dir])
+
+    # visualization settings
+    sys.argv.extend(["--train-vis-count", str(state['trainVisCount'])])
+    sys.argv.extend(["--val-vis-count", str(state['valVisCount'])])
 
     sys.argv.append("--sly")
 

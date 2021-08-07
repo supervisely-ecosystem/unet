@@ -159,6 +159,30 @@
         </sly-field>
     </sly-field>
 
+    <sly-field title="Visualization" description="Show predictions improvement over time for random images">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-compare"></i>
+        </sly-icon>
+        <sly-field title="Number of train images"
+                   description="Random images from training for visualization">
+            <el-input-number v-model="state.trainVisCount" :min="0" :max="data.trainImagesCount" :disabled="data.done6"></el-input-number>
+        </sly-field>
+        <sly-field title="Number of val images"
+                   description="Random images from validation for visualization">
+            <el-input-number v-model="state.valVisCount" :min="0" :max="data.valImagesCount" :disabled="data.done6"></el-input-number>
+        </sly-field>
+
+        <div class="fflex">
+            <span class="mr5">Save checkpoint every</span>
+            <el-input-number v-model="state.checkpointInterval"
+                             :min="1" :max="state.epochs" :disabled="data.done6">
+            </el-input-number>
+            <span class="ml5">epochs</span>
+        </div>
+
+
+    </sly-field>
+
     <el-button type="primary" class="regular"
                @click="command('use_hyp')"
                v-if="!data.done6">
