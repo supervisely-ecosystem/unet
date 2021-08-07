@@ -1,7 +1,9 @@
+import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 import supervisely_lib as sly
 import numpy as np
+import cv2
 
 
 class SlySegDataset(Dataset):
@@ -13,18 +15,21 @@ class SlySegDataset(Dataset):
         model_classes_json = sly.json.load_json_file(model_classes_path)
         self.model_classes = [sly.ObjClass.from_json(data) for data in model_classes_json]
 
+        self.input_height = input_height
+        self.input_width = input_width
+
         #self.input_images, self.target_masks = simulation.generate_random_data(192, 192, count=count)
         self.sly_augs = sly_augs
 
         self.transforms_img = transforms.Compose([
             # step0 - sly_augs will be applied here
             transforms.ToTensor(),
-            transforms.Resize(size=(input_height, input_width), interpolation=transforms.InterpolationMode.NEAREST),
+            transforms.Resize(size=(input_height, input_width)),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
         ])
         self.transforms_ann = transforms.Compose([
             # step0 - sly_augs will be applied here
-            transforms.ToTensor(),
+            #transforms.ToTensor(),
             transforms.Resize(size=(input_height, input_width), interpolation=transforms.InterpolationMode.NEAREST),
         ])
 
@@ -48,14 +53,22 @@ class SlySegDataset(Dataset):
         if self.sly_augs:
             image, mask = self.sly_augs(image, seg_mask)
 
-        image = self.transforms_img(image)
-        seg_mask = self.transforms_ann(seg_mask)
-        return [image, seg_mask]
+        # prepare tensor for image
+        image = self.transforms_img(image)  # resize + normalize
+
+        # prepare tensor for mask
+        seg_mask = cv2.resize(seg_mask, (self.input_width, self.input_height), interpolation=cv2.INTER_NEAREST)
+        seg_mask = torch.from_numpy(seg_mask).long()
+        #seg_mask = torch.unsqueeze(seg_mask, 0)
+        #seg_mask = self.transforms_ann(seg_mask)
+
+        return image, seg_mask
 
     def _colors_to_indices(self, color_mask):
         # output shape - [height, width]
         height, width = color_mask.shape[:2]
         seg_mask = np.zeros((height, width), dtype=np.uint8)
         for class_index, obj_class in enumerate(self.model_classes):
-            seg_mask[color_mask == obj_class.color] = class_index
+            indices = np.where(np.all(color_mask == obj_class.color, axis=-1))
+            seg_mask[indices] = class_index
         return seg_mask

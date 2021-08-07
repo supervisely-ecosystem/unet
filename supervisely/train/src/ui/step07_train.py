@@ -88,14 +88,13 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         # convert project to segmentation masks
         global project_dir_seg
         project_dir_seg = os.path.join(g.my_app.data_dir, g.project_info.name + "_seg")
-        sly.fs.remove_dir(project_dir_seg)  # @TODO: for debug
 
         if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
             sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
             progress_cb = get_progress_cb(
                 index="Train1",
                 message="Convert SLY annotations to segmentation masks",
-                total=step01_input_project.project_fs.total_items
+                total=sly.Project(g.project_dir, sly.OpenMode.READ).total_items
             )
             sly.Project.to_segmentation_task(
                 g.project_dir, project_dir_seg,

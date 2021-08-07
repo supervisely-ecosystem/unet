@@ -60,7 +60,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, n_epoc
     lr = args.lr
     n_epochs = n_epochs or args.epochs
 
-    root = Path(args.root)
+    root = Path(args.checkpoints_dir)
     model_path = root / 'model.pt'
 
     if model_path.exists():

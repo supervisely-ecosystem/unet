@@ -9,7 +9,7 @@ def init(data, state):
 
     #state["imgSize"] = 256
     state["imgSize"] = {
-        "width": 256,
+        "width": 512, #@TODO: 512 for debug 256 - for prod
         "height": 256,
         "proportional": True
     }
