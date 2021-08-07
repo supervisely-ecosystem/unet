@@ -9,15 +9,15 @@ import supervisely_lib as sly
 
 def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, model_classes: sly.ProjectMeta):
     height, width = predicted_class_indices.shape[:2]
-    ann = sly.Annotation(img_size=(height, width))
 
-    for idx, class_name in enumerate(model.CLASSES):  # curr_col2cls.items():
-        class_mask = np.all(mask == idx, axis=2)  # exact match (3-channel img & rgb color)
+    labels = []
+    for idx, class_info in enumerate(classes_json):  # curr_col2cls.items():
+        class_mask = np.all(predicted_class_indices == idx, axis=2)  # exact match (3-channel img & rgb color)
         bitmap = sly.Bitmap(data=class_mask)
-        obj_class = sly.ObjClass(name=class_name, geometry_type=sly.Bitmap)
-
-        ann = ann.add_label(sly.Label(bitmap, obj_class))
-        #  clear used pixels in mask to check missing colors, see below
+        obj_class = model_classes.get_obj_class(class_info["name"])
+        labels.append(sly.Label(bitmap, obj_class))
+    ann = sly.Annotation(img_size=(height, width), labels=labels)
+    return ann
 
 
 def vis_inference(model: nn.Module, classes, input_height, input_width, project_dir, items_path):
