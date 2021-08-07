@@ -20,8 +20,10 @@ def main():
 
 
 #@TODO: change predefined augs
+#@TODO: __background__
 #@TODO: disable rotate reflect - iaa.geometric.Rotate
 #@TODO: check restart step for all steps
+#@TODO: validation metrics exclude background?? integrate BCE??
 if __name__ == "__main__":
     #sly.main_wrapper("main", main)
     main()

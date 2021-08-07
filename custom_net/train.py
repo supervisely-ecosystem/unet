@@ -164,7 +164,7 @@ def main():
         train_loader=train_loader,
         valid_loader=valid_loader,
         validation=valid,
-        num_classes=num_classes
+        classes=classes
     )
 
 
