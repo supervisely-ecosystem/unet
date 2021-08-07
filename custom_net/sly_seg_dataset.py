@@ -5,6 +5,8 @@ import supervisely_lib as sly
 import numpy as np
 import cv2
 
+from utils import prepare_image_input
+
 
 class SlySegDataset(Dataset):
     def __init__(self, project_dir, model_classes_path, split_path, input_height, input_width, sly_augs=None):
@@ -18,15 +20,7 @@ class SlySegDataset(Dataset):
         self.input_height = input_height
         self.input_width = input_width
 
-        #self.input_images, self.target_masks = simulation.generate_random_data(192, 192, count=count)
         self.sly_augs = sly_augs
-
-        self.transforms_img = transforms.Compose([
-            # step0 - sly_augs will be applied here
-            transforms.ToTensor(),
-            transforms.Resize(size=(input_height, input_width)),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
-        ])
 
     def __len__(self):
         return len(self.input_items)
@@ -49,13 +43,13 @@ class SlySegDataset(Dataset):
             image, mask = self.sly_augs(image, seg_mask)
 
         # prepare tensor for image
-        image = self.transforms_img(image)  # totensor + resize + normalize
+        input = prepare_image_input(image, self.input_width, self.input_height)
 
         # prepare tensor for mask
         seg_mask = cv2.resize(seg_mask, (self.input_width, self.input_height), interpolation=cv2.INTER_NEAREST)
         seg_mask = torch.from_numpy(seg_mask).long()
 
-        return image, seg_mask
+        return input, seg_mask
 
     def _colors_to_indices(self, color_mask):
         # output shape - [height, width]

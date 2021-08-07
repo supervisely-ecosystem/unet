@@ -6,9 +6,19 @@ from torch.optim import lr_scheduler
 
 import random
 import numpy as np
+import cv2
 
 import torch
 import tqdm
+
+from torchvision import transforms
+transforms_img = transforms.Compose([
+    # step0 - sly_augs will be applied here
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
+])
+
+from inference import inference
 
 
 def cuda(x):
@@ -54,13 +64,17 @@ def get_scheduler(args, optimizer):
     return scheduler
 
 
-def train(args, model, criterion, train_loader, valid_loader, validation, n_epochs=None, num_classes=None):
+def prepare_image_input(image, input_width, input_height):
+    # RGB -> Normalized Tensor
+    input = cv2.resize(image, (input_width, input_height))
+    input = transforms_img(input)  # totensor + normalize
+    return input
+
+
+def train(args, model, criterion, train_loader, valid_loader, validation, classes):
     #device = torch.device(args.gpu_id)
-
-    print(123)
-
     lr = args.lr
-    n_epochs = n_epochs or args.epochs
+    n_epochs = args.epochs
 
     root = Path(args.checkpoints_dir)
     model_path = root / 'model.pt'
@@ -122,10 +136,14 @@ def train(args, model, criterion, train_loader, valid_loader, validation, n_epoc
             write_event(log, step, loss=mean_loss)
             tq.close()
             save(epoch + 1)
-            valid_metrics = validation(model, criterion, valid_loader, num_classes)
+            valid_metrics = validation(model, criterion, valid_loader, len(classes))
             write_event(log, step, **valid_metrics)
             valid_loss = valid_metrics['valid_loss']
             valid_losses.append(valid_loss)
+            #@TODO: predictions improvment over time
+            img_path = "/app_debug_data/data/Lemons (Annotated)_seg/ds1/img/IMG_0748.jpeg"
+            save_path = f"/app_debug_data/{epoch}.jpeg"
+            inference(model, classes, args.input_height, args.input_width, img_path, save_path)
         except KeyboardInterrupt:
             tq.close()
             print('Ctrl+C, saving snapshot')

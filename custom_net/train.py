@@ -155,27 +155,6 @@ def main():
         pin_memory=torch.cuda.is_available()
     )
 
-    # def train_transform(p=1):
-    #     return Compose([
-    #         PadIfNeeded(min_height=args.train_crop_height, min_width=args.train_crop_width, p=1),
-    #         RandomCrop(height=args.train_crop_height, width=args.train_crop_width, p=1),
-    #         VerticalFlip(p=0.5),
-    #         HorizontalFlip(p=0.5),
-    #         Normalize(p=1)
-    #     ], p=p)
-    #
-    # def val_transform(p=1):
-    #     return Compose([
-    #         PadIfNeeded(min_height=args.val_crop_height, min_width=args.val_crop_width, p=1),
-    #         CenterCrop(height=args.val_crop_height, width=args.val_crop_width, p=1),
-    #         Normalize(p=1)
-    #     ], p=p)
-
-    # train_loader = make_loader(train_file_names, shuffle=True, transform=train_transform(p=1), problem_type=args.type,
-    #                            batch_size=args.batch_size)
-    # valid_loader = make_loader(val_file_names, transform=val_transform(p=1), problem_type=args.type,
-    #                            batch_size=len(device_ids))
-
     sly.json.dump_json_file(vars(args), os.path.join(checkpoints_dir, "train_args.json"))
 
     utils.train(
