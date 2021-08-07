@@ -27,11 +27,6 @@ class SlySegDataset(Dataset):
             transforms.Resize(size=(input_height, input_width)),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
         ])
-        self.transforms_ann = transforms.Compose([
-            # step0 - sly_augs will be applied here
-            #transforms.ToTensor(),
-            transforms.Resize(size=(input_height, input_width), interpolation=transforms.InterpolationMode.NEAREST),
-        ])
 
     def __len__(self):
         return len(self.input_items)
@@ -54,13 +49,11 @@ class SlySegDataset(Dataset):
             image, mask = self.sly_augs(image, seg_mask)
 
         # prepare tensor for image
-        image = self.transforms_img(image)  # resize + normalize
+        image = self.transforms_img(image)  # totensor + resize + normalize
 
         # prepare tensor for mask
         seg_mask = cv2.resize(seg_mask, (self.input_width, self.input_height), interpolation=cv2.INTER_NEAREST)
         seg_mask = torch.from_numpy(seg_mask).long()
-        #seg_mask = torch.unsqueeze(seg_mask, 0)
-        #seg_mask = self.transforms_ann(seg_mask)
 
         return image, seg_mask
 

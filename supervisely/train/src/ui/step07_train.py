@@ -1,13 +1,11 @@
 import os
 import sys
 
-import step01_input_project
 import step02_splits
 import supervisely_lib as sly
 from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
 import step03_classes
-#from sly_seg_dataset import SlySegDataset
 
 
 _open_lnk_name = "open_app.lnk"

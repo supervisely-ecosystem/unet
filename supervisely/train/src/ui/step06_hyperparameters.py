@@ -4,7 +4,7 @@ import sly_globals as g
 
 
 def init(data, state):
-    state["epochs"] = 5
+    state["epochs"] = 50  # @TODO: 50 for debug
     state["gpusId"] = '0'
 
     #state["imgSize"] = 256

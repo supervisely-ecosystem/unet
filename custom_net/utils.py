@@ -96,10 +96,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, n_epoc
             mean_loss = 0
             for i, (inputs, targets) in enumerate(tl):
                 inputs = cuda(inputs)
-                #inputs = inputs.to(device)
-
                 with torch.no_grad():
-                    #targets = targets.to(device)
                     targets = cuda(targets)
 
                 outputs = model(inputs)
