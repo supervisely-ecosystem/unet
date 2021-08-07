@@ -69,28 +69,29 @@
                 </sly-line-chart>
             </div>
         </sly-field>
-
+        <sly-field title="Predictions improvement dynamics"
+                   description="Model predictions for random images from train/val over time"
+        >
+            <div class="fflex">
+                <div class="mr15">Epoch</div>
+                <el-slider v-model="state.visEpoch"
+                           :min="1" :max="state.epochs" :step="1"
+                           show-stops show-input
+                           style="width: 500px;"
+                >
+                </el-slider>
+            </div>
+            <div class="fflex">
+                <div class="mr10">Show examples from</div>
+                <el-select v-model="state.visSets" multiple>
+                    <el-option key="onlyTrain" label="train" value="train"></el-option>
+                    <el-option key="onlyVal" label="val" value="val"></el-option>
+                </el-select>
+            </div>
+            <sly-grid-gallery v-if="data.gallery"
+                              :content="data.gallery.content"
+                              :options="data.gallery.options">
+            </sly-grid-gallery>
+        </sly-field>
     </div>
-
-    <sly-field title="Predictions improvement dynamics"
-               description="Model predictions for random images from train/val over time"
-    >
-        <div class="fflex">
-            <div class="mr15">Epoch</div>
-            <el-slider v-model="state.visEpoch"
-                       :min="1" :max="state.epochs" :step="1"
-                       show-stops show-input
-                       style="width: 500px;"
-            >
-            </el-slider>
-        </div>
-        <div class="fflex">
-            <div class="mr10">Show examples from</div>
-            <el-select v-model="state.visSets" multiple>
-                <el-option key="onlyTrain" label="train" value="train"></el-option>
-                <el-option key="onlyVal" label="val" value="val"></el-option>
-            </el-select>
-        </div>
-        <sly-grid-gallery :content="data.gallery.content" :options="data.gallery.options"></sly-grid-gallery>
-    </sly-field>
 </sly-card>

@@ -120,8 +120,10 @@ def create_splits(api: sly.Api, task_id, context, state, app_logger):
             ])
         g.api.app.set_fields(g.task_id, fields)
 
-    _save_set_to_json(train_set_path, train_set)
-    _save_set_to_json(val_set_path, val_set)
+    if train_set is not None:
+        _save_set_to_json(train_set_path, train_set)
+    if val_set is not None:
+        _save_set_to_json(val_set_path, val_set)
 
 
 def _save_set_to_json(save_path, items):

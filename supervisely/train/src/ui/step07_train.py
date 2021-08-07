@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 
 import step02_splits
 import supervisely_lib as sly
@@ -16,6 +17,10 @@ chart_lr: sly.app.widgets.Chart = None
 chart_bce: sly.app.widgets.Chart = None
 chart_dice: sly.app.widgets.Chart = None
 chart_loss: sly.app.widgets.Chart = None
+
+gallery: sly.app.widgets.PredictionsDynamicsGallery = None
+train_vis_items_path = os.path.join(g.info_dir, "train_vis_items.json")
+val_vis_items_path = os.path.join(g.info_dir, "val_vis_items.json")
 
 
 def init(data, state):
@@ -37,7 +42,8 @@ def init(data, state):
 
     state["expName"] = g.project_info.name
     state["visEpoch"] = 0
-    data["gallery"] = sly.app.widgets.EmptyGridGallery().to_json()
+
+    data["gallery"] = gallery
     state["visSets"] = ["train", "val"]
 
 
@@ -110,6 +116,16 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
         # save model classes info + classes order. Order is used to convert model predictions to correct masks for every class
         sly.json.dump_json_file(classes_json, model_classes_path)
+
+        # predictions improvement over time
+        global gallery
+        gallery = sly.app.widgets.PredictionsDynamicsGallery(g.task_id, g.api, "data.gallery", project_seg.meta)
+        gallery.complete_update()
+
+        train_vis_items = random.sample(step02_splits.train_set, state['trainVisCount'])
+        val_vis_items = random.sample(step02_splits.val_set, state['valVisCount'])
+        step02_splits._save_set_to_json(os.path.join(g.info_dir, "train_vis_items.json"), train_vis_items)
+        step02_splits._save_set_to_json(os.path.join(g.info_dir, "val_vis_items.json"), val_vis_items)
 
         set_train_arguments(state)
         import train
@@ -201,8 +217,7 @@ def set_train_arguments(state):
     sys.argv.extend(["--checkpoints-dir", g.checkpoints_dir])
 
     # visualization settings
-    sys.argv.extend(["--train-vis-count", str(state['trainVisCount'])])
-    sys.argv.extend(["--val-vis-count", str(state['valVisCount'])])
-
+    sys.argv.extend(["--train-vis-items-path", train_vis_items_path])
+    sys.argv.extend(["--val-vis-items-path", val_vis_items_path])
     sys.argv.append("--sly")
 

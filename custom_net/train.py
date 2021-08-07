@@ -1,36 +1,20 @@
 import argparse
-import json
 import os
 from pathlib import Path
 from validation import validation_binary, validation_multi
 
 import torch
 from torch import nn
-from torch.optim import Adam
 from torch.utils.data import DataLoader
 import torch.backends.cudnn as cudnn
 import torch.backends.cudnn
 
 from models import UNet11, LinkNet34, UNet, UNet16, AlbuNet
 from loss import LossBinary, LossMulti
-#from dataset import RoboticsDataset
 import utils
-import sys
-#from prepare_train_val import get_split
 
 import supervisely_lib as sly
 from sly_seg_dataset import SlySegDataset
-
-
-from albumentations import (
-    HorizontalFlip,
-    VerticalFlip,
-    Normalize,
-    Compose,
-    PadIfNeeded,
-    RandomCrop,
-    CenterCrop
-)
 
 
 model_list = {
@@ -43,10 +27,6 @@ model_list = {
 
 
 def main():
-    # arg('--train_crop_height', type=int, default=1024)
-    # arg('--train_crop_width', type=int, default=1280)
-    # arg('--val_crop_height', type=int, default=1024)
-    # arg('--val_crop_width', type=int, default=1280)
     # arg('--model', type=str, default='UNet', choices=moddel_list.keys())
 
     parser = argparse.ArgumentParser()
@@ -99,8 +79,8 @@ def main():
     parser.add_argument('--checkpoints-dir', default='', help='checkpoint dir')
 
     # visualization settings
-    parser.add_argument('--train-vis-count', type=int, default=1, help='Number of random images from TRAIN to visualize predictions over time')
-    parser.add_argument('--val-vis-count', type=int, default=1, help='Number of random images from VAL to visualize predictions over time')
+    parser.add_argument('--train-vis-items-path', default='', help='predictions over time on images from TRAIN')
+    parser.add_argument('--val-vis-items-path', type=int, default=1, help='predictions over time on images from VAL')
 
     # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')

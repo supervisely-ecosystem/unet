@@ -17,7 +17,7 @@ transforms_img = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
 ])
-
+import supervisely_lib as sly
 from inference import inference
 
 
@@ -141,10 +141,14 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             valid_loss = valid_metrics['valid_loss']
             valid_losses.append(valid_loss)
 
-            #@TODO: predictions improvement over time
-            #img_path = "/app_debug_data/data/Lemons (Annotated)_seg/ds1/img/IMG_0748.jpeg"
-            #save_path = f"/app_debug_data/{epoch}.jpeg"
-            #inference(model, classes, args.input_height, args.input_width, img_path, save_path)
+            if args.sly:
+                pass
+
+                #@TODO: predictions improvement over time
+                #predictions =
+                #img_path = "/app_debug_data/data/Lemons (Annotated)_seg/ds1/img/IMG_0748.jpeg"
+                #save_path = f"/app_debug_data/{epoch}.jpeg"
+                #inference(model, classes, args.input_height, args.input_width, img_path, save_path)
         except KeyboardInterrupt:
             tq.close()
             print('Ctrl+C, saving snapshot')
