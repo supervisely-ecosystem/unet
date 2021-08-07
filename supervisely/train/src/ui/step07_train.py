@@ -82,6 +82,9 @@ def update_charts(phase, epoch, epoch_samples, metrics):
 @g.my_app.ignore_errors_and_show_dialog_window()
 def train(api: sly.Api, task_id, context, state, app_logger):
     try:
+        #@TODO: height - width
+        #image_height % 32 == 0 and image_width % 32 == 0
+
         # convert project to segmentation masks
         global project_dir_seg
         project_dir_seg = os.path.join(g.my_app.data_dir, g.project_info.name + "_seg")
@@ -158,7 +161,9 @@ def set_train_arguments(state):
 
     # basic hyperparameters
     sys.argv.extend(["--epochs", str(state["epochs"])])
-    sys.argv.extend(["--input-size", str(state["imgSize"])])
+    #sys.argv.extend(["--input-size", str(state["imgSize"])])
+    sys.argv.extend(["--input-height", str(state["imgSize"]["height"])])
+    sys.argv.extend(["--input-width", str(state["imgSize"]["width"])])
     sys.argv.extend(["--batch-size", str(state["batchSizePerGPU"])])
 
     # # optimizer

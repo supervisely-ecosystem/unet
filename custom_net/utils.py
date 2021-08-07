@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 from pathlib import Path
+import torch.optim as optim
+from torch.optim import lr_scheduler
 
 import random
 import numpy as np
@@ -9,8 +11,8 @@ import torch
 import tqdm
 
 
-# def cuda(x):
-#     return x.cuda() if torch.cuda.is_available() else x
+def cuda(x):
+    return x.cuda(non_blocking=True) if torch.cuda.is_available() else x
 
 
 def write_event(log, step, **data):
@@ -21,30 +23,46 @@ def write_event(log, step, **data):
     log.flush()
 
 
-def check_crop_size(image_height, image_width):
-    """Checks if image size divisible by 32.
+def get_optimizer(args, model):
+    my_optimizer = None
+    if args.optimizer == "SGD":
+        my_optimizer = optim.SGD(
+            model.parameters(),
+            lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, nesterov=args.nesterov
+        )
+    elif args.optimizer == "Adam":
+        my_optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    elif args.optimizer == "AdamW":
+        my_optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    else:
+        raise RuntimeError(f"Unknown optimizer {args.optimizer}")
+    return my_optimizer
 
-    Args:
-        image_height:
-        image_width:
 
-    Returns:
-        True if both height and width divisible by 32 and False otherwise.
+def get_scheduler(args, optimizer):
+    scheduler = None
+    if args.lr_schedule == "":
+        pass
+    elif args.lr_schedule == "StepLR":
+        scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma_step)
+    elif args.lr_schedule == "ExponentialLR":
+        scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=args.gamma_exp)
+    elif args.lr_schedule == "MultiStepLR":
+        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=args.milestones, gamma=args.gamma_step)
+    else:
+        raise RuntimeError(f"Unknown lr_schedule {args.lr_schedule}")
+    return scheduler
 
-    """
-    return image_height % 32 == 0 and image_width % 32 == 0
 
-
-def train(args, model, criterion, train_loader, valid_loader, validation, init_optimizer, n_epochs=None, fold=None,
-          num_classes=None):
-    device = torch.device(args.gpu_id)
+def train(args, model, criterion, train_loader, valid_loader, validation, n_epochs=None, num_classes=None):
+    #device = torch.device(args.gpu_id)
 
     lr = args.lr
-    n_epochs = n_epochs or args.n_epochs
-    optimizer = init_optimizer(lr)
+    n_epochs = n_epochs or args.epochs
 
     root = Path(args.root)
-    model_path = root / 'model_{fold}.pt'.format(fold=fold)
+    model_path = root / 'model.pt'
+
     if model_path.exists():
         state = torch.load(str(model_path))
         epoch = state['epoch']
@@ -61,8 +79,11 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
         'step': step,
     }, str(model_path))
 
+    optimizer = get_optimizer(args, model)
+    scheduler = get_scheduler(args, optimizer)
+
     report_each = 10
-    log = root.joinpath('train_{fold}.log'.format(fold=fold)).open('at', encoding='utf8')
+    log = root.joinpath('train.log').open('at', encoding='utf8')
     valid_losses = []
     for epoch in range(epoch, n_epochs + 1):
         model.train()
@@ -74,10 +95,12 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
         try:
             mean_loss = 0
             for i, (inputs, targets) in enumerate(tl):
-                inputs = inputs.to(device)
+                inputs = cuda(inputs)
+                #inputs = inputs.to(device)
 
                 with torch.no_grad():
-                    targets = targets.to(device)
+                    #targets = targets.to(device)
+                    targets = cuda(targets)
 
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)

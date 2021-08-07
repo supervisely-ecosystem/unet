@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 from pathlib import Path
 from validation import validation_binary, validation_multi
 
@@ -19,7 +20,6 @@ import sys
 
 import supervisely_lib as sly
 from sly_seg_dataset import SlySegDataset
-import sly_ui_utils
 
 
 from albumentations import (
@@ -32,22 +32,22 @@ from albumentations import (
     CenterCrop
 )
 
-moddel_list = {'UNet11': UNet11,
-               'UNet16': UNet16,
-               'UNet': UNet,
-               'AlbuNet': AlbuNet,
-               'LinkNet34': LinkNet34}
+
+model_list = {
+    'UNet11': UNet11,
+    'UNet16': UNet16,
+    'UNet': UNet,
+    'AlbuNet': AlbuNet,
+    'LinkNet34': LinkNet34
+}
 
 
 def main():
-    # arg('--n-epochs', type=int, default=100)
     # arg('--train_crop_height', type=int, default=1024)
     # arg('--train_crop_width', type=int, default=1280)
     # arg('--val_crop_height', type=int, default=1024)
     # arg('--val_crop_width', type=int, default=1280)
     # arg('--model', type=str, default='UNet', choices=moddel_list.keys())
-
-    # n - epochs -> epochs
 
     parser = argparse.ArgumentParser()
     # model architecture
@@ -61,7 +61,9 @@ def main():
 
     # basic hyperparameters
     parser.add_argument('--epochs', type=int, default=5)
-    parser.add_argument('--input-size', type=int, default=256, help='model input image size')
+    #parser.add_argument('--input-size', type=int, default=256, help='model input image size')
+    parser.add_argument('--input-height', type=int, default=256, help='model input image size')
+    parser.add_argument('--input-width', type=int, default=256, help='model input image size')
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--jaccard-weight', default=0.5, type=float)
 
@@ -105,19 +107,6 @@ def main():
     checkpoints_dir = Path(args.checkpoints_dir)
     checkpoints_dir.mkdir(exist_ok=True, parents=True)
 
-    #@TODO: check later
-    # if not utils.check_crop_size(args.train_crop_height, args.train_crop_width):
-    #     print('Input image sizes should be divisible by 32, but train '
-    #           'crop sizes ({train_crop_height} and {train_crop_width}) '
-    #           'are not.'.format(train_crop_height=args.train_crop_height, train_crop_width=args.train_crop_width))
-    #     sys.exit(0)
-    #
-    # if not utils.check_crop_size(args.val_crop_height, args.val_crop_width):
-    #     print('Input image sizes should be divisible by 32, but validation '
-    #           'crop sizes ({val_crop_height} and {val_crop_width}) '
-    #           'are not.'.format(val_crop_height=args.val_crop_height, val_crop_width=args.val_crop_width))
-    #     sys.exit(0)
-
     classes = sly.json.load_json_file(args.classes_path)
     num_classes = len(classes)
 
@@ -129,6 +118,7 @@ def main():
     #     model = model_name(num_classes=num_classes, pretrained=True)
 
     if torch.cuda.is_available():
+        #@TODO: later can be used for bulti GPU training, now it is disabled
         if args.gpu_id:
             device_ids = [args.gpu_id] #list(map(int, args.gpu_id.split(',')))
         else:
@@ -147,9 +137,9 @@ def main():
 
     cudnn.benchmark = True
 
-    train_set = SlySegDataset(args.project_dir, args.classes_path, args.train_set_path, input_size=args.input_size)
-    val_set = SlySegDataset(args.project_dir, args.classes_path, args.val_set_path, input_size=args.input_size)
-    print('num_train = {}, num_val = {}'.format(len(train_set), len(val_set)))
+    train_set = SlySegDataset(args.project_dir, args.classes_path, args.train_set_path, args.input_height, args.input_width)
+    val_set = SlySegDataset(args.project_dir, args.classes_path, args.val_set_path,args.input_height, args.input_width)
+    sly.logger.info("Train/Val splits", extra={"train_size": len(train_set), "val_size": len(val_set)})
 
     train_loader = DataLoader(
         train_set,
@@ -186,21 +176,15 @@ def main():
     # valid_loader = make_loader(val_file_names, transform=val_transform(p=1), problem_type=args.type,
     #                            batch_size=len(device_ids))
 
-    checkpoints_dir.joinpath('params.json').write_text(
-        json.dumps(vars(args), indent=True, sort_keys=True))
-
-    optimizer = sly_ui_utils.get_optimizer(args, model)
-    lr_schedule = sly_ui_utils.get_schedule(args, optimizer)
+    sly.json.dump_json_file(vars(args), os.path.join(checkpoints_dir, "train_args.json"))
 
     utils.train(
-        init_optimizer=lambda lr: Adam(model.parameters(), lr=lr),
         args=args,
         model=model,
         criterion=loss,
         train_loader=train_loader,
         valid_loader=valid_loader,
         validation=valid,
-        fold=args.fold,
         num_classes=num_classes
     )
 

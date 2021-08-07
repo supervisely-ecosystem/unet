@@ -5,7 +5,7 @@ import numpy as np
 
 
 class SlySegDataset(Dataset):
-    def __init__(self, project_dir, model_classes_path, split_path, input_size, sly_augs=None):
+    def __init__(self, project_dir, model_classes_path, split_path, input_height, input_width, sly_augs=None):
         self.project_fs = sly.Project(project_dir, sly.OpenMode.READ)
 
         self.input_items = sly.json.load_json_file(split_path)
@@ -19,13 +19,13 @@ class SlySegDataset(Dataset):
         self.transforms_img = transforms.Compose([
             # step0 - sly_augs will be applied here
             transforms.ToTensor(),
-            transforms.Resize(size=[input_size, input_size], interpolation=transforms.InterpolationMode.NEAREST),
+            transforms.Resize(size=(input_height, input_width), interpolation=transforms.InterpolationMode.NEAREST),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
         ])
         self.transforms_ann = transforms.Compose([
             # step0 - sly_augs will be applied here
             transforms.ToTensor(),
-            transforms.Resize(size=[input_size, input_size], interpolation=transforms.InterpolationMode.NEAREST),
+            transforms.Resize(size=(input_height, input_width), interpolation=transforms.InterpolationMode.NEAREST),
         ])
 
     def __len__(self):
