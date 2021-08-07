@@ -57,6 +57,8 @@ def get_scheduler(args, optimizer):
 def train(args, model, criterion, train_loader, valid_loader, validation, n_epochs=None, num_classes=None):
     #device = torch.device(args.gpu_id)
 
+    print(123)
+
     lr = args.lr
     n_epochs = n_epochs or args.epochs
 
@@ -86,6 +88,11 @@ def train(args, model, criterion, train_loader, valid_loader, validation, n_epoc
     log = root.joinpath('train.log').open('at', encoding='utf8')
     valid_losses = []
     for epoch in range(epoch, n_epochs + 1):
+        if scheduler is not None:
+            scheduler.step()
+        for param_group in optimizer.param_groups:
+            print("LR", param_group['lr'])
+
         model.train()
         random.seed()
         tq = tqdm.tqdm(total=(len(train_loader) * args.batch_size))

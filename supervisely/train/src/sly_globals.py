@@ -42,8 +42,7 @@ project_meta = sly.ProjectMeta.from_json(api.project.get_meta(project_id))
 project_dir = os.path.join(my_app.data_dir, "sly_project")
 
 artifacts_dir = os.path.join(my_app.data_dir, "artifacts")
-sly.fs.mkdir(artifacts_dir)
 info_dir = os.path.join(artifacts_dir, "info")
 sly.fs.mkdir(info_dir)
 checkpoints_dir = os.path.join(artifacts_dir, "checkpoints")
-sly.fs.mkdir(checkpoints_dir)
+sly.fs.mkdir(checkpoints_dir, remove_content_if_exists=True)  # remove content for debug, has no effect in production

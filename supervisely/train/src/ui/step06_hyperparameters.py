@@ -4,7 +4,7 @@ import sly_globals as g
 
 
 def init(data, state):
-    state["epochs"] = 50  # @TODO: 50 for debug
+    state["epochs"] = 500  # @TODO: 50 for debug
     state["gpusId"] = '0'
 
     #state["imgSize"] = 256
@@ -21,7 +21,7 @@ def init(data, state):
     state["saveLast"] = True
     state["saveBest"] = True
 
-    state["optimizer"] = "SGD"
+    state["optimizer"] = "Adam" #"SGD"
     state["lr"] = 0.001
     state["momentum"] = 0.9
     state["weightDecay"] = 0.0001
