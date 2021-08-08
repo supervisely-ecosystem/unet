@@ -148,7 +148,8 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 sly_integration.vis_inference(epoch, model, classes,
                                               args.input_height, args.input_width,
                                               args.project_dir, args.val_vis_items_path)
-
+                xxx = 10
+                xxx += 1
                 #@TODO: predictions improvement over time
                 #predictions =
                 #img_path = "/app_debug_data/data/Lemons (Annotated)_seg/ds1/img/IMG_0748.jpeg"

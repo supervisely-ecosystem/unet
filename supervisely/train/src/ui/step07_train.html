@@ -74,12 +74,29 @@
         >
             <div class="fflex">
                 <div class="mr15">Epoch</div>
-                <el-slider v-model="state.visEpoch"
-                           :min="1" :max="state.epochs" :step="1"
-                           show-stops show-input
-                           style="width: 500px;"
+                <div style="color: red;">{{data.gallery.content.layout[2]}}</div>
+<!--                data.gallery.content.layout = data.gallery.content.layout.slice(0,2).concat([[`IMG_1836.jpeg_pred_${value}`]])-->
+
+                <el-input-number v-model="state.visEpoch" :min="1" :max="state.epochs" :step="1" :debounce="500"
+                                 @change="(value) => {
+                                    data.gallery.content.layout = [
+                                        data.gallery.content.layout[0], data.gallery.content.layout[1],
+                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )
+                                    ]
+                                }"
                 >
-                </el-slider>
+
+                </el-input-number>
+                <!--                <el-slider v-model="state.visEpoch"-->
+<!--                           :min="1" :max="state.epochs" :step="1"-->
+<!--                           show-stops show-input-->
+<!--                           style="width: 500px;"-->
+<!--                           @change="(value) => {-->
+<!--                                data.gallery.content.layout-->
+<!--                                [2] = data.gallery.content.pred_layout.map( (x)=>`${x}_${state.visEpoch}` )-->
+<!--                           }"-->
+<!--                >-->
+<!--                </el-slider>-->
             </div>
             <div class="fflex">
                 <div class="mr10">Show examples from</div>
