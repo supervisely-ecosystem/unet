@@ -88,6 +88,7 @@
                     <el-option key="onlyVal" label="val" value="val"></el-option>
                 </el-select>
             </div>
+            <pre>{{data.gallery.content}}</pre>
             <sly-grid-gallery v-if="data.gallery"
                               :content="data.gallery.content"
                               :options="data.gallery.options">

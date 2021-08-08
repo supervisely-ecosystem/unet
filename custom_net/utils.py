@@ -142,8 +142,12 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             valid_losses.append(valid_loss)
 
             if args.sly:
-                sly_integration.vis_inference(model, classes, args.input_height, args.input_width,
+                sly_integration.vis_inference(epoch, model, classes,
+                                              args.input_height, args.input_width,
                                               args.project_dir, args.train_vis_items_path)
+                sly_integration.vis_inference(epoch, model, classes,
+                                              args.input_height, args.input_width,
+                                              args.project_dir, args.val_vis_items_path)
 
                 #@TODO: predictions improvement over time
                 #predictions =

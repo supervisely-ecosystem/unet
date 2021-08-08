@@ -165,13 +165,21 @@
         <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
             <i class="zmdi zmdi-compare"></i>
         </sly-icon>
+<!--        Condition ? : - is for convenient debug-->
+<!--        (IsItMuted === true) ? 'On' : 'Off';-->
         <sly-field title="Number of train images"
                    description="Random images from training for visualization">
-            <el-input-number v-model="state.trainVisCount" :min="0" :max="data.trainImagesCount" :disabled="data.done6"></el-input-number>
+            <el-input-number v-model="state.trainVisCount"
+                             :min="0" :max="(data.trainImagesCount) ? data.trainImagesCount : 10"
+                             :disabled="data.done6">
+            </el-input-number>
         </sly-field>
         <sly-field title="Number of val images"
                    description="Random images from validation for visualization">
-            <el-input-number v-model="state.valVisCount" :min="0" :max="data.valImagesCount" :disabled="data.done6"></el-input-number>
+            <el-input-number v-model="state.valVisCount"
+                             :min="0" :max="(data.valImagesCount) ? data.valImagesCount : 10"
+                             :disabled="data.done6">
+            </el-input-number>
         </sly-field>
     </sly-field>
 

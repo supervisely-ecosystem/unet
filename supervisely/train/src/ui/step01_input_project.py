@@ -54,6 +54,11 @@ def download(api: sly.Api, task_id, context, state, app_logger):
 
 
 def get_image_info_from_cache(dataset_name, item_name):
+    global project_fs
+    if project_fs is None:
+        # for debug step07 without running all previous steps
+        project_fs = sly.Project(g.project_dir, sly.OpenMode.READ)
+
     dataset_fs = project_fs.datasets.get(dataset_name)
     img_info_path = dataset_fs.get_img_info_path(item_name)
     image_info_dict = sly.json.load_json_file(img_info_path)
