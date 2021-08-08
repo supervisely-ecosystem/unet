@@ -153,11 +153,6 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                                               args.project_dir, args.val_vis_items_path)
                 xxx = 10
                 xxx += 1
-                #@TODO: predictions improvement over time
-                #predictions =
-                #img_path = "/app_debug_data/data/Lemons (Annotated)_seg/ds1/img/IMG_0748.jpeg"
-                #save_path = f"/app_debug_data/{epoch}.jpeg"
-                #inference(model, classes, args.input_height, args.input_width, img_path, save_path)
         except KeyboardInterrupt:
             tq.close()
             print('Ctrl+C, saving snapshot')
