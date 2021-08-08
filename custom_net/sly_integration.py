@@ -9,7 +9,6 @@ import supervisely_lib as sly
 
 def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, model_classes: sly.ProjectMeta):
     height, width = predicted_class_indices.shape[:2]
-
     labels = []
     for idx, class_info in enumerate(classes_json):  # curr_col2cls.items():
         class_mask = np.all(predicted_class_indices == idx, axis=2)  # exact match (3-channel img & rgb color)

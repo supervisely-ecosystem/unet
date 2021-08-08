@@ -11,14 +11,14 @@ import cv2
 import torch
 import tqdm
 
+import sly_integration
+
 from torchvision import transforms
 transforms_img = transforms.Compose([
     # step0 - sly_augs will be applied here
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
 ])
-import supervisely_lib as sly
-from inference import inference
 
 
 def cuda(x):
@@ -142,7 +142,8 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             valid_losses.append(valid_loss)
 
             if args.sly:
-                pass
+                sly_integration.vis_inference(model, classes, args.input_height, args.input_width,
+                                              args.project_dir, args.train_vis_items_path)
 
                 #@TODO: predictions improvement over time
                 #predictions =

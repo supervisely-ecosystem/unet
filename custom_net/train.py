@@ -80,7 +80,7 @@ def main():
 
     # visualization settings
     parser.add_argument('--train-vis-items-path', default='', help='predictions over time on images from TRAIN')
-    parser.add_argument('--val-vis-items-path', type=int, default=1, help='predictions over time on images from VAL')
+    parser.add_argument('--val-vis-items-path',   default='', help='predictions over time on images from VAL')
 
     # integration with dashboard (ignore flag during local dev)
     parser.add_argument('--sly', action='store_true', help='for Supervisely App integration')
@@ -112,7 +112,7 @@ def main():
         raise SystemError('GPU device not found')
 
     if num_classes == 1:
-        raise RuntimeError("Train dashboard always gives min 2 classes (x + gb)")
+        raise RuntimeError("Train dashboard always gives min 2 classes (classX + BG)")
         #loss = LossBinary(jaccard_weight=args.jaccard_weight)
         #valid = validation_binary
     else:

@@ -84,6 +84,17 @@ def update_charts(phase, epoch, epoch_samples, metrics):
     g.api.app.set_fields(g.task_id, fields)
 
 
+def sample_items_for_visualization(state):
+    train_set = sly.json.load_json_file(step02_splits.train_set_path)
+    val_set = sly.json.load_json_file(step02_splits.val_set_path)
+
+    train_vis_items = random.sample(train_set, state['trainVisCount'])
+    val_vis_items = random.sample(val_set, state['valVisCount'])
+
+    sly.json.dump_json_file(train_vis_items, train_vis_items_path)
+    sly.json.dump_json_file(val_vis_items, val_vis_items_path)
+
+
 @g.my_app.callback("train")
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()
@@ -122,10 +133,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         gallery = sly.app.widgets.PredictionsDynamicsGallery(g.task_id, g.api, "data.gallery", project_seg.meta)
         gallery.complete_update()
 
-        train_vis_items = random.sample(step02_splits.train_set, state['trainVisCount'])
-        val_vis_items = random.sample(step02_splits.val_set, state['valVisCount'])
-        step02_splits._save_set_to_json(os.path.join(g.info_dir, "train_vis_items.json"), train_vis_items)
-        step02_splits._save_set_to_json(os.path.join(g.info_dir, "val_vis_items.json"), val_vis_items)
+        sample_items_for_visualization(state)
 
         set_train_arguments(state)
         import train
