@@ -10,8 +10,7 @@ import cv2
 
 import torch
 import tqdm
-
-import sly_integration
+import supervisely_lib as sly
 
 from torchvision import transforms
 transforms_img = transforms.Compose([
@@ -23,14 +22,6 @@ transforms_img = transforms.Compose([
 
 def cuda(x):
     return x.cuda(non_blocking=True) if torch.cuda.is_available() else x
-
-
-def write_event(log, step, **data):
-    data['step'] = step
-    data['dt'] = datetime.now().isoformat()
-    log.write(json.dumps(data, sort_keys=True))
-    log.write('\n')
-    log.flush()
 
 
 def get_optimizer(args, model):
@@ -72,6 +63,9 @@ def prepare_image_input(image, input_width, input_height):
 
 
 def train(args, model, criterion, train_loader, valid_loader, validation, classes):
+    if args.sly:
+        import sly_integration
+
     #device = torch.device(args.gpu_id)
     lr = args.lr
     n_epochs = args.epochs
@@ -98,9 +92,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
     optimizer = get_optimizer(args, model)
     scheduler = get_scheduler(args, optimizer)
 
-    report_each = 10
-    log = root.joinpath('train.log').open('at', encoding='utf8')
-    #valid_losses = []
+    report_each = args.metrics_period
 
     if args.sly:
         sly_integration.init_progress_bars(n_epochs, len(train_loader), len(valid_loader))
@@ -111,20 +103,17 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
 
         if scheduler is not None:
             scheduler.step()
+
+        lr = None
         for param_group in optimizer.param_groups:
-            print("LR", param_group['lr'])
+            lr = param_group['lr']
 
         model.train()
         random.seed()
 
-        #tq = tqdm.tqdm(total=(len(train_loader) * args.batch_size))
-        #tq.set_description('Epoch {}, lr {}'.format(epoch, lr))
-
         losses = []
-        tl = train_loader
         try:
-            mean_loss = 0
-            for i, (inputs, targets) in enumerate(tl):
+            for i, (inputs, targets) in enumerate(train_loader):
                 inputs = cuda(inputs)
                 with torch.no_grad():
                     targets = cuda(targets)
@@ -132,26 +121,22 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 optimizer.zero_grad()
-                #batch_size = inputs.size(0)
                 loss.backward()
                 optimizer.step()
                 step += 1
-                #tq.update(batch_size)
                 if args.sly:
                     sly_integration.progress_increment_train_iter(1)
 
                 losses.append(loss.item())
-                mean_loss = np.mean(losses[-report_each:])
-                #tq.set_postfix(loss='{:.5f}'.format(mean_loss))
-                if i and i % report_each == 0:
-                    write_event(log, step, loss=mean_loss)
-            write_event(log, step, loss=mean_loss)
-            #tq.close()
+                if i and (i % report_each == 0 or i == len(train_loader) - 1):
+                    sly.logger("Train metrics", extra={"lr": lr})
+                    if args.sly:
+                        sly_integration.report_train_metrics(epoch, len(train_loader), i, lr, loss)
             save(epoch + 1)
-            valid_metrics = validation(model, criterion, valid_loader, len(classes))
-            write_event(log, step, **valid_metrics)
-            valid_loss = valid_metrics['valid_loss']
-            #valid_losses.append(valid_loss)
+            metrics = validation(model, criterion, valid_loader, len(classes))
+
+            if args.sly:
+                sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
 
             # if args.sly:
             #@TODO: add progress widget

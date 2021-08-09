@@ -54,26 +54,19 @@
         <sly-field title="Training charts" description="Real-time training metrics">
             <div class="fflex">
                 <sly-line-chart
-                        style="width: 50%;"
+                        style="width: 33%;"
                         :options.sync="data.chartLR.options"
                         :content="data.chartLR.series">
                 </sly-line-chart>
                 <sly-line-chart
-                        style="width: 50%;"
-                        :options.sync="data.chartBCE.options"
-                        :content="data.chartBCE.series">
-                </sly-line-chart>
-            </div>
-            <div class="fflex">
-                <sly-line-chart
-                        style="width: 50%;"
-                        :options.sync="data.chartDICE.options"
-                        :content="data.chartDICE.series">
-                </sly-line-chart>
-                <sly-line-chart
-                        style="width: 50%;"
+                        style="width: 33%;"
                         :options.sync="data.chartLoss.options"
                         :content="data.chartLoss.series">
+                </sly-line-chart>
+                <sly-line-chart
+                        style="width: 33%;"
+                        :options.sync="data.chartAcc.options"
+                        :content="data.chartAcc.series">
                 </sly-line-chart>
             </div>
         </sly-field>

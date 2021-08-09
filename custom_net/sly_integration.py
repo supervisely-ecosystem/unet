@@ -6,7 +6,7 @@ import supervisely_lib as sly
 
 import sly_globals as g
 from inference import inference
-from step07_train import gallery
+from step07_train import gallery, chart_lr, chart_loss, chart_acc
 from step01_input_project import get_image_info_from_cache
 
 
@@ -89,3 +89,31 @@ def progress_set_epoch(epoch):
 def progress_increment_train_iter(count):
     progress_iter.increment(count)
 
+
+def report_train_metrics(epoch, iters_in_epoch, iter, lr, loss):
+    x = epoch + iter / iters_in_epoch
+    fields = [
+        chart_lr.get_field(x, lr),
+        chart_loss.get_field(x, loss, "train"),
+    ]
+    g.api.app.set_fields(g.task_id, fields)
+
+
+def report_val_metrics(epoch, loss, avg_iou, agv_dice):
+    fields = [
+        chart_loss.get_field(epoch, loss, "val"),
+        chart_acc.get_field(epoch, avg_iou, "avg IoU"),
+        chart_acc.get_field(epoch, agv_dice, "avg Dice"),
+    ]
+    g.api.app.set_fields(g.task_id, fields)
+
+
+# def update_charts(phase, epoch, ):
+#     fields = [
+#         chart_lr.get_field(epoch, metrics['lr']),
+#         #@TODO: log metrics here
+#         # chart_loss.get_field(epoch, metrics['bce'], phase),
+#         # chart_acc.get_field(epoch, metrics['dice'], phase),
+#         # chart_loss.get_field(epoch, metrics['loss'], phase),
+#     ]
+#     g.api.app.set_fields(g.task_id, fields)

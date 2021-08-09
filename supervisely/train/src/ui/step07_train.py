@@ -14,9 +14,8 @@ project_dir_seg = None
 model_classes_path = os.path.join(g.info_dir, "model_classes.json")
 
 chart_lr: sly.app.widgets.Chart = None
-chart_bce: sly.app.widgets.Chart = None
-chart_dice: sly.app.widgets.Chart = None
 chart_loss: sly.app.widgets.Chart = None
+chart_acc: sly.app.widgets.Chart = None
 
 gallery: sly.app.widgets.PredictionsDynamicsGallery = None
 train_vis_items_path = os.path.join(g.info_dir, "train_vis_items.json")
@@ -53,26 +52,22 @@ def restart(data, state):
 
 
 def init_charts(data, state):
-    global chart_lr, chart_bce, chart_dice, chart_loss
+    global chart_lr, chart_loss, chart_acc
+    # yrange = [state["lr"] - state["lr"] / 2.0, state["lr"] + state["lr"] / 2.0],
     chart_lr = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLR",
                                      title="LR", series_names=["LR"],
-                                     yrange=[state["lr"] - state["lr"] / 2.0, state["lr"] + state["lr"] / 2.0],
                                      ydecimals=6, xdecimals=2)
-    chart_bce = sly.app.widgets.Chart(g.task_id, g.api, "data.chartBCE",
-                                      title="BCE", series_names=["train", "val"],
-                                      smoothing=0.6, ydecimals=6, xdecimals=2)
-    chart_dice = sly.app.widgets.Chart(g.task_id, g.api, "data.chartDICE",
-                                      title="DICE", series_names=["train", "val"],
-                                      smoothing=0.6, ydecimals=6, xdecimals=2)
     chart_loss = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLoss",
-                                       title="Total loss", series_names=["train", "val"],
-                                       smoothing=0.6, ydecimals=6, xdecimals=2)
+                                      title="Loss", series_names=["train", "val"],
+                                      smoothing=0.6, ydecimals=6, xdecimals=2)
+    chart_acc = sly.app.widgets.Chart(g.task_id, g.api, "data.chartAcc",
+                                      title="Val Acc", series_names=["avg IoU", "avg Dice"],
+                                      smoothing=0.6, ydecimals=6, xdecimals=2)
     state["smoothing"] = 0.6
 
     chart_lr.init_data(data)
-    chart_bce.init_data(data)
-    chart_dice.init_data(data)
     chart_loss.init_data(data)
+    chart_acc.init_data(data)
 
 
 def init_progress_bars(data):
@@ -85,16 +80,6 @@ def init_progress_bars(data):
     progress_epoch.init_data(data)
     progress_iter.init_data(data)
     progress_val.init_data(data)
-
-
-def update_charts(phase, epoch, epoch_samples, metrics):
-    fields = [
-        chart_lr.get_field(epoch, metrics['lr']),
-        chart_bce.get_field(epoch, metrics['bce'] / epoch_samples, phase),
-        chart_dice.get_field(epoch, metrics['dice'] / epoch_samples, phase),
-        chart_loss.get_field(epoch, metrics['loss'] / epoch_samples, phase),
-    ]
-    g.api.app.set_fields(g.task_id, fields)
 
 
 def sample_items_for_visualization(state):
