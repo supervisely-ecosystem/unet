@@ -84,6 +84,8 @@ def progress_set_epoch(epoch):
     progress_epoch.set(epoch, force_update=True)
     progress_iter.reset()
     progress_iter.set(0, force_update=True)
+    progress_val.reset()
+    progress_val.update(force=True)
 
 
 def progress_increment_train_iter(count):
