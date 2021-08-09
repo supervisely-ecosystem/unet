@@ -128,7 +128,8 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 sly_integration.report_train_metrics(epoch, len(train_loader), i, lr, loss_cpu)
 
         save(epoch + 1)
-        metrics = validation(model, criterion, valid_loader, len(classes))
+        metrics = validation(model, criterion, valid_loader, len(classes),
+                             progress_cb=sly_integration.progress_increment_val_iter)
         if args.sly:
             sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
 

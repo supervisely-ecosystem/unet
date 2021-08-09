@@ -36,7 +36,7 @@ def get_jaccard(y_true, y_pred):
     return list(((intersection + epsilon) / (union - intersection + epsilon)).data.cpu().numpy())
 
 
-def validation_multi(model: nn.Module, criterion, valid_loader, num_classes):
+def validation_multi(model: nn.Module, criterion, valid_loader, num_classes, progress_cb=None):
     with torch.no_grad():
         model.eval()
         losses = []
@@ -52,8 +52,10 @@ def validation_multi(model: nn.Module, criterion, valid_loader, num_classes):
             target_classes = targets.data.cpu().numpy()
             confusion_matrix += calculate_confusion_matrix_from_arrays(
                 output_classes, target_classes, num_classes)
+            if progress_cb is not None:
+                progress_cb(1)
 
-        confusion_matrix = confusion_matrix[1:, 1:]  # exclude background
+        #confusion_matrix = confusion_matrix[1:, 1:]  # exclude background
         valid_loss = np.mean(losses)  # type: float
         ious = {'iou_{}'.format(cls + 1): iou
                 for cls, iou in enumerate(calculate_iou(confusion_matrix))}

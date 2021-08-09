@@ -90,6 +90,10 @@ def progress_increment_train_iter(count):
     progress_iter.increment(count)
 
 
+def progress_increment_val_iter(count):
+    progress_val.increment(count)
+
+
 def report_train_metrics(epoch, iters_in_epoch, iter, lr, loss):
     x = epoch + iter / iters_in_epoch
     fields = [
