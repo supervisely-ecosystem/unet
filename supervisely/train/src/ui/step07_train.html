@@ -12,26 +12,23 @@
     >
         <i class="zmdi zmdi-play mr5"></i> Train
     </el-button>
-    <div>{{data.progressEpoch}}</div>
-    <div>{{data.progressIter}}</div>
-    <div>{{data.progressVal}}</div>
     <div v-if="data.progressEpoch.message && !data.outputUrl" class="mt10">
         <div style="color: #20a0ff">
             {{data.progressEpoch.message}}: {{data.progressEpoch.current}} / {{data.progressEpoch.total}}
         </div>
-        <el-progress :percentage="data.data.progressEpoch.percent"></el-progress>
+        <el-progress :percentage="data.progressEpoch.percent"></el-progress>
     </div>
     <div v-if="data.progressIter.message && !data.outputUrl" class="mt10">
         <div style="color: #20a0ff">
             {{data.progressIter.message}}: {{data.progressIter.current}} / {{data.progressIter.total}}
         </div>
-        <el-progress :percentage="data.data.progressIter.percent"></el-progress>
+        <el-progress :percentage="data.progressIter.percent"></el-progress>
     </div>
     <div v-if="data.progressVal.message && !data.outputUrl" class="mt10">
         <div style="color: #20a0ff">
             {{data.progressVal.message}}: {{data.progressVal.current}} / {{data.progressVal.total}}
         </div>
-        <el-progress :percentage="data.data.progressVal.percent"></el-progress>
+        <el-progress :percentage="data.progressVal.percent"></el-progress>
     </div>
 
     <div class="mt15" v-if="state.started === true || state.done7">

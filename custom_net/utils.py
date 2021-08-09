@@ -107,7 +107,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
 
     for epoch in range(epoch, n_epochs + 1):
         if args.sly:
-            sly_integration.update_epoch(epoch)
+            sly_integration.progress_set_epoch(epoch)
 
         if scheduler is not None:
             scheduler.step()
@@ -138,7 +138,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 step += 1
                 #tq.update(batch_size)
                 if args.sly:
-                    sly_integration.update_iter(batch_size)
+                    sly_integration.progress_increment_train_iter(1)
 
                 losses.append(loss.item())
                 mean_loss = np.mean(losses[-report_each:])

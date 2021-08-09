@@ -76,19 +76,16 @@ def init_progress_bars(epochs, train_iters, val_iters):
     progress_iter.set_total(train_iters)
     progress_val.set_total(val_iters)
 
-    fields = [
-        progress_epoch.get_field(),
-        progress_iter.get_field()
-    ]
-    g.api.app.set_fields(g.task_id, fields)
+    progress_epoch.set(0)
+    progress_iter.set(0)
 
 
+def progress_set_epoch(epoch):
+    progress_epoch.set(epoch, force_update=True)
+    progress_iter.reset()
+    progress_iter.set(0, force_update=True)
 
-#
-# def update_epoch(epoch):
-#     progress_epoch(epoch)
-#     progress_iter(0)
-#
-#
-# def update_iter(iter):
-#     progress_iter(iter)
+
+def progress_increment_train_iter(count):
+    progress_iter.increment(count)
+
