@@ -19,17 +19,12 @@ def main():
     g.my_app.run(data=data, state=state)
 
 
-#     #@TODO: limit max value for input-number
-#     #@TODO: synced views - check (disable default flag to False?)
+#@TODO: reimplement pred dynamics
 #@TODO: change predefined augs
-#@TODO: __background__
 #@TODO: disable rotate reflect - iaa.geometric.Rotate
 #@TODO: check restart step for all steps
-#@TODO: validation metrics exclude background?? integrate BCE??
 #@TODO: reimplement everything to ProgressBar widget
 #@TODO: report metric every X
-#@TODO: chart - update_y_range=True
-#@TODO: validation skips background - do we need add background class?
 if __name__ == "__main__":
     #sly.main_wrapper("main", main)
     main()
