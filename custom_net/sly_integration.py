@@ -67,6 +67,12 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
         gallery.add_prediction(item_name, time_index, pred_ann)
     gallery.update()
 
+    # predicted_classes = output.data.cpu().numpy().argmax(axis=1)
+    # model_classes = [sly.ObjClass.from_json(data) for data in classes]
+    # colors = np.array([cls.color for cls in model_classes])
+    # colored_mask = colors[predicted_classes[0]]
+    # sly.image.write(save_path, colored_mask)
+
 
 from step07_train import progress_epoch, progress_iter
 
