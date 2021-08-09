@@ -5,10 +5,6 @@
           subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
           ref="step7"
 >
-    <sly-field title="Experiment name"
-               description="Training artifacts will be saved to the following directory in team files: /unet/<task_id>_<experiment name>">
-        <el-input v-model="state.expName" :disabled="state.started"></el-input>
-    </sly-field>
     <el-button v-if="!state.done7"
                type="primary" class="regular"
                @click="state.started = true; command('train')"
@@ -16,11 +12,26 @@
     >
         <i class="zmdi zmdi-play mr5"></i> Train
     </el-button>
-    <div v-if="data.progressTrain1 && !data.outputUrl" class="mt10">
+    <div>{{data.progressEpoch}}</div>
+    <div>{{data.progressIter}}</div>
+    <div>{{data.progressVal}}</div>
+    <div v-if="data.progressEpoch.message && !data.outputUrl" class="mt10">
         <div style="color: #20a0ff">
-            {{data.progressTrain1}}: {{data.progressCurrentTrain1}} / {{data.progressTotalTrain1}}
+            {{data.progressEpoch.message}}: {{data.progressEpoch.current}} / {{data.progressEpoch.total}}
         </div>
-        <el-progress :percentage="data.progressPercentTrain1"></el-progress>
+        <el-progress :percentage="data.data.progressEpoch.percent"></el-progress>
+    </div>
+    <div v-if="data.progressIter.message && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressIter.message}}: {{data.progressIter.current}} / {{data.progressIter.total}}
+        </div>
+        <el-progress :percentage="data.data.progressIter.percent"></el-progress>
+    </div>
+    <div v-if="data.progressVal.message && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressVal.message}}: {{data.progressVal.current}} / {{data.progressVal.total}}
+        </div>
+        <el-progress :percentage="data.data.progressVal.percent"></el-progress>
     </div>
 
     <div class="mt15" v-if="state.started === true || state.done7">
@@ -69,47 +80,33 @@
                 </sly-line-chart>
             </div>
         </sly-field>
-        <sly-field title="Predictions improvement dynamics"
-                   description="Model predictions for random images from train/val over time"
-        >
-            <div class="fflex">
-                <div class="mr15">Epoch</div>
-                <div style="color: red;">{{data.gallery.content.layout[2]}}</div>
-<!--                data.gallery.content.layout = data.gallery.content.layout.slice(0,2).concat([[`IMG_1836.jpeg_pred_${value}`]])-->
-
-                <el-input-number v-model="state.visEpoch" :min="1" :max="state.epochs" :step="1" :debounce="500"
-                                 @change="(value) => {
-                                    data.gallery.content.layout = [
-                                        data.gallery.content.layout[0], data.gallery.content.layout[1],
-                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )
-                                    ]
-                                }"
-                >
-
-                </el-input-number>
-                <!--                <el-slider v-model="state.visEpoch"-->
-<!--                           :min="1" :max="state.epochs" :step="1"-->
-<!--                           show-stops show-input-->
-<!--                           style="width: 500px;"-->
-<!--                           @change="(value) => {-->
-<!--                                data.gallery.content.layout-->
-<!--                                [2] = data.gallery.content.pred_layout.map( (x)=>`${x}_${state.visEpoch}` )-->
-<!--                           }"-->
+<!--        <sly-field title="Predictions improvement dynamics"-->
+<!--                   description="Model predictions for random images from train/val over time"-->
+<!--        >-->
+<!--            <div class="fflex">-->
+<!--                <div class="mr15">Epoch</div>-->
+<!--                <el-input-number v-model="state.visEpoch" :min="1" :max="state.epochs" :step="1" :debounce="500"-->
+<!--                                 @change="(value) => {-->
+<!--                                    data.gallery.content.layout = [-->
+<!--                                        data.gallery.content.layout[0], data.gallery.content.layout[1],-->
+<!--                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )-->
+<!--                                    ]-->
+<!--                                }"-->
 <!--                >-->
-<!--                </el-slider>-->
-            </div>
-            <div class="fflex">
-                <div class="mr10">Show examples from</div>
-                <el-select v-model="state.visSets" multiple>
-                    <el-option key="onlyTrain" label="train" value="train"></el-option>
-                    <el-option key="onlyVal" label="val" value="val"></el-option>
-                </el-select>
-            </div>
-            <pre>{{data.gallery.content}}</pre>
-            <sly-grid-gallery v-if="data.gallery"
-                              :content="data.gallery.content"
-                              :options="data.gallery.options">
-            </sly-grid-gallery>
-        </sly-field>
+<!--                </el-input-number>-->
+<!--            </div>-->
+<!--            <div class="fflex">-->
+<!--                <div class="mr10">Show examples from</div>-->
+<!--                <el-select v-model="state.visSets" multiple>-->
+<!--                    <el-option key="onlyTrain" label="train" value="train"></el-option>-->
+<!--                    <el-option key="onlyVal" label="val" value="val"></el-option>-->
+<!--                </el-select>-->
+<!--            </div>-->
+<!--            <pre>{{data.gallery.content}}</pre>-->
+<!--            <sly-grid-gallery v-if="data.gallery"-->
+<!--                              :content="data.gallery.content"-->
+<!--                              :options="data.gallery.options">-->
+<!--            </sly-grid-gallery>-->
+<!--        </sly-field>-->
     </div>
 </sly-card>

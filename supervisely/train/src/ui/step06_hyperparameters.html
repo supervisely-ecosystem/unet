@@ -10,6 +10,10 @@
         <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
             <i class="zmdi zmdi-settings"></i>
         </sly-icon>
+        <sly-field title="Experiment name"
+                   description="Training artifacts will be saved to the following directory in team files: /unet/<task_id>_<experiment name>">
+            <el-input v-model="state.expName" :disabled="state.started" style="width: 400px;"></el-input>
+        </sly-field>
         <sly-field title="Number of epochs">
             <el-input-number v-model="state.epochs" :min="1" :max="10000" :disabled="data.done6"></el-input-number>
         </sly-field>
@@ -18,7 +22,6 @@
 <!--            <el-input-number v-model="state.imgSize" :min="64" :step="32" :disabled="data.done6"></el-input-number>-->
             <sly-size v-model="state.imgSize" :options="{proportions: {width: 256, height: 256}}"></sly-size>
         </sly-field>
-
         <sly-field title="Batch size"
                    description="number of samples for a single GPU">
             <el-input-number v-model="state.batchSizePerGPU" :min="4" :disabled="data.done6"></el-input-number>
@@ -109,7 +112,7 @@
         </sly-field>
     </sly-field>
 
-    <sly-field title="Logging frequency" description="How often metrics should be logged, increase if training dataset is small">
+    <sly-field title="Logging frequency" description="How often metrics should be logged">
         <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
             <i class="zmdi zmdi-file-text"></i>
         </sly-icon>

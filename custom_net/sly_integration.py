@@ -1,11 +1,11 @@
-import step07_train
-import supervisely_lib as sly
-from inference import inference
 import numpy as np
 from torch import nn
 import torch
 import utils
 import supervisely_lib as sly
+
+import sly_globals as g
+from inference import inference
 from step07_train import gallery
 from step01_input_project import get_image_info_from_cache
 
@@ -28,6 +28,11 @@ def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, mod
         labels.append(sly.Label(bitmap, obj_class))
     ann = sly.Annotation(img_size=(height, width), labels=labels)
     return ann
+
+
+###############################################
+######## DO NOT MODIFY THIS METHODS ###########
+###############################################
 
 
 def vis_inference(time_index, model: nn.Module, classes, input_height, input_width, project_dir, items_path):
@@ -61,3 +66,29 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
             gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
         gallery.add_prediction(item_name, time_index, pred_ann)
     gallery.update()
+
+
+from step07_train import progress_epoch, progress_iter, progress_val
+
+
+def init_progress_bars(epochs, train_iters, val_iters):
+    progress_epoch.set_total(epochs)
+    progress_iter.set_total(train_iters)
+    progress_val.set_total(val_iters)
+
+    fields = [
+        progress_epoch.get_field(),
+        progress_iter.get_field()
+    ]
+    g.api.app.set_fields(g.task_id, fields)
+
+
+
+#
+# def update_epoch(epoch):
+#     progress_epoch(epoch)
+#     progress_iter(0)
+#
+#
+# def update_iter(iter):
+#     progress_iter(iter)

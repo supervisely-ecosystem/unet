@@ -101,7 +101,14 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
     report_each = 10
     log = root.joinpath('train.log').open('at', encoding='utf8')
     valid_losses = []
+
+    if args.sly:
+        sly_integration.init_progress_bars(n_epochs, len(train_loader), len(valid_loader))
+
     for epoch in range(epoch, n_epochs + 1):
+        if args.sly:
+            sly_integration.update_epoch(epoch)
+
         if scheduler is not None:
             scheduler.step()
         for param_group in optimizer.param_groups:
@@ -109,8 +116,10 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
 
         model.train()
         random.seed()
-        tq = tqdm.tqdm(total=(len(train_loader) * args.batch_size))
-        tq.set_description('Epoch {}, lr {}'.format(epoch, lr))
+
+        #tq = tqdm.tqdm(total=(len(train_loader) * args.batch_size))
+        #tq.set_description('Epoch {}, lr {}'.format(epoch, lr))
+
         losses = []
         tl = train_loader
         try:
@@ -127,34 +136,39 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 loss.backward()
                 optimizer.step()
                 step += 1
-                tq.update(batch_size)
+                #tq.update(batch_size)
+                if args.sly:
+                    sly_integration.update_iter(batch_size)
+
                 losses.append(loss.item())
                 mean_loss = np.mean(losses[-report_each:])
-                tq.set_postfix(loss='{:.5f}'.format(mean_loss))
+                #tq.set_postfix(loss='{:.5f}'.format(mean_loss))
                 if i and i % report_each == 0:
                     write_event(log, step, loss=mean_loss)
             write_event(log, step, loss=mean_loss)
-            tq.close()
+            #tq.close()
             save(epoch + 1)
             valid_metrics = validation(model, criterion, valid_loader, len(classes))
             write_event(log, step, **valid_metrics)
             valid_loss = valid_metrics['valid_loss']
             valid_losses.append(valid_loss)
 
-            if args.sly:
-                #@TODO: remove __bg__ class frm visualization
-                #@TODO: limit max value for input-number
-                #@TODO: synced views - check (disable default flag to False?)
-                sly_integration.vis_inference(epoch, model, classes,
-                                              args.input_height, args.input_width,
-                                              args.project_dir, args.train_vis_items_path)
-                sly_integration.vis_inference(epoch, model, classes,
-                                              args.input_height, args.input_width,
-                                              args.project_dir, args.val_vis_items_path)
-                xxx = 10
-                xxx += 1
+            # if args.sly:
+            #@TODO: add progress widget
+            #@TODO: add evaluation interval
+            #     #@TODO: remove __bg__ class frm visualization
+            #     #@TODO: limit max value for input-number
+            #     #@TODO: synced views - check (disable default flag to False?)
+            #     sly_integration.vis_inference(epoch, model, classes,
+            #                                   args.input_height, args.input_width,
+            #                                   args.project_dir, args.train_vis_items_path)
+            #     sly_integration.vis_inference(epoch, model, classes,
+            #                                   args.input_height, args.input_width,
+            #                                   args.project_dir, args.val_vis_items_path)
+            #     xxx = 10
+            #     xxx += 1
         except KeyboardInterrupt:
-            tq.close()
+            #tq.close()
             print('Ctrl+C, saving snapshot')
             save(epoch)
             print('done.')

@@ -4,6 +4,7 @@ import sly_globals as g
 
 
 def init(data, state):
+    state["expName"] = g.project_info.name
     state["epochs"] = 500  # @TODO: 50 for debug
     state["gpusId"] = '0'
 

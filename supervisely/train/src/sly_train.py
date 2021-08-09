@@ -24,6 +24,7 @@ def main():
 #@TODO: disable rotate reflect - iaa.geometric.Rotate
 #@TODO: check restart step for all steps
 #@TODO: validation metrics exclude background?? integrate BCE??
+#@TODO: reimplement everything to ProgressBar widget
 if __name__ == "__main__":
     #sly.main_wrapper("main", main)
     main()

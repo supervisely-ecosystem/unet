@@ -22,14 +22,16 @@ gallery: sly.app.widgets.PredictionsDynamicsGallery = None
 train_vis_items_path = os.path.join(g.info_dir, "train_vis_items.json")
 val_vis_items_path = os.path.join(g.info_dir, "val_vis_items.json")
 
+progress_epoch: sly.app.widgets.ProgressBar = None
+progress_iter: sly.app.widgets.ProgressBar = None
+progress_val: sly.app.widgets.ProgressBar = None
+
 
 def init(data, state):
-    init_progress("Train1", data)
-    # init_progress("Iter", data)
-    # init_progress("UploadDir", data)
     # data["eta"] = None
 
     init_charts(data, state)
+    init_progress_bars(data)
 
     state["collapsed7"] = True
     state["disabled7"] = True
@@ -40,7 +42,6 @@ def init(data, state):
     data["outputName"] = None
     data["outputUrl"] = None
 
-    state["expName"] = g.project_info.name
     state["visEpoch"] = 0
 
     data["gallery"] = gallery
@@ -74,12 +75,24 @@ def init_charts(data, state):
     chart_loss.init_data(data)
 
 
+def init_progress_bars(data):
+    global progress_epoch
+    progress_epoch = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressEpoch", "Epoch")
+    global progress_iter
+    progress_iter = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressIter", "Training Iteration")
+    global progress_val
+    progress_val = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressVal", "Validation Iteration")
+    progress_epoch.init_data(data)
+    progress_iter.init_data(data)
+    progress_val.init_data(data)
+
+
 def update_charts(phase, epoch, epoch_samples, metrics):
     fields = [
-        chart_lr.get_append_field(epoch, metrics['lr']),
-        chart_bce.get_append_field(epoch, metrics['bce'] / epoch_samples, phase),
-        chart_dice.get_append_field(epoch, metrics['dice'] / epoch_samples, phase),
-        chart_loss.get_append_field(epoch, metrics['loss']  / epoch_samples, phase),
+        chart_lr.get_field(epoch, metrics['lr']),
+        chart_bce.get_field(epoch, metrics['bce'] / epoch_samples, phase),
+        chart_dice.get_field(epoch, metrics['dice'] / epoch_samples, phase),
+        chart_loss.get_field(epoch, metrics['loss'] / epoch_samples, phase),
     ]
     g.api.app.set_fields(g.task_id, fields)
 
