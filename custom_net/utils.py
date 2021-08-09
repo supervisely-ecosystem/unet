@@ -131,6 +131,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
         metrics = validation(model, criterion, valid_loader, len(classes),
                              progress_cb=sly_integration.progress_increment_iter)
         if args.sly:
+            #@TODO: visualize colored masks + change widget + butttons to change layout 3 column
             sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
             sly_integration.vis_inference(epoch, model, classes,
                                           args.input_height, args.input_width,
