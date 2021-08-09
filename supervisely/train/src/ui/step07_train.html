@@ -24,13 +24,6 @@
         </div>
         <el-progress :percentage="data.progressIter.percent"></el-progress>
     </div>
-    <div v-if="data.progressVal.message && !data.outputUrl" class="mt10">
-        <div style="color: #20a0ff">
-            {{data.progressVal.message}}: {{data.progressVal.current}} / {{data.progressVal.total}}
-        </div>
-        <el-progress :percentage="data.progressVal.percent"></el-progress>
-    </div>
-
     <div class="mt15" v-if="state.started === true || state.done7">
         <hr class="mt10 mb10" style="border: 0; border-top: 1px solid rgba(0,0,0,.12);"/>
         <sly-field title="Smoothing" description="Change the smoothing of line charts">

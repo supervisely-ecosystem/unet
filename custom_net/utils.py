@@ -121,7 +121,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             optimizer.step()
             step += 1 # @TODO: remove?
             if args.sly:
-                sly_integration.progress_increment_train_iter(1)
+                sly_integration.progress_increment_iter(1)
             sly.logger.info("Train metrics", extra={"epoch": epoch, "iter": i, "lr": lr, "loss": loss_cpu})
 
             if (i % report_each == 0 or i == len(train_loader) - 1) and args.sly:
@@ -129,7 +129,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
 
         save(epoch + 1)
         metrics = validation(model, criterion, valid_loader, len(classes),
-                             progress_cb=sly_integration.progress_increment_val_iter)
+                             progress_cb=sly_integration.progress_increment_iter)
         if args.sly:
             sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
             sly_integration.vis_inference(epoch, model, classes,

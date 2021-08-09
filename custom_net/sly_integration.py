@@ -68,13 +68,12 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
     gallery.update()
 
 
-from step07_train import progress_epoch, progress_iter, progress_val
+from step07_train import progress_epoch, progress_iter
 
 
 def init_progress_bars(epochs, train_iters, val_iters):
     progress_epoch.set_total(epochs)
-    progress_iter.set_total(train_iters)
-    progress_val.set_total(val_iters)
+    progress_iter.set_total(train_iters + val_iters)
 
     progress_epoch.set(0)
     progress_iter.set(0)
@@ -84,16 +83,10 @@ def progress_set_epoch(epoch):
     progress_epoch.set(epoch, force_update=True)
     progress_iter.reset()
     progress_iter.set(0, force_update=True)
-    progress_val.reset()
-    progress_val.update(force=True)
 
 
-def progress_increment_train_iter(count):
+def progress_increment_iter(count):
     progress_iter.increment(count)
-
-
-def progress_increment_val_iter(count):
-    progress_val.increment(count)
 
 
 def report_train_metrics(epoch, iters_in_epoch, iter, lr, loss):
@@ -112,14 +105,3 @@ def report_val_metrics(epoch, loss, avg_iou, agv_dice):
         chart_acc.get_field(epoch, agv_dice, "avg Dice"),
     ]
     g.api.app.set_fields(g.task_id, fields)
-
-
-# def update_charts(phase, epoch, ):
-#     fields = [
-#         chart_lr.get_field(epoch, metrics['lr']),
-#         #@TODO: log metrics here
-#         # chart_loss.get_field(epoch, metrics['bce'], phase),
-#         # chart_acc.get_field(epoch, metrics['dice'], phase),
-#         # chart_loss.get_field(epoch, metrics['loss'], phase),
-#     ]
-#     g.api.app.set_fields(g.task_id, fields)

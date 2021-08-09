@@ -23,7 +23,6 @@ val_vis_items_path = os.path.join(g.info_dir, "val_vis_items.json")
 
 progress_epoch: sly.app.widgets.ProgressBar = None
 progress_iter: sly.app.widgets.ProgressBar = None
-progress_val: sly.app.widgets.ProgressBar = None
 
 
 def init(data, state):
@@ -75,12 +74,9 @@ def init_progress_bars(data):
     global progress_epoch
     progress_epoch = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressEpoch", "Epoch")
     global progress_iter
-    progress_iter = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressIter", "Training Iteration")
-    global progress_val
-    progress_val = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressVal", "Validation Iteration")
+    progress_iter = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressIter", "Iterations (train + val)")
     progress_epoch.init_data(data)
     progress_iter.init_data(data)
-    progress_val.init_data(data)
 
 
 def sample_items_for_visualization(state):
