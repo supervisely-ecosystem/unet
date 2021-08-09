@@ -100,7 +100,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
 
     report_each = 10
     log = root.joinpath('train.log').open('at', encoding='utf8')
-    valid_losses = []
+    #valid_losses = []
 
     if args.sly:
         sly_integration.init_progress_bars(n_epochs, len(train_loader), len(valid_loader))
@@ -132,7 +132,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 optimizer.zero_grad()
-                batch_size = inputs.size(0)
+                #batch_size = inputs.size(0)
                 loss.backward()
                 optimizer.step()
                 step += 1
@@ -151,7 +151,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             valid_metrics = validation(model, criterion, valid_loader, len(classes))
             write_event(log, step, **valid_metrics)
             valid_loss = valid_metrics['valid_loss']
-            valid_losses.append(valid_loss)
+            #valid_losses.append(valid_loss)
 
             # if args.sly:
             #@TODO: add progress widget
