@@ -53,15 +53,16 @@ def restart(data, state):
 
 def init_charts(data, state):
     global chart_lr, chart_loss, chart_acc
-    # yrange = [state["lr"] - state["lr"] / 2.0, state["lr"] + state["lr"] / 2.0],
     chart_lr = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLR",
                                      title="LR", series_names=["LR"],
+                                     yrange=[0, state["lr"] + state["lr"]],
                                      ydecimals=6, xdecimals=2)
     chart_loss = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLoss",
                                       title="Loss", series_names=["train", "val"],
                                       smoothing=0.6, ydecimals=6, xdecimals=2)
     chart_acc = sly.app.widgets.Chart(g.task_id, g.api, "data.chartAcc",
                                       title="Val Acc", series_names=["avg IoU", "avg Dice"],
+                                      yrange=[0, 1],
                                       smoothing=0.6, ydecimals=6, xdecimals=2)
     state["smoothing"] = 0.6
 
@@ -119,7 +120,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
             )
             reset_progress(index="Train1")
 
-        # model classes = selected_classes + bg
+        # model classes = selected_classes + __bg__
         project_seg = sly.Project(project_dir_seg, sly.OpenMode.READ)
         classes_json = project_seg.meta.obj_classes.to_json()
 

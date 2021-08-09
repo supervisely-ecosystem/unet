@@ -43,9 +43,8 @@
                     style="width: 450px;"
                     @input="(val)=>{
                                 state.smoothing = val;
-                                data.chartBCE.options.smoothingWeight = val;
-                                data.chartDICE.options.smoothingWeight = val;
                                 data.chartLoss.options.smoothingWeight = val;
+                                data.chartAcc.options.smoothingWeight = val;
                             }"
             >
             </el-slider>

@@ -1,15 +1,11 @@
-import json
-from datetime import datetime
 from pathlib import Path
 import torch.optim as optim
 from torch.optim import lr_scheduler
 
 import random
-import numpy as np
 import cv2
 
 import torch
-import tqdm
 import supervisely_lib as sly
 
 from torchvision import transforms
@@ -111,50 +107,42 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
         model.train()
         random.seed()
 
-        losses = []
-        try:
-            for i, (inputs, targets) in enumerate(train_loader):
-                inputs = cuda(inputs)
-                with torch.no_grad():
-                    targets = cuda(targets)
+        for i, (inputs, targets) in enumerate(train_loader):
+            inputs = cuda(inputs)
+            with torch.no_grad():
+                targets = cuda(targets)
 
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                step += 1
-                if args.sly:
-                    sly_integration.progress_increment_train_iter(1)
-
-                losses.append(loss.item())
-                if i and (i % report_each == 0 or i == len(train_loader) - 1):
-                    sly.logger("Train metrics", extra={"lr": lr})
-                    if args.sly:
-                        sly_integration.report_train_metrics(epoch, len(train_loader), i, lr, loss)
-            save(epoch + 1)
-            metrics = validation(model, criterion, valid_loader, len(classes))
-
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
+            float(loss.data.cpu().numpy())
+            optimizer.zero_grad()
+            loss.backward()
+            loss_cpu = float(loss.data.cpu().numpy())
+            optimizer.step()
+            step += 1 # @TODO: remove?
             if args.sly:
-                sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
+                sly_integration.progress_increment_train_iter(1)
+            sly.logger.info("Train metrics", extra={"epoch": epoch, "iter": i, "lr": lr, "loss": loss_cpu})
 
-            # if args.sly:
-            #@TODO: add progress widget
-            #@TODO: add evaluation interval
-            #     #@TODO: remove __bg__ class frm visualization
-            #     #@TODO: limit max value for input-number
-            #     #@TODO: synced views - check (disable default flag to False?)
-            #     sly_integration.vis_inference(epoch, model, classes,
-            #                                   args.input_height, args.input_width,
-            #                                   args.project_dir, args.train_vis_items_path)
-            #     sly_integration.vis_inference(epoch, model, classes,
-            #                                   args.input_height, args.input_width,
-            #                                   args.project_dir, args.val_vis_items_path)
-            #     xxx = 10
-            #     xxx += 1
-        except KeyboardInterrupt:
-            #tq.close()
-            print('Ctrl+C, saving snapshot')
-            save(epoch)
-            print('done.')
-            return
+            if (i % report_each == 0 or i == len(train_loader) - 1) and args.sly:
+                sly_integration.report_train_metrics(epoch, len(train_loader), i, lr, loss_cpu)
+
+        save(epoch + 1)
+        metrics = validation(model, criterion, valid_loader, len(classes))
+        if args.sly:
+            sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
+
+        # if args.sly:
+        #@TODO: add progress widget
+        #@TODO: add evaluation interval
+        #     #@TODO: remove __bg__ class frm visualization
+        #     #@TODO: limit max value for input-number
+        #     #@TODO: synced views - check (disable default flag to False?)
+        #     sly_integration.vis_inference(epoch, model, classes,
+        #                                   args.input_height, args.input_width,
+        #                                   args.project_dir, args.train_vis_items_path)
+        #     sly_integration.vis_inference(epoch, model, classes,
+        #                                   args.input_height, args.input_width,
+        #                                   args.project_dir, args.val_vis_items_path)
+        #     xxx = 10
+        #     xxx += 1
