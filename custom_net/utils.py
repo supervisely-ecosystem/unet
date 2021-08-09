@@ -132,16 +132,9 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                              progress_cb=sly_integration.progress_increment_val_iter)
         if args.sly:
             sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
-
-        # if args.sly:
-        #@TODO: add evaluation interval
-        #     #@TODO: limit max value for input-number
-        #     #@TODO: synced views - check (disable default flag to False?)
-        #     sly_integration.vis_inference(epoch, model, classes,
-        #                                   args.input_height, args.input_width,
-        #                                   args.project_dir, args.train_vis_items_path)
-        #     sly_integration.vis_inference(epoch, model, classes,
-        #                                   args.input_height, args.input_width,
-        #                                   args.project_dir, args.val_vis_items_path)
-        #     xxx = 10
-        #     xxx += 1
+            sly_integration.vis_inference(epoch, model, classes,
+                                          args.input_height, args.input_width,
+                                          args.project_dir, args.train_vis_items_path)
+            sly_integration.vis_inference(epoch, model, classes,
+                                          args.input_height, args.input_width,
+                                          args.project_dir, args.val_vis_items_path)

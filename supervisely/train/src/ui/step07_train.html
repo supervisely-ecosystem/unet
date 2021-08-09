@@ -69,21 +69,25 @@
                 </sly-line-chart>
             </div>
         </sly-field>
-<!--        <sly-field title="Predictions improvement dynamics"-->
-<!--                   description="Model predictions for random images from train/val over time"-->
-<!--        >-->
-<!--            <div class="fflex">-->
-<!--                <div class="mr15">Epoch</div>-->
-<!--                <el-input-number v-model="state.visEpoch" :min="1" :max="state.epochs" :step="1" :debounce="500"-->
-<!--                                 @change="(value) => {-->
-<!--                                    data.gallery.content.layout = [-->
-<!--                                        data.gallery.content.layout[0], data.gallery.content.layout[1],-->
-<!--                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )-->
-<!--                                    ]-->
-<!--                                }"-->
-<!--                >-->
-<!--                </el-input-number>-->
-<!--            </div>-->
+<!--        <div style="color: red;">xxx = {{Object.keys(data.gallery.content.annotations).lengt}}</div>-->
+        <pre>{{data.gallery}}</pre>
+<!--        <pre>{{data.gallery.options.syncViewsBindings}}</pre>-->
+        <sly-field title="Predictions improvement dynamics"
+                   description="Model predictions over time for random images from train/val"
+                   v-if="data.gallery && Object.keys(data.gallery.content.annotations).length > 0"
+        >
+            <div class="fflex">
+                <div class="mr15">Epoch</div>
+                <el-input-number v-model="state.visEpoch" :min="1" :max="data.progressEpoch.current" :step="1" :debounce="500"
+                                 @change="(value) => {
+                                    data.gallery.content.layout = [
+                                        data.gallery.content.layout[0], data.gallery.content.layout[1],
+                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )
+                                    ]
+                                }"
+                >
+                </el-input-number>
+            </div>
 <!--            <div class="fflex">-->
 <!--                <div class="mr10">Show examples from</div>-->
 <!--                <el-select v-model="state.visSets" multiple>-->
@@ -91,11 +95,15 @@
 <!--                    <el-option key="onlyVal" label="val" value="val"></el-option>-->
 <!--                </el-select>-->
 <!--            </div>-->
-<!--            <pre>{{data.gallery.content}}</pre>-->
-<!--            <sly-grid-gallery v-if="data.gallery"-->
-<!--                              :content="data.gallery.content"-->
-<!--                              :options="data.gallery.options">-->
-<!--            </sly-grid-gallery>-->
-<!--        </sly-field>-->
+            <sly-grid-gallery v-if="data.gallery"
+                              :content="data.gallery.content"
+                              :options="data.gallery.options">
+            </sly-grid-gallery>
+        </sly-field>
+        <div v-else
+             v-loading="Object.keys(data.gallery.content.annotations).length === 0"
+             element-loading-text="Predictions will be available after first epoch..."
+             style="height: 150px">
+        </div>
     </div>
 </sly-card>

@@ -19,6 +19,8 @@ def main():
     g.my_app.run(data=data, state=state)
 
 
+#     #@TODO: limit max value for input-number
+#     #@TODO: synced views - check (disable default flag to False?)
 #@TODO: change predefined augs
 #@TODO: __background__
 #@TODO: disable rotate reflect - iaa.geometric.Rotate
