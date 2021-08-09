@@ -134,9 +134,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
 
         # if args.sly:
-        #@TODO: add progress widget
         #@TODO: add evaluation interval
-        #     #@TODO: remove __bg__ class frm visualization
         #     #@TODO: limit max value for input-number
         #     #@TODO: synced views - check (disable default flag to False?)
         #     sly_integration.vis_inference(epoch, model, classes,
