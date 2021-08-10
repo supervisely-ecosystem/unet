@@ -1,10 +1,9 @@
-<!--:options="{collapsable: true}"-->
-<!--          :collapsed.sync="state.collapsed6"-->
-<!--          :disabled="{disabled: state.disabled6, message: 'Finish previous steps before configure training'}"-->
-
 <sly-card title="Traning hyperparameters"
           subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
           ref="step6"
+          :options="{collapsable: true}"
+          :collapsed.sync="state.collapsed6"
+          :disabled="{disabled: state.disabled6, message: 'Finish previous steps before configure training'}"
 >
     <sly-field title="General" description="Basic training settings">
         <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">

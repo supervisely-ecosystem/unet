@@ -1,0 +1,22 @@
+{
+  "name": "Train UNet",
+  "type": "app",
+  "categories": [
+    "neural network",
+    "semantic segmentation"
+  ],
+  "description": "Dashboard to configure, start and monitor training",
+  "docker_image": "supervisely/unet:1.0.0",
+  "main_script": "supervisely/train/src/sly_train.py",
+  "gui_template": "supervisely/train/src/gui.html",
+  "task_location": "workspace_tasks",
+  "need_gpu": true,
+  "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
+  "icon_cover": true,
+  "context_menu": {
+    "target": ["images_project"],
+    "context_root": "Neural Networks",
+    "context_category": "UNet"
+  },
+  "instance_version": "6.4.24"
+}

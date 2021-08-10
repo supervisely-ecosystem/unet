@@ -1,9 +1,10 @@
-<!--          :options="{collapsable: true}"-->
-<!--          :collapsed.sync="state.collapsed7"-->
-<!--          :disabled="{disabled: state.disabled7, message: 'Finish previous steps before run training'}"-->
+
 <sly-card title="Training progress"
           subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
           ref="step7"
+          :options="{collapsable: true}"
+          :collapsed.sync="state.collapsed7"
+          :disabled="{disabled: state.disabled7, message: 'Finish previous steps before run training'}"
 >
     <el-button v-if="!state.done7"
                type="primary" class="regular"

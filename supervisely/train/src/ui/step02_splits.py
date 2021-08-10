@@ -134,3 +134,7 @@ def _save_set_to_json(save_path, items):
             "item_name": item.name
         })
     sly.json.dump_json_file(res, save_path)
+
+
+def restart(data, state):
+    data["done2"] = False

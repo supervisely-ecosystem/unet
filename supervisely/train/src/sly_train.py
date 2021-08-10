@@ -20,7 +20,6 @@ def main():
 
 
 #@TODO: check restart step for all steps
-#@TODO: start train from custom checkpoint
 if __name__ == "__main__":
     #sly.main_wrapper("main", main)
     main()

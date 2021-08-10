@@ -89,3 +89,7 @@ def use_hyp(api: sly.Api, task_id, context, state, app_logger):
         {"field": "state.activeStep", "payload": 7},
     ]
     g.api.app.set_fields(g.task_id, fields)
+
+
+def restart(data, state):
+    data["done6"] = False
