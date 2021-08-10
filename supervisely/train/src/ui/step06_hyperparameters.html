@@ -20,7 +20,7 @@
         <sly-field title="Input image size (in pixels)"
                    description="Model input resolution, by default image is resized to square">
 <!--            <el-input-number v-model="state.imgSize" :min="64" :step="32" :disabled="data.done6"></el-input-number>-->
-            <sly-size v-model="state.imgSize" :options="{proportions: {width: 256, height: 256}}"></sly-size>
+            <sly-size v-model="state.imgSize" :options="{proportions: {width: 256, height: 256}}" :disabled="data.done6"></sly-size>
         </sly-field>
         <sly-field title="Batch size"
                    description="number of samples for a single GPU">

@@ -53,6 +53,7 @@ def main():
     parser.add_argument('--classes-path', default='', help='path to the list of classes (order matters)')
     parser.add_argument('--train-set-path', default='', help='list of training items')
     parser.add_argument('--val-set-path', default='', help='list of validation')
+    parser.add_argument('--sly-augs-path', default='', help='path to SlyImgAug config')
 
     # basic hyperparameters
     parser.add_argument('--epochs', type=int, default=5)
@@ -136,8 +137,8 @@ def main():
 
     cudnn.benchmark = True
 
-    train_set = SlySegDataset(args.project_dir, args.classes_path, args.train_set_path, args.input_height, args.input_width)
-    val_set = SlySegDataset(args.project_dir, args.classes_path, args.val_set_path,args.input_height, args.input_width)
+    train_set = SlySegDataset(args.project_dir, args.classes_path, args.train_set_path, args.input_height, args.input_width, args.sly_augs_path)
+    val_set = SlySegDataset(args.project_dir, args.classes_path, args.val_set_path,args.input_height, args.input_width, None)
     sly.logger.info("Train/Val splits", extra={"train_size": len(train_set), "val_size": len(val_set)})
 
     train_loader = DataLoader(

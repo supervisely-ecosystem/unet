@@ -3,6 +3,7 @@ import sys
 import random
 
 import step02_splits
+import step04_augs
 import supervisely_lib as sly
 from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
@@ -181,6 +182,10 @@ def set_train_arguments(state):
     sys.argv.extend(["--classes-path", model_classes_path])
     sys.argv.extend(["--train-set-path", step02_splits.train_set_path])
     sys.argv.extend(["--val-set-path", step02_splits.val_set_path])
+    if state["useAugs"]:
+        sys.argv.extend(["--sly-augs-path", step04_augs.augs_config_path])
+    else:
+        sys.argv.extend(["--sly-augs-path", ''])
 
     # basic hyperparameters
     sys.argv.extend(["--epochs", str(state["epochs"])])

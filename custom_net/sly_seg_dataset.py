@@ -9,7 +9,7 @@ from utils import prepare_image_input
 
 
 class SlySegDataset(Dataset):
-    def __init__(self, project_dir, model_classes_path, split_path, input_height, input_width, sly_augs=None):
+    def __init__(self, project_dir, model_classes_path, split_path, input_height, input_width, sly_augs_path=None):
         self.project_fs = sly.Project(project_dir, sly.OpenMode.READ)
 
         self.input_items = sly.json.load_json_file(split_path)
@@ -20,7 +20,12 @@ class SlySegDataset(Dataset):
         self.input_height = input_height
         self.input_width = input_width
 
-        self.sly_augs = sly_augs
+        self._sly_augs_path = None
+        self.sly_augs = None
+        if sly_augs_path is not None and sly_augs_path != "":
+            self._sly_augs_path = sly_augs_path
+            config = sly.json.load_json_file(sly_augs_path)
+            self.sly_augs = sly.imgaug_utils.build_pipeline(config["pipeline"], random_order=config["random_order"])
 
     def __len__(self):
         return len(self.input_items)
@@ -39,8 +44,8 @@ class SlySegDataset(Dataset):
         color_mask = sly.image.read(mask_path)    # RGB
         seg_mask = self._colors_to_indices(color_mask)
 
-        if self.sly_augs:
-            image, mask = self.sly_augs(image, seg_mask)
+        if self.sly_augs is not None:
+            image, mask = sly.imgaug_utils.apply_to_image_and_mask(self.sly_augs, image, seg_mask)
 
         # prepare tensor for image
         input = prepare_image_input(image, self.input_width, self.input_height)
