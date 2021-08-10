@@ -24,6 +24,12 @@
         </div>
         <el-progress :percentage="data.progressIter.percent"></el-progress>
     </div>
+    <div v-if="data.progressOther.message && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressOther.message}}: {{data.progressOther.current}} / {{data.progressOther.total}}
+        </div>
+        <el-progress :percentage="data.progressOther.percent"></el-progress>
+    </div>
     <div class="mt15" v-if="state.started === true || state.done7">
         <hr class="mt10 mb10" style="border: 0; border-top: 1px solid rgba(0,0,0,.12);"/>
         <sly-field title="Smoothing" description="Change the smoothing of line charts">
@@ -66,7 +72,6 @@
         <sly-field title="Predictions improvement dynamics"
                    description="Model predictions over time for random images from train/val"
                    v-if="data.gallery && Object.keys(data.gallery.content.annotations).length > 0"
-
         >
             <div class="fflex">
                 <el-button size="small"

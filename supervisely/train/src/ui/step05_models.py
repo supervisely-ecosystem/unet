@@ -60,7 +60,6 @@ def restart(data, state):
 @g.my_app.ignore_errors_and_show_dialog_window()
 def download_weights(api: sly.Api, task_id, context, state, app_logger):
     #"https://download.pytorch.org/models/vgg11-8a719046.pth" to /root/.cache/torch/hub/checkpoints/vgg11-8a719046.pth
-
     from train import model_list
 
     global local_weights_path

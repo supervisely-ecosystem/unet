@@ -1,12 +1,13 @@
 import os
 import sys
 import random
+from functools import partial
 
 import step02_splits
 import step04_augs
 import step05_models
 import supervisely_lib as sly
-from sly_progress_utils import init_progress, get_progress_cb, reset_progress
+#from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
 import step03_classes
 
@@ -25,6 +26,7 @@ val_vis_items_path = os.path.join(g.info_dir, "val_vis_items.json")
 
 progress_epoch: sly.app.widgets.ProgressBar = None
 progress_iter: sly.app.widgets.ProgressBar = None
+progress_other: sly.app.widgets.ProgressBar = None
 
 
 def init(data, state):
@@ -79,8 +81,12 @@ def init_progress_bars(data):
     progress_epoch = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressEpoch", "Epoch")
     global progress_iter
     progress_iter = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressIter", "Iterations (train + val)")
+    global progress_other
+    progress_other = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressOther", "Progress")
+
     progress_epoch.init_data(data)
     progress_iter.init_data(data)
+    progress_other.init_data(data)
 
 
 def sample_items_for_visualization(state):
@@ -94,6 +100,35 @@ def sample_items_for_visualization(state):
     sly.json.dump_json_file(val_vis_items, val_vis_items_path)
 
 
+def _save_link_to_ui(local_dir, app_url):
+    # save report to file *.lnk (link to report)
+    local_path = os.path.join(local_dir, _open_lnk_name)
+    sly.fs.ensure_base_path(local_path)
+    with open(local_path, "w") as text_file:
+        print(app_url, file=text_file)
+
+
+def upload_artifacts_and_log_progress(experiment_name):
+    _save_link_to_ui(g.artifacts_dir, g.my_app.app_url)
+
+    def upload_monitor(monitor, api: sly.Api, task_id, progress: sly.app.widgets.ProgressBar):
+        if progress.get_total() is None:
+            progress.set_total(monitor.len)
+        else:
+            progress.set(monitor.bytes_read)
+        progress.update()
+
+    global progress_other
+    progress_other = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressOther",
+                                                 "Upload directory with training artifacts to Team Files",
+                                                 is_size=True, min_report_percent=5)
+    progress_cb = partial(upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other)
+
+    remote_dir = f"/unet/{g.task_id}_{experiment_name}"
+    res_dir = g.api.file.upload_directory(g.team_id, g.artifacts_dir, remote_dir, progress_size_cb=progress_cb)
+    return res_dir
+
+
 @g.my_app.callback("train")
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()
@@ -105,17 +140,16 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
         if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
             sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
-            progress_cb = get_progress_cb(
-                index="Train1",
-                message="Convert SLY annotations to segmentation masks",
-                total=sly.Project(g.project_dir, sly.OpenMode.READ).total_items
-            )
+            global progress_other
+            progress_other = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressOther",
+                                                         "Convert SLY annotations to segmentation masks",
+                                                         sly.Project(g.project_dir, sly.OpenMode.READ).total_items)
             sly.Project.to_segmentation_task(
                 g.project_dir, project_dir_seg,
                 target_classes=step03_classes.selected_classes,
-                progress_cb=progress_cb
+                progress_cb=progress_other.increment
             )
-            reset_progress(index="Train1")
+            progress_other.reset_and_update()
 
         # model classes = selected_classes + __bg__
         project_seg = sly.Project(project_dir_seg, sly.OpenMode.READ)
@@ -130,37 +164,27 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         gallery.complete_update()
 
         sample_items_for_visualization(state)
+        sly.json.dump_json_file(state, os.path.join(g.info_dir, "ui_state.json"))
 
         set_train_arguments(state)
         import train
         train.main()
 
-        #sly.json.dump_json_file(state, os.path.join(g.info_dir, "ui_state.json"))
+        progress_epoch.reset_and_update()
+        progress_iter.reset_and_update()
 
+        remote_dir = upload_artifacts_and_log_progress(experiment_name=state["expName"])
+        file_info = api.file.get_info_by_path(g.team_id, os.path.join(remote_dir, _open_lnk_name))
+        api.task.set_output_directory(task_id, file_info.id, remote_dir)
 
-        # init_script_arguments(state)
-        # mm_train()
-        #
-        # # hide progress bars and eta
-        # fields = [
-        #     {"field": "data.progressEpoch", "payload": None},
-        #     {"field": "data.progressIter", "payload": None},
-        #     {"field": "data.eta", "payload": None},
-        # ]
-        # g.api.app.set_fields(g.task_id, fields)
-        #
-        # remote_dir = upload_artifacts_and_log_progress()
-        # file_info = api.file.get_info_by_path(g.team_id, os.path.join(remote_dir, _open_lnk_name))
-        # api.task.set_output_directory(task_id, file_info.id, remote_dir)
-        #
-        # # show result directory in UI
-        # fields = [
-        #     {"field": "data.outputUrl", "payload": g.api.file.get_url(file_info.id)},
-        #     {"field": "data.outputName", "payload": remote_dir},
-        #     {"field": "state.done9", "payload": True},
-        #     {"field": "state.started", "payload": False},
-        # ]
-        # g.api.app.set_fields(g.task_id, fields)
+        # show result directory in UI
+        fields = [
+            {"field": "data.outputUrl", "payload": g.api.file.get_url(file_info.id)},
+            {"field": "data.outputName", "payload": remote_dir},
+            {"field": "state.done9", "payload": True},
+            {"field": "state.started", "payload": False},
+        ]
+        g.api.app.set_fields(g.task_id, fields)
     except Exception as e:
         api.app.set_field(task_id, "state.started", False)
         raise e  # app will handle this error and show modal window
