@@ -18,7 +18,7 @@ def main():
     g.my_app.compile_template(g.root_source_dir)
     g.my_app.run(data=data, state=state)
 
-#@TODO: stop training by request
+
 #@TODO: check restart step for all steps
 #@TODO: start train from custom checkpoint
 if __name__ == "__main__":
