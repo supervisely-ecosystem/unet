@@ -1,3 +1,25 @@
+<!--<el-slider v-model="state.visEpoch"-->
+<!--           show-input-->
+<!--           show-stops-->
+<!--           :min="1"-->
+<!--           :max="data.finishedEpoch"-->
+<!--           :step="1"-->
+<!--           :disabled="state.visEpoch == 0"-->
+<!--&gt;-->
+<!--</el-slider>-->
+
+<!--<el-slider v-model="state.visEpoch"-->
+<!--           show-input-->
+<!--           show-stops-->
+<!--           :min="1"-->
+<!--           :max="data.finishedEpoch"-->
+<!--           :step="1"-->
+<!--           :disabled="state.visEpoch == 0"-->
+<!--           :debounce="700"-->
+<!--           style="width: 300px;"-->
+<!--&gt;-->
+<!--</el-slider>-->
+<!--           @input="state.setTimeIndexLoading = true; command('set_gallery_time_index')"-->
 
 <sly-card title="Training progress"
           subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
@@ -109,6 +131,20 @@
                     <i class="zmdi zmdi-rotate-left ml15 mr5"></i>follow latest
                 </el-button>
             </div>
+<!--            <div class="fflex">-->
+<!--                <div class="ml15 mr15">Show epoch {{state.visEpoch}} / {{data.finishedEpoch}}</div>-->
+<!--                <el-slider v-model="state.visEpoch"-->
+<!--                           show-input-->
+<!--                           :min="1"-->
+<!--                           style="width: 350px;"-->
+<!--                           :max="data.finishedEpoch"-->
+<!--                           :debounce="700"-->
+<!--                           @change="command('set_gallery_time_index')">-->
+<!--                </el-slider>-->
+<!--                <el-button type="text" @click="command('follow_latest_prediction')">-->
+<!--                    <i class="zmdi zmdi-rotate-left ml15 mr5"></i>follow latest-->
+<!--                </el-button>-->
+<!--            </div>-->
             <sly-grid-gallery v-if="data.gallery"
                               :content="data.gallery.content"
                               :options="data.gallery.options">
