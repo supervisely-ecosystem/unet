@@ -62,48 +62,32 @@
                 </sly-line-chart>
             </div>
         </sly-field>
-        <!--        <div style="color: red;">xxx = {{Object.keys(data.gallery.content.annotations).length}}</div>-->
-        <!--        <pre>{{data.gallery}}</pre>-->
-        <!--        <pre>{{data.gallery.options.syncViewsBindings}}</pre>-->
 
         <sly-field title="Predictions improvement dynamics"
                    description="Model predictions over time for random images from train/val"
                    v-if="data.gallery && Object.keys(data.gallery.content.annotations).length > 0"
-        >
-            <!--            <pre>{{data.gallery}}</pre>-->
-            <!--            <pre>{{data.gallery.content.layout}}</pre>-->
-            <!--            <pre>{{data.gallery.content.options.syncViewsBindings}}</pre>-->
-            <!--            <div class="fflex">-->
-            <!--                <div class="mr15">Epoch</div>-->
-            <!--                <el-input-number v-model="state.visEpoch" :min="1" :max="data.progressEpoch.current" :step="1" :debounce="500"-->
-            <!--                                 @change="(value) => {-->
-            <!--                                    data.gallery.content.layout = [-->
-            <!--                                        data.gallery.content.layout[0], data.gallery.content.layout[1],-->
-            <!--                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )-->
-            <!--                                    ]-->
-            <!--                                }"-->
-            <!--                >-->
-            <!--                </el-input-number>-->
-            <!--            </div>-->
-            <!--            <div class="fflex">-->
-            <!--                <div class="mr10">Show examples from</div>-->
-            <!--                <el-select v-model="state.visSets" multiple>-->
-            <!--                    <el-option key="onlyTrain" label="train" value="train"></el-option>-->
-            <!--                    <el-option key="onlyVal" label="val" value="val"></el-option>-->
-            <!--                </el-select>-->
-            <!--            </div>-->
 
+        >
             <div class="fflex">
                 <el-button size="small"
                            type="primary" class="regular action-icon-btn"
-                           @click="command('set_gallery_prev')">
+                           @click="state.setTimeIndexLoading = true; state.visEpoch -= 1; command('set_gallery_time_index')"
+                           :disabled="state.visEpoch <= 1 || data.finishedEpoch === 0"
+                           :loading="state.setTimeIndexLoading">
                     <i class="zmdi zmdi-arrow-left"></i>
                 </el-button>
-                <div class="ml15 mr15">{{state.visEpoch}} / {{data.progressEpoch.current}}</div>
+                <div class="ml15 mr15">Show epoch {{state.visEpoch}} / {{data.finishedEpoch}}</div>
                 <el-button size="small"
                            type="primary" class="regular action-icon-btn"
-                           @click="command('set_gallery_next')">
+                           @click="state.setTimeIndexLoading = true; state.visEpoch += 1; command('set_gallery_time_index')"
+                           :disabled="state.visEpoch === data.finishedEpoch || data.finishedEpoch === 0"
+                           :loading="state.setTimeIndexLoading">
                     <i class="zmdi zmdi-arrow-right"></i>
+                </el-button>
+                <el-button type="text"
+                           @click="command('follow_latest_prediction')"
+                >
+                    <i class="zmdi zmdi-rotate-left ml15 mr5"></i>follow latest
                 </el-button>
             </div>
             <sly-grid-gallery v-if="data.gallery"
@@ -112,7 +96,7 @@
             </sly-grid-gallery>
         </sly-field>
         <div v-else
-             v-loading="Object.keys(data.gallery.content.annotations).length === 0"
+             v-loading="true"
              element-loading-text="Predictions will be available after first epoch..."
              style="height: 150px">
         </div>

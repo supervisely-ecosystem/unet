@@ -41,6 +41,8 @@ def init(data, state):
     data["outputUrl"] = None
 
     state["visEpoch"] = 0
+    data["finishedEpoch"] = 0
+    state["setTimeIndexLoading"] = False
 
     data["gallery"] = gallery
     state["visSets"] = ["train", "val"]
@@ -165,7 +167,9 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         raise e  # app will handle this error and show modal window
 
     # stop application
-    g.my_app.stop()
+    g.my_app.show_modal_window("Training is finished, app is still running and you can preview predictions dynamics over time."
+                               "Please stop app manually once you are finished with it.")
+    #g.my_app.stop()
 
 
 def set_train_arguments(state):
@@ -225,15 +229,30 @@ def set_train_arguments(state):
     sys.argv.append("--sly")
 
 
-@g.my_app.callback("set_gallery_prev")
+@g.my_app.callback("set_gallery_time_index")
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()
-def set_gallery_prev(api: sly.Api, task_id, context, state, app_logger):
-    pass
+def set_gallery_time_index(api: sly.Api, task_id, context, state, app_logger):
+    try:
+        gallery.set_time_index(state["visEpoch"])
+    except Exception as e:
+        api.task.set_field(task_id, "state.setTimeIndexLoading", False)
+        raise e
+    finally:
+        api.task.set_field(task_id, "state.setTimeIndexLoading", False)
 
 
-@g.my_app.callback("set_gallery_next")
+@g.my_app.callback("stop")
 @sly.timeit
-@g.my_app.ignore_errors_and_show_dialog_window()
-def set_gallery_next(api: sly.Api, task_id, context, state, app_logger):
-    pass
+def stop(api: sly.Api, task_id, context, state, app_logger):
+    fields = [
+        {"field": "state.done7", "payload": True},
+        {"field": "state.started", "payload": False},
+    ]
+    g.api.app.set_fields(g.task_id, fields)
+
+
+@g.my_app.callback("follow_latest_prediction")
+@sly.timeit
+def follow_latest_prediction(api: sly.Api, task_id, context, state, app_logger):
+    gallery.follow_last_time_index()

@@ -81,7 +81,9 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
 
     if update is True:
         gallery.update()
-        gallery.set_time_index(time_index)
+        if gallery.is_show_last_time():
+            gallery.show_last_time_index()
+            g.api.task.set_field(g.task_id, "state.visEpoch", time_index)
 
 
 from step07_train import progress_epoch, progress_iter
@@ -118,5 +120,6 @@ def report_val_metrics(epoch, loss, avg_iou, agv_dice):
         chart_loss.get_field(epoch, loss, "val"),
         chart_acc.get_field(epoch, avg_iou, "avg IoU"),
         chart_acc.get_field(epoch, agv_dice, "avg Dice"),
+        {"field": f"data.finishedEpoch", "payload": epoch},
     ]
     g.api.app.set_fields(g.task_id, fields)
