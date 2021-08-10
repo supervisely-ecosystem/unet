@@ -75,11 +75,13 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
         if not gallery.has_item(item_name):
             image_info = get_image_info_from_cache(dataset_name, item_name)
             gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
+            #@TODO: remove_bg_from_predictions
             gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
         gallery.add_prediction(item_name, time_index, pred_ann)
 
     if update is True:
         gallery.update()
+        gallery.set_time_index(time_index)
 
 
 from step07_train import progress_epoch, progress_iter

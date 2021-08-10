@@ -224,3 +224,16 @@ def set_train_arguments(state):
     sys.argv.extend(["--val-vis-items-path", val_vis_items_path])
     sys.argv.append("--sly")
 
+
+@g.my_app.callback("set_gallery_prev")
+@sly.timeit
+@g.my_app.ignore_errors_and_show_dialog_window()
+def set_gallery_prev(api: sly.Api, task_id, context, state, app_logger):
+    pass
+
+
+@g.my_app.callback("set_gallery_next")
+@sly.timeit
+@g.my_app.ignore_errors_and_show_dialog_window()
+def set_gallery_next(api: sly.Api, task_id, context, state, app_logger):
+    pass

@@ -62,32 +62,50 @@
                 </sly-line-chart>
             </div>
         </sly-field>
-<!--        <div style="color: red;">xxx = {{Object.keys(data.gallery.content.annotations).length}}</div>-->
-<!--        <pre>{{data.gallery}}</pre>-->
-<!--        <pre>{{data.gallery.options.syncViewsBindings}}</pre>-->
+        <!--        <div style="color: red;">xxx = {{Object.keys(data.gallery.content.annotations).length}}</div>-->
+        <!--        <pre>{{data.gallery}}</pre>-->
+        <!--        <pre>{{data.gallery.options.syncViewsBindings}}</pre>-->
+
         <sly-field title="Predictions improvement dynamics"
                    description="Model predictions over time for random images from train/val"
                    v-if="data.gallery && Object.keys(data.gallery.content.annotations).length > 0"
         >
+            <!--            <pre>{{data.gallery}}</pre>-->
+            <!--            <pre>{{data.gallery.content.layout}}</pre>-->
+            <!--            <pre>{{data.gallery.content.options.syncViewsBindings}}</pre>-->
+            <!--            <div class="fflex">-->
+            <!--                <div class="mr15">Epoch</div>-->
+            <!--                <el-input-number v-model="state.visEpoch" :min="1" :max="data.progressEpoch.current" :step="1" :debounce="500"-->
+            <!--                                 @change="(value) => {-->
+            <!--                                    data.gallery.content.layout = [-->
+            <!--                                        data.gallery.content.layout[0], data.gallery.content.layout[1],-->
+            <!--                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )-->
+            <!--                                    ]-->
+            <!--                                }"-->
+            <!--                >-->
+            <!--                </el-input-number>-->
+            <!--            </div>-->
+            <!--            <div class="fflex">-->
+            <!--                <div class="mr10">Show examples from</div>-->
+            <!--                <el-select v-model="state.visSets" multiple>-->
+            <!--                    <el-option key="onlyTrain" label="train" value="train"></el-option>-->
+            <!--                    <el-option key="onlyVal" label="val" value="val"></el-option>-->
+            <!--                </el-select>-->
+            <!--            </div>-->
+
             <div class="fflex">
-                <div class="mr15">Epoch</div>
-                <el-input-number v-model="state.visEpoch" :min="1" :max="data.progressEpoch.current" :step="1" :debounce="500"
-                                 @change="(value) => {
-                                    data.gallery.content.layout = [
-                                        data.gallery.content.layout[0], data.gallery.content.layout[1],
-                                        data.gallery.content.pred_layout.map( (x)=>`${x}_${value}` )
-                                    ]
-                                }"
-                >
-                </el-input-number>
+                <el-button size="small"
+                           type="primary" class="regular action-icon-btn"
+                           @click="command('set_gallery_prev')">
+                    <i class="zmdi zmdi-arrow-left"></i>
+                </el-button>
+                <div class="ml15 mr15">{{state.visEpoch}} / {{data.progressEpoch.current}}</div>
+                <el-button size="small"
+                           type="primary" class="regular action-icon-btn"
+                           @click="command('set_gallery_next')">
+                    <i class="zmdi zmdi-arrow-right"></i>
+                </el-button>
             </div>
-<!--            <div class="fflex">-->
-<!--                <div class="mr10">Show examples from</div>-->
-<!--                <el-select v-model="state.visSets" multiple>-->
-<!--                    <el-option key="onlyTrain" label="train" value="train"></el-option>-->
-<!--                    <el-option key="onlyVal" label="val" value="val"></el-option>-->
-<!--                </el-select>-->
-<!--            </div>-->
             <sly-grid-gallery v-if="data.gallery"
                               :content="data.gallery.content"
                               :options="data.gallery.options">
