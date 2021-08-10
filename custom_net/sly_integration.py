@@ -19,7 +19,7 @@ def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, mod
     height, width = predicted_class_indices.shape[:2]
     labels = []
     for idx, class_info in enumerate(classes_json):  # curr_col2cls.items():
-        class_mask = np.all(predicted_class_indices == idx, axis=2)  # exact match (3-channel img & rgb color)
+        class_mask = predicted_class_indices == idx  # exact match (3-channel img & rgb color)
         if not np.any(class_mask):
             # 0 pixels for class
             continue
@@ -42,7 +42,7 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
     # small optimization for debug
     global _model_classes, _project_fs, _path_to_items
     if _model_classes is None:
-        model_classes = sly.ProjectMeta(obj_classes=sly.ObjClassCollection.from_json(classes))
+        model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection.from_json(classes))
     if _project_fs is None:
         project_fs = sly.Project(project_dir, sly.OpenMode.READ)
     if items_path not in _path_to_items:
@@ -58,20 +58,26 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
 
         image_path = dataset_fs.get_img_path(item_name)
         predicted_class_indices = inference(model, input_height, input_width, image_path)
-        pred_ann = _convert_prediction_to_sly_format(predicted_class_indices, classes, model_classes)
+        pred_ann = _convert_prediction_to_sly_format(predicted_class_indices, classes, model_meta)
 
-        if not gallery.has_item(item_name):
-            image_info = get_image_info_from_cache(dataset_name, item_name)
-            gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
-            gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
-        gallery.add_prediction(item_name, time_index, pred_ann)
-    gallery.update()
+        # debug raw predictions
+        # colors = np.array([cls.color for cls in model_meta.obj_classes])
+        # colored_mask = colors[predicted_class_indices]
+        # sly.fs.ensure_base_path("/app_debug_data/debug")
+        # sly.image.write(f"/app_debug_data/debug/{time_index:03d}.png", colored_mask)
 
-    # predicted_classes = output.data.cpu().numpy().argmax(axis=1)
-    # model_classes = [sly.ObjClass.from_json(data) for data in classes]
-    # colors = np.array([cls.color for cls in model_classes])
-    # colored_mask = colors[predicted_classes[0]]
-    # sly.image.write(save_path, colored_mask)
+        # debug predictions in sly Format
+        # img_draw = sly.image.read(image_path)
+        # pred_ann.draw_pretty(img_draw)
+        # sly.fs.ensure_base_path("/app_debug_data/debug")
+        # sly.image.write(f"/app_debug_data/debug/{time_index:03d}.png", img_draw)
+
+        # if not gallery.has_item(item_name):
+        #     image_info = get_image_info_from_cache(dataset_name, item_name)
+        #     gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
+        #     gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
+        # gallery.add_prediction(item_name, time_index, pred_ann)
+    # gallery.update()
 
 
 from step07_train import progress_epoch, progress_iter

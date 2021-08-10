@@ -16,7 +16,7 @@ def inference(model: nn.Module, input_height, input_width, image_path):
     output = model(input)
 
     image_height, image_width = image.shape[:2]
-    predicted_classes_indices = output.data.cpu().numpy().argmax(axis=1)
+    predicted_classes_indices = output.data.cpu().numpy().argmax(axis=1)[0]
     result = cv2.resize(predicted_classes_indices, (image_width, image_height), interpolation=cv2.INTER_NEAREST)
     return result
 
