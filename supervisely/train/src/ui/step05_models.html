@@ -50,14 +50,20 @@
     </el-tabs>
     <el-button type="primary" class="regular mt10"
                @click="command('download_weights')"
-               :loading="!!data.progress5"
+               :loading="!!data.progress5.message"
                v-if="!data.done5">
         Use selected model
     </el-button>
-    <div v-if="data.progress5" class="mt10">
-        <div style="color: #20a0ff">{{data.progress5}}: {{data.progressCurrent5}} / {{data.progressTotal5}}</div>
-        <el-progress :percentage="data.progressPercent5"></el-progress>
+    <div v-if="data.progress5.message" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progress5.message}}: {{data.progress5.current}} / {{data.progress5.total}}
+        </div>
+        <el-progress :percentage="data.progress5.percent"></el-progress>
     </div>
+<!--    <div v-if="data.progress5" class="mt10">-->
+<!--        <div style="color: #20a0ff">{{data.progress5}}: {{data.progressCurrent5}} / {{data.progressTotal5}}</div>-->
+<!--        <el-progress :percentage="data.progressPercent5"></el-progress>-->
+<!--    </div>-->
     <div v-if="data.done5">
         <i class="zmdi zmdi-check-circle mr5 mt10" style="color: #13ce66"></i>
         <span style="color: #5a6772;">Model has been successfully defined</span>

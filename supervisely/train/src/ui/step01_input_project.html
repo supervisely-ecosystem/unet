@@ -19,10 +19,6 @@
             v-if="!data.done1">
         Download
     </el-button>
-<!--    <div v-if="data.progress1" class="mt10">-->
-<!--        <div style="color: #20a0ff">{{data.progress1}}: {{data.progressCurrent1}} / {{data.progressTotal1}}</div>-->
-<!--        <el-progress :percentage="data.progressPercent1"></el-progress>-->
-<!--    </div>-->
     <div v-if="data.progress1.message" class="mt10">
         <div style="color: #20a0ff">
             {{data.progress1.message}}: {{data.progress1.current}} / {{data.progress1.total}}

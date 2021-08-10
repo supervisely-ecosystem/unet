@@ -5,8 +5,7 @@ from pathlib import Path
 
 import sly_globals as g
 import supervisely_lib as sly
-from sly_progress_utils import get_progress_cb, reset_progress, init_progress
-
+progress5 = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progress5", "Download weights", is_size=True, min_report_percent=5)
 
 local_weights_path = None
 
@@ -45,9 +44,10 @@ def init(data, state):
     state["weightsInitialization"] = "random"  # "custom"
     state["collapsed5"] = True
     state["disabled5"] = True
-    init_progress(5, data)
 
-    state["weightsPath"] = ""# "/mmclassification/5687_synthetic products v2_003/checkpoints/epoch_10.pth"  #@TODO: for debug
+    progress5.init_data(data)
+
+    state["weightsPath"] = ""
     data["done5"] = False
 
 
@@ -83,9 +83,9 @@ def download_weights(api: sly.Api, task_id, context, state, app_logger):
                 file_info = g.api.file.get_info_by_path(g.team_id, weights_path_remote)
                 if file_info is None:
                     raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), weights_path_remote)
-                progress_cb = get_progress_cb(6, "Download weights", file_info.sizeb, is_size=True, min_report_percent=1)
-                g.api.file.download(g.team_id, weights_path_remote, local_weights_path, g.my_app.cache, progress_cb)
-                reset_progress(6)
+                progress5.set_total(file_info.sizeb)
+                g.api.file.download(g.team_id, weights_path_remote, local_weights_path, g.my_app.cache, progress5.increment)
+                progress5.reset_and_update()
         else:
             weights_url = model_list[state["selectedModel"]].get("pretrained")
             if weights_url is not None:
@@ -95,13 +95,13 @@ def download_weights(api: sly.Api, task_id, context, state, app_logger):
                 if sly.fs.file_exists(local_weights_path) is False:
                     response = requests.head(weights_url, allow_redirects=True)
                     sizeb = int(response.headers.get('content-length', 0))
-                    progress_cb = get_progress_cb(6, "Download weights", sizeb, is_size=True, min_report_percent=1)
-                    sly.fs.download(weights_url, local_weights_path, g.my_app.cache, progress_cb)
-                    reset_progress(6)
+                    progress5.set_total(sizeb)
+                    sly.fs.download(weights_url, local_weights_path, g.my_app.cache, progress5.increment)
+                    progress5.reset_and_update()
                 sly.logger.info("Pretrained weights has been successfully downloaded",
                                 extra={"weights": local_weights_path})
     except Exception as e:
-        reset_progress(6)
+        progress5.reset_and_update()
         raise e
 
     fields = [
