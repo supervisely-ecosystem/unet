@@ -6,10 +6,19 @@
           :disabled="{disabled: state.disabled4, message: 'Select training classes at step 3 before configure augmentations'}"
           ref="step4"
 >
-    <div class="fflex">
+    <div class="fflex mb10">
         <el-switch v-model="state.useAugs" :disabled="data.done4"></el-switch>
         <div class="ml10">Augmentations</div>
     </div>
+    <sly-field v-if="state.useAugs"
+               title="Auto resize"
+               description="Whether you use augmentations or not, images will be automatically resized to model input
+               resolution. You don't need to add this transformation to the aug pipeline."
+    >
+        <sly-icon slot="icon" :options="{ color: '#ea9d22', bgColor: '#fcefd9', rounded: false }">
+            <i class="zmdi zmdi-alert-triangle"></i>
+        </sly-icon>
+    </sly-field>
     <el-tabs type="border-card" class="el-tabs-cards mt10" v-model="state.augsType" v-if="state.useAugs">
         <el-tab-pane name="template" :disabled="data.done4">
             <el-radio slot="label" v-model="state.augsType" label="template" :disabled="data.done4">
