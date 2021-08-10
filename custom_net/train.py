@@ -17,14 +17,21 @@ import supervisely_lib as sly
 from sly_seg_dataset import SlySegDataset
 
 
+
+# Pytorch can automatically download pretrained weights, we use direct download to show progress bar in UI at step05
+from torchvision.models.vgg import model_urls as vgg_urls
+from torchvision.models.resnet import model_urls as resnet_urls
+
 model_list = {
     'UNet11': {
         "class": UNet11,
-        "description": "Initialized from vgg-11 pretrained on ImageNet"
+        "description": "Initialized from vgg-11 pretrained on ImageNet",
+        "pretrained": vgg_urls['vgg11']
     },
     'UNet16': {
         "class": UNet16,
-        "description": "Initialized from vgg-16 pretrained on ImageNet"
+        "description": "Initialized from vgg-16 pretrained on ImageNet",
+        "pretrained": vgg_urls['vgg16']
     },
     'UNet': {
         "class": UNet,
@@ -32,11 +39,13 @@ model_list = {
     },
     'AlbuNet': {
         "class": AlbuNet,
-        "description": "UNet modification with resnet34 encoder pretrained on ImageNet"
+        "description": "UNet modification with resnet34 encoder pretrained on ImageNet",
+        "pretrained": resnet_urls['resnet34']
     },
     'LinkNet34': {
         "class": LinkNet34,
-        "description": "LinkNet with resnet34 encoder pretrained on ImageNet"
+        "description": "LinkNet with resnet34 encoder pretrained on ImageNet",
+        "pretrained": resnet_urls['resnet34']
     }
 }
 
@@ -46,14 +55,14 @@ def main():
 
     parser = argparse.ArgumentParser()
     # model architecture
-    parser.add_argument('--model', default='UNet-classic', help='model architecture name')
+    parser.add_argument('--model', default='UNet11', help='model architecture name')
 
     # for data loader
     parser.add_argument('--project-dir', default='', help='path to sly project with segmentation masks')
     parser.add_argument('--classes-path', default='', help='path to the list of classes (order matters)')
     parser.add_argument('--train-set-path', default='', help='list of training items')
     parser.add_argument('--val-set-path', default='', help='list of validation')
-    parser.add_argument('--sly-augs-path', default='', help='path to SlyImgAug config')
+    parser.add_argument('--sly-augs-path', default='123', help='path to SlyImgAug config')
 
     # basic hyperparameters
     parser.add_argument('--epochs', type=int, default=5)
@@ -110,12 +119,8 @@ def main():
     classes = sly.json.load_json_file(args.classes_path)
     num_classes = len(classes)
 
-    #@TODO: model selector later
-    #if args.model == 'UNet':
-    model = UNet(num_classes=num_classes)
-    # else:
-    #     model_name = moddel_list[args.model]
-    #     model = model_name(num_classes=num_classes, pretrained=True)
+    model_name = model_list[args.model]["class"]
+    model = model_name(num_classes=num_classes, pretrained=True)
 
     if torch.cuda.is_available():
         #@TODO: later can be used for bulti GPU training, now it is disabled

@@ -37,7 +37,7 @@ remote_preview_path = "/temp/unet/preview_augs.jpg"
 
 augs_json_config = None
 augs_py_preview = None
-augs_config_path = None
+augs_config_path = os.path.join(g.info_dir, "augs_config.json")
 
 
 def _load_template(json_path):
@@ -172,14 +172,10 @@ def use_augs(api: sly.Api, task_id, context, state, app_logger):
     global augs_config_path
 
     if state["useAugs"] is True:
-        augs_config_path = os.path.join(g.info_dir, "augs_config.json")
         sly.json.dump_json_file(augs_json_config, augs_config_path)
-
         augs_py_path = os.path.join(g.info_dir, "augs_preview.py")
         with open(augs_py_path, 'w') as f:
             f.write(augs_py_preview)
-    else:
-        augs_config_path = None
 
     fields = [
         {"field": "data.done4", "payload": True},
