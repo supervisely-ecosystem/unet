@@ -9,7 +9,7 @@
         <el-tab-pane name="random" :disabled="data.done5">
             <el-radio slot="label" v-model="state.weightsInitialization" label="random" :disabled="data.done5">
                 Start from scratch
-                <div>Initialize models with random weights, ResNet based models are initialized with weights from ImageNet</div>
+                <div>Most of the models are pretrained on ImageNet</div>
             </el-radio>
             <table class="beautiful-table">
                 <thead>
@@ -41,7 +41,7 @@
         <el-tab-pane name="custom" :disabled="data.done5">
             <el-radio slot="label" v-model="state.weightsInitialization" label="custom" :disabled="data.done5">
                 Custom weights
-                <div>Define path in Team Files to your weights</div>
+                <div>Model architecture and weights will be initialized from the provided model</div>
             </el-radio>
             <sly-field title="Path to weights file" description="Copy path in Team Files">
                 <el-input v-model="state.weightsPath" :disabled="data.done5" placeholder="Path to .pt file in Team Files"></el-input>

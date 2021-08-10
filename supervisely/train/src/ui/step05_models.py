@@ -12,12 +12,13 @@ local_weights_path = None
 
 
 def get_models_list():
-    res = [
-        {
-            "model": "UNet-classic",
-            "description": "Weights are initialized randomly"
-        }
-    ]
+    from train import model_list
+    res = []
+    for name, data in model_list.items():
+        res.append({
+            "model": name,
+            "description": data["description"]
+        })
     return res
 
 
@@ -40,7 +41,7 @@ def init(data, state):
     models = get_models_list()
     data["models"] = models
     data["modelColumns"] = get_table_columns()
-    state["selectedModel"] = "UNet-classic"
+    state["selectedModel"] = models[0]["model"]
     state["weightsInitialization"] = "random"  # "custom"
     state["collapsed5"] = True
     state["disabled5"] = True

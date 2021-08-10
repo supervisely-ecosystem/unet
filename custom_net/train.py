@@ -18,11 +18,26 @@ from sly_seg_dataset import SlySegDataset
 
 
 model_list = {
-    'UNet11': UNet11,
-    'UNet16': UNet16,
-    'UNet': UNet,
-    'AlbuNet': AlbuNet,
-    'LinkNet34': LinkNet34
+    'UNet11': {
+        "class": UNet11,
+        "description": "Initialized from vgg-11 pretrained on ImageNet"
+    },
+    'UNet16': {
+        "class": UNet16,
+        "description": "Initialized from vgg-16 pretrained on ImageNet"
+    },
+    'UNet': {
+        "class": UNet,
+        "description": "Vanilla UNet with random weights"
+    },
+    'AlbuNet': {
+        "class": AlbuNet,
+        "description": "UNet modification with resnet34 encoder pretrained on ImageNet"
+    },
+    'LinkNet34': {
+        "class": LinkNet34,
+        "description": "LinkNet with resnet34 encoder pretrained on ImageNet"
+    }
 }
 
 

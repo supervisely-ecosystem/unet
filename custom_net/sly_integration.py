@@ -1,7 +1,5 @@
 import numpy as np
 from torch import nn
-import torch
-import utils
 import supervisely_lib as sly
 
 import sly_globals as g
@@ -31,7 +29,7 @@ def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, mod
 
 
 ###############################################
-######## DO NOT MODIFY THIS METHODS ###########
+######## DO NOT MODIFY METHODS BELOW ##########
 ###############################################
 
 
@@ -75,7 +73,6 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
         if not gallery.has_item(item_name):
             image_info = get_image_info_from_cache(dataset_name, item_name)
             gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
-            #@TODO: remove_bg_from_predictions
             gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
         gallery.add_prediction(item_name, time_index, pred_ann)
 

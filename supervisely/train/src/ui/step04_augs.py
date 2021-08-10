@@ -8,21 +8,25 @@ import step03_classes
 
 _templates = [
     {
-        "config": "supervisely/train/augs/mmclass-lite.json",
-        "name": "Lite (color + rotate)",
+        "config": "supervisely/train/augs/seg_simple.json",
+        "name": "Only Color",
     },
     {
-        "config": "supervisely/train/augs/mmclass-lite-with-fliplr.json",
-        "name": "Lite + fliplr",
+        "config": "supervisely/train/augs/seg_simple_rotate.json",
+        "name": "Light: color + rotate",
     },
     {
-        "config": "supervisely/train/augs/mmclass-heavy-no-fliplr.json",
-        "name": "Heavy",
+        "config": "supervisely/train/augs/seg_simple_rotate_crop.json",
+        "name": "Medium: light + crop",
     },
     {
-        "config": "supervisely/train/augs/mmclass-heavy-with-fliplr.json",
-        "name": "Heavy + fliplr",
+        "config": "supervisely/train/augs/seg_simple_rotate_crop_flipLR.json",
+        "name": "Heavy: medium + flipLR",
     },
+    {
+        "config": "supervisely/train/augs/seg_simple_rotate_crop_flipLR_flipUD.json",
+        "name": "Heavy + flipUD",
+    }
 ]
 
 _custom_pipeline_path = None
