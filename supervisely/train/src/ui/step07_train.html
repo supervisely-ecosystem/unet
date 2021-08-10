@@ -1,0 +1,128 @@
+
+<sly-card title="Training progress"
+          subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
+          ref="step7"
+          :options="{collapsable: true}"
+          :collapsed.sync="state.collapsed7"
+          :disabled="{disabled: state.disabled7, message: 'Finish previous steps before run training'}"
+>
+    <el-button v-if="!state.done7"
+               type="primary" class="regular"
+               @click="state.started = true; command('train')"
+               :loading="state.started === true"
+    >
+        <i class="zmdi zmdi-play mr5"></i> Train
+    </el-button>
+    <div v-if="data.outputUrl">
+        <sly-field title="Training artifacts"
+                   description="Training artifacts has been uploaded to Team Files">
+            <a slot="title" target="_blank" :href="`${data.outputUrl}`">{{data.outputName}}</a>
+            <sly-icon slot="icon" :options="{ color: '#33c94c', bgColor: '#d9f7e4', rounded: false }">
+                <i class="zmdi zmdi-folder"></i>
+            </sly-icon>
+        </sly-field>
+        <div>
+            <i class="zmdi zmdi-check-circle mr5" style="color: #13ce66"></i>
+            <span style="color: #5a6772;">Training has been successfully finished</span>
+        </div>
+    </div>
+    <div v-if="data.progressEpoch.message && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressEpoch.message}}: {{data.progressEpoch.current}} / {{data.progressEpoch.total}}
+        </div>
+        <el-progress :percentage="data.progressEpoch.percent"></el-progress>
+    </div>
+    <div v-if="data.progressIter.message && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressIter.message}}: {{data.progressIter.current}} / {{data.progressIter.total}}
+        </div>
+        <el-progress :percentage="data.progressIter.percent"></el-progress>
+    </div>
+    <div v-if="data.progressOther.message && !data.outputUrl" class="mt10">
+        <div style="color: #20a0ff">
+            {{data.progressOther.message}}: {{data.progressOther.current}} / {{data.progressOther.total}}
+        </div>
+        <el-progress :percentage="data.progressOther.percent"></el-progress>
+    </div>
+    <div class="mt15" v-if="state.started === true || state.done7">
+        <hr class="mt10 mb10" style="border: 0; border-top: 1px solid rgba(0,0,0,.12);"/>
+        <sly-field title="Smoothing" description="Change the smoothing of line charts">
+            <sly-icon slot="icon" :options="{ color: '#006ad4', bgColor: '#bbe2ff', rounded: false }">
+                <i class="zmdi zmdi-trending-up"></i>
+            </sly-icon>
+            <el-slider
+                    :value="state.smoothing"
+                    :min="0" :max="0.95" :step="0.05" show-input
+                    style="width: 450px;"
+                    @input="(val)=>{
+                                state.smoothing = val;
+                                data.chartLoss.options.smoothingWeight = val;
+                                data.chartAcc.options.smoothingWeight = val;
+                            }"
+            >
+            </el-slider>
+        </sly-field>
+
+        <sly-field title="Training charts" description="Real-time training metrics">
+            <div class="fflex">
+                <sly-line-chart
+                        style="width: 33%;"
+                        :options.sync="data.chartLR.options"
+                        :content="data.chartLR.series">
+                </sly-line-chart>
+                <sly-line-chart
+                        style="width: 33%;"
+                        :options.sync="data.chartLoss.options"
+                        :content="data.chartLoss.series">
+                </sly-line-chart>
+                <sly-line-chart
+                        style="width: 33%;"
+                        :options.sync="data.chartAcc.options"
+                        :content="data.chartAcc.series">
+                </sly-line-chart>
+            </div>
+        </sly-field>
+
+        <sly-field title="Predictions improvement dynamics"
+                   description="Model predictions over time for random images from train/val"
+                   v-if="data.gallery && Object.keys(data.gallery.content.annotations).length > 0"
+        >
+            <div class="fflex">
+                <el-button size="small"
+                           type="primary" class="regular action-icon-btn"
+                           @click="state.setTimeIndexLoading = true; state.visEpoch -= 1; command('set_gallery_time_index')"
+                           :disabled="state.visEpoch <= 1 || data.finishedEpoch === 0"
+                           :loading="state.setTimeIndexLoading">
+                    <i class="zmdi zmdi-arrow-left"></i>
+                </el-button>
+                <div class="ml15 mr15">Show epoch {{state.visEpoch}} / {{data.finishedEpoch}}</div>
+                <el-button size="small"
+                           type="primary" class="regular action-icon-btn"
+                           @click="state.setTimeIndexLoading = true; state.visEpoch += 1; command('set_gallery_time_index')"
+                           :disabled="state.visEpoch === data.finishedEpoch || data.finishedEpoch === 0"
+                           :loading="state.setTimeIndexLoading">
+                    <i class="zmdi zmdi-arrow-right"></i>
+                </el-button>
+                <el-button type="text"
+                           @click="command('follow_latest_prediction')"
+                >
+                    <i class="zmdi zmdi-rotate-left ml15 mr5"></i>follow latest
+                </el-button>
+            </div>
+            <sly-grid-gallery v-if="data.gallery"
+                              :content="data.gallery.content"
+                              :options="data.gallery.options">
+                <template v-slot:card-footer="{ annotation }">
+                    <div class="mt5" style="text-align: center">
+                        <el-tag type="primary">{{annotation.title}}</el-tag>
+                    </div>
+                </template>
+            </sly-grid-gallery>
+        </sly-field>
+        <div v-else
+             v-loading="true"
+             element-loading-text="Predictions will be available after first epoch..."
+             style="height: 150px">
+        </div>
+    </div>
+</sly-card>

@@ -8,21 +8,25 @@ import step03_classes
 
 _templates = [
     {
-        "config": "supervisely/train/augs/mmclass-lite.json",
-        "name": "Lite (color + rotate)",
+        "config": "supervisely/train/augs/seg_simple.json",
+        "name": "Only Color",
     },
     {
-        "config": "supervisely/train/augs/mmclass-lite-with-fliplr.json",
-        "name": "Lite + fliplr",
+        "config": "supervisely/train/augs/seg_simple_rotate.json",
+        "name": "Light: color + rotate",
     },
     {
-        "config": "supervisely/train/augs/mmclass-heavy-no-fliplr.json",
-        "name": "Heavy",
+        "config": "supervisely/train/augs/seg_simple_rotate_crop.json",
+        "name": "Medium: light + crop",
     },
     {
-        "config": "supervisely/train/augs/mmclass-heavy-with-fliplr.json",
-        "name": "Heavy + fliplr",
+        "config": "supervisely/train/augs/seg_simple_rotate_crop_flipLR.json",
+        "name": "Heavy: medium + flipLR",
     },
+    {
+        "config": "supervisely/train/augs/seg_simple_rotate_crop_flipLR_flipUD.json",
+        "name": "Heavy + flipUD",
+    }
 ]
 
 _custom_pipeline_path = None
@@ -33,7 +37,7 @@ remote_preview_path = "/temp/unet/preview_augs.jpg"
 
 augs_json_config = None
 augs_py_preview = None
-augs_config_path = None
+augs_config_path = os.path.join(g.info_dir, "augs_config.json")
 
 
 def _load_template(json_path):
@@ -168,14 +172,10 @@ def use_augs(api: sly.Api, task_id, context, state, app_logger):
     global augs_config_path
 
     if state["useAugs"] is True:
-        augs_config_path = os.path.join(g.info_dir, "augs_config.json")
         sly.json.dump_json_file(augs_json_config, augs_config_path)
-
         augs_py_path = os.path.join(g.info_dir, "augs_preview.py")
         with open(augs_py_path, 'w') as f:
             f.write(augs_py_preview)
-    else:
-        augs_config_path = None
 
     fields = [
         {"field": "data.done4", "payload": True},
@@ -184,3 +184,7 @@ def use_augs(api: sly.Api, task_id, context, state, app_logger):
         {"field": "state.activeStep", "payload": 5},
     ]
     g.api.app.set_fields(g.task_id, fields)
+
+
+def restart(data, state):
+    data["done4"] = False

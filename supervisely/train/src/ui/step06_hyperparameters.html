@@ -1,71 +1,125 @@
 <sly-card title="Traning hyperparameters"
           subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
+          ref="step6"
           :options="{collapsable: true}"
           :collapsed.sync="state.collapsed6"
           :disabled="{disabled: state.disabled6, message: 'Finish previous steps before configure training'}"
-          ref="step6"
 >
-    <sly-field title="GPU device id"
-               description="Run nvidia-smi or check agent's page to see how many devices your machine has or keep by default">
-        <el-select v-model="state.gpusId" :disabled="data.done6">
-            <el-option key="0" label="0" value="0"></el-option>
-            <el-option key="1" label="1" value="1"></el-option>
-            <el-option key="2" label="2" value="2"></el-option>
-            <el-option key="3" label="3" value="3"></el-option>
+    <sly-field title="General" description="Basic training settings">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-settings"></i>
+        </sly-icon>
+        <sly-field title="Experiment name"
+                   description="Training artifacts will be saved to the following directory in team files: /unet/<task_id>_<experiment name>">
+            <el-input v-model="state.expName" :disabled="data.done6" style="width: 400px;"></el-input>
+        </sly-field>
+        <sly-field title="Number of epochs">
+            <el-input-number v-model="state.epochs" :min="1" :max="10000" :disabled="data.done6"></el-input-number>
+        </sly-field>
+        <sly-field title="Input image size (in pixels)"
+                   description="Model input resolution, by default image is resized to square">
+            <!--            <el-input-number v-model="state.imgSize" :min="64" :step="32" :disabled="data.done6"></el-input-number>-->
+            <sly-size v-model="state.imgSize" :options="{proportions: {width: 256, height: 256}}"
+                      :disabled="data.done6"></sly-size>
+        </sly-field>
+        <sly-field title="Batch size"
+                   description="number of samples for a single GPU">
+            <el-input-number v-model="state.batchSizePerGPU" :min="4" :disabled="data.done6"></el-input-number>
+        </sly-field>
+    </sly-field>
+
+    <sly-field title="Optimizer">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-graduation-cap"></i>
+        </sly-icon>
+        <div slot="description">
+            Choose optimizer and its settings, learn more in official
+            <a href="https://pytorch.org/docs/1.9.0/optim.html?module-torch.optim" target="_blank">
+                pytorch documentation
+            </a>
+        </div>
+        <el-select class="mt10 mb10" v-model="state.optimizer" :disabled="data.done6">
+            <el-option key="SGD" label="SGD" value="SGD"></el-option>
+            <el-option key="Adam" label="Adam" value="Adam"></el-option>
+            <el-option key="AdamW" label="AdamW" value="AdamW"></el-option>
         </el-select>
+        <sly-field title="Learning rate">
+            <el-input-number v-model="state.lr" :min="0" :step="0.0005" :debounce="1000"
+                             :disabled="data.done6"></el-input-number>
+        </sly-field>
+        <sly-field v-if="state.optimizer === 'SGD'" title="Momentum">
+            <el-input-number v-model="state.momentum" :min="0" :step="0.05" :debounce="1000"
+                             :disabled="data.done6"></el-input-number>
+        </sly-field>
+        <sly-field title="Weight decay">
+            <el-input-number v-model="state.weightDecay" :min="0" :step="0.0001" :debounce="1000"
+                             :disabled="data.done6"></el-input-number>
+        </sly-field>
+        <sly-field v-if="state.optimizer === 'SGD'" title="Nesterov">
+            <el-switch v-model="state.nesterov" on-color="#13ce66" off-color="#B8B8B8"
+                       :disabled="data.done6"></el-switch>
+        </sly-field>
     </sly-field>
-    <sly-field title="Number of epochs">
-        <el-input-number v-model="state.epochs" :min="1" :max="10000" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field title="Input image size (in pixels)"
-               description="Model input resolution, image is resized to square">
-        <el-input-number v-model="state.imgSize" :min="64" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field title="Batch size"
-               description="number of samples for a single GPU">
-        <el-input-number v-model="state.batchSizePerGPU" :min="4" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field title="Number of workers"
-               description="Maximum number of dataloader workers, use 0 for debug">
-        <el-input-number v-model="state.workersPerGPU" :min="0" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field title="Validation interval"
-               description="By default we evaluate the model on the validation set after each epoch, you can change the evaluation interval">
-        <div class="fflex">
-            <span class="mr5">Evaluate validation set every </span>
-            <el-input-number v-model="state.valInterval" :min="1" :max="state.epochs" :disabled="data.done6"></el-input-number>
-            <span class="ml5">epochs</span>
+
+    <sly-field title="LR Schedule">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-graduation-cap"></i>
+        </sly-icon>
+        <div slot="description">
+            configure learning rate schedule in python, learn more in official
+            <a href="https://pytorch.org/docs/1.9.0/optim.html#how-to-adjust-learning-rate" target="_blank">
+                pytorch documentation
+            </a>
+        </div>
+        <el-switch v-model="state.lrPolicyEnabled" on-color="#13ce66" off-color="#B8B8B8"
+                   :disabled="data.done6"></el-switch>
+        <div v-if="state.lrPolicyEnabled">
+            <el-select class="mt10 mb10" v-model="state.lrSchedule" :disabled="data.done6">
+                <el-option key="StepLR" label="StepLR" value="StepLR"></el-option>
+                <el-option key="ExponentialLR" label="ExponentialLR" value="ExponentialLR"></el-option>
+                <el-option key="MultiStepLR" label="MultiStepLR" value="MultiStepLR"></el-option>
+            </el-select>
+            <sly-field title="Step size" v-if="state.lrSchedule === 'StepLR'">
+                <el-input-number v-model="state.stepSize" :min="0" :max="state.epochs" :debounce="1000"
+                                 :disabled="data.done6"></el-input-number>
+            </sly-field>
+            <sly-field title="Milestones" v-if="state.lrSchedule === 'MultiStepLR'">
+                <el-input v-model="state.milestones" :disabled="data.done6"></el-input>
+            </sly-field>
+            <sly-field title="Gamma" v-if="state.lrSchedule !== 'ExponentialLR'">
+                <el-input-number v-model="state.gammaStep" :min="0" :max="1" :step="0.01" :debounce="1000"
+                                 :disabled="data.done6"></el-input-number>
+            </sly-field>
+            <sly-field title="Gamma" v-if="state.lrSchedule === 'ExponentialLR'">
+                <el-input-number v-model="state.gammaExp" :min="0" :max="1" :step="0.01" :debounce="1000"
+                                 :disabled="data.done6"></el-input-number>
+            </sly-field>
         </div>
     </sly-field>
-    <sly-field title="Checkpoints interval"
-               description="Save checkpoints periodically">
-        <div class="fflex">
-            <span class="mr5">Save checkpoint every</span>
-            <el-input-number v-model="state.checkpointInterval"
-                             :min="1" :max="state.epochs" :disabled="data.done6">
-            </el-input-number>
-            <span class="ml5">epochs</span>
-        </div>
+
+    <sly-field title="System" description="Select hardware, single- and multi-process data loading">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-desktop-mac"></i>
+        </sly-icon>
+        <sly-field title="GPU device id"
+                   description="Run nvidia-smi or check agent's page to see how many devices your machine has or keep by default">
+            <el-select v-model="state.gpusId" :disabled="data.done6">
+                <el-option key="0" label="0" value="0"></el-option>
+                <el-option key="1" label="1" value="1"></el-option>
+                <el-option key="2" label="2" value="2"></el-option>
+                <el-option key="3" label="3" value="3"></el-option>
+            </el-select>
+        </sly-field>
+        <sly-field title="Number of workers"
+                   description="Maximum number of dataloader workers, use 0 for debug">
+            <el-input-number v-model="state.numWorkers" :min="0" :disabled="data.done6"></el-input-number>
+        </sly-field>
     </sly-field>
 
-    <sly-field title="Save last checkpoint"
-               description="Whether to force the last checkpoint to be saved regardless of interval">
-        <el-switch v-model="state.saveLast"
-                   on-color="#13ce66" off-color="#B8B8B8"
-                   :disabled="data.done6">
-        </el-switch>
-    </sly-field>
-
-    <sly-field title="Save best checkpoint"
-               description="Best checkpoint will be marked with prefix 'best_'">
-        <el-switch v-model="state.saveBest"
-                   on-color="#13ce66" off-color="#B8B8B8"
-                   :disabled="data.done6">
-        </el-switch>
-    </sly-field>
-
-    <sly-field title="Logging frequency"
-               description="How often metrics should be logged, increase if training data is small">
+    <sly-field title="Logging frequency" description="How often metrics should be logged">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-file-text"></i>
+        </sly-icon>
         <div class="fflex">
             <span class="mr5">Log metrics every </span>
             <el-input-number v-model="state.metricsPeriod" :min="1" :disabled="data.done6"></el-input-number>
@@ -73,42 +127,85 @@
         </div>
     </sly-field>
 
-    <sly-field title="Optimizer">
-        <div slot="description">
-            Choose optimizer and its settings, learn more in official
-            <a href="https://pytorch.org/docs/1.9.0/optim.html?module-torch.optim" target="_blank">
-                pytorch documentation
-            </a>
-        </div>
-        <el-select class=mt10 v-model="state.optimizer" :disabled="data.done6">
-            <el-option key="SGD" label="SGD" value="SGD"></el-option>
-            <el-option key="Adam" label="Adam" value="Adam"></el-option>
-            <el-option key="AdamW" label="AdamW" value="AdamW"></el-option>
-        </el-select>
-    </sly-field>
-    <sly-field title="Learning rate">
-        <el-input-number v-model="state.lr" :min="0" :step="0.0005" :debounce="1000" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field v-if="state.optimizer === 'SGD'" title="Momentum">
-        <el-input-number v-model="state.momentum" :min="0" :step="0.05" :debounce="1000" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field title="Weight decay">
-        <el-input-number v-model="state.weightDecay" :min="0" :step="0.0001" :debounce="1000" :disabled="data.done6"></el-input-number>
-    </sly-field>
-    <sly-field v-if="state.optimizer === 'SGD'" title="Nesterov">
-        <el-switch v-model="state.nesterov" on-color="#13ce66" off-color="#B8B8B8" :disabled="data.done6"></el-switch>
+    <sly-field title="Checkpoints" description="How many checkpoints will be saved">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-grain"></i>
+        </sly-icon>
+        <sly-field title="Validation interval"
+                   description="By default we evaluate the model on the validation set after each epoch, you can change the evaluation interval">
+            <div class="fflex">
+                <span class="mr5">Evaluate validation set every </span>
+                <el-input-number v-model="state.valInterval" :min="1" :max="state.epochs"
+                                 :disabled="data.done6"></el-input-number>
+                <span class="ml5">epochs</span>
+            </div>
+        </sly-field>
+        <sly-field title="Checkpoints interval"
+                   description="Save checkpoints periodically">
+            <div class="fflex">
+                <span class="mr5">Save checkpoint every</span>
+                <el-input-number v-model="state.checkpointInterval"
+                                 :min="1" :max="state.epochs" :disabled="data.done6">
+                </el-input-number>
+                <span class="ml5">epochs</span>
+            </div>
+        </sly-field>
+        <sly-field title="Checkpoints save count"
+                   description="The maximum checkpoints to keep. In some cases we want only the latest few checkpoints and would
+                            like to delete old ones to save the disk space. If option is disabled then it means unlimited.">
+            <div class="mb5">
+                <el-switch v-model="state.maxKeepCkptsEnabled"
+                           on-color="#13ce66" off-color="#B8B8B8"
+                           :disabled="data.done6">
+                </el-switch>
+            </div>
+            <el-input-number v-if="state.maxKeepCkptsEnabled"
+                             v-model="state.maxKeepCkpts"
+                             :disabled="!state.maxKeepCkptsEnabled || data.done6"
+                             :min="1">
+            </el-input-number>
+            <el-input v-if="!state.maxKeepCkptsEnabled" placeholder="unlimited" :disabled="true" style="width: 180px;">
+            </el-input>
+        </sly-field>
+        <sly-field title="Save last checkpoint"
+                   description="Whether to force the last checkpoint to be saved regardless of interval">
+            <el-switch v-model="state.saveLast"
+                       on-color="#13ce66" off-color="#B8B8B8"
+                       :disabled="data.done6">
+            </el-switch>
+        </sly-field>
+        <sly-field title="Save best checkpoint"
+                   description="Best checkpoint will be marked with prefix 'best_'">
+            <el-switch v-model="state.saveBest"
+                       on-color="#13ce66" off-color="#B8B8B8"
+                       :disabled="data.done6">
+            </el-switch>
+        </sly-field>
     </sly-field>
 
-    <sly-field title="Learning Policy" description="configure learning rate schedule in python (for advanced users)">
-        <el-switch v-model="state.lrPolicyEnabled" on-color="#13ce66" off-color="#B8B8B8" :disabled="data.done6"></el-switch>
-        <sly-copy-to-clipboard class="mt10" v-if="state.lrPolicyEnabled" :data="state.lrPolicyPyConfig">
-            <sly-editor v-model="state.lrPolicyPyConfig"
-                        :options="{'mode': 'ace/mode/python', 'readOnly': !!data.done6, 'maxLines': 100}">
-            </sly-editor>
-        </sly-copy-to-clipboard>
+    <sly-field title="Visualization" description="Show predictions improvement over time for random images">
+        <sly-icon slot="icon" :options="{ color: '#4aa0f8', bgColor: '#ebf4fc', rounded: false }">
+            <i class="zmdi zmdi-compare"></i>
+        </sly-icon>
+        <!--        Condition ? : - is for convenient debug-->
+        <!--        (IsItMuted === true) ? 'On' : 'Off';-->
+        <sly-field title="Number of train images"
+                   description="Random images from training for visualization">
+            <el-input-number v-model="state.trainVisCount"
+                             :min="0" :max="(data.trainImagesCount) ? data.trainImagesCount : 10"
+                             :disabled="data.done6">
+            </el-input-number>
+        </sly-field>
+        <sly-field title="Number of val images"
+                   description="Random images from validation for visualization">
+            <el-input-number v-model="state.valVisCount"
+                             :min="0" :max="(data.valImagesCount) ? data.valImagesCount : 10"
+                             :disabled="data.done6">
+            </el-input-number>
+        </sly-field>
     </sly-field>
 
-    <el-button type="primary" class="regular mt10"
+    <el-button type="primary" class="regular"
                @click="command('use_hyp')"
                v-if="!data.done6">
         Finish step

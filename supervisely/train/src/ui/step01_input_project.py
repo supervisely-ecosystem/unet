@@ -3,15 +3,14 @@ from collections import namedtuple
 import random
 import supervisely_lib as sly
 import sly_globals as g
-from sly_progress_utils import get_progress_cb, reset_progress, init_progress
 
 
-progress_index = 1
-_images_infos = None # dataset_name -> image_name -> image_info
+_images_infos = None  # dataset_name -> image_name -> image_info
 _cache_base_filename = os.path.join(g.my_app.data_dir, "images_info")
 _cache_path = _cache_base_filename + ".db"
 project_fs: sly.Project = None
 _image_id_to_paths = {}
+progress1 = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progress1", "Download project from server")
 
 
 def init(data, state):
@@ -19,7 +18,7 @@ def init(data, state):
     data["projectName"] = g.project_info.name
     data["projectImagesCount"] = g.project_info.items_count
     data["projectPreviewUrl"] = g.api.image.preview_url(g.project_info.reference_image_url, 100, 100)
-    init_progress(progress_index, data)
+    progress1.init_data(data)
     data["done1"] = False
     state["collapsed1"] = False
 
@@ -33,15 +32,14 @@ def download(api: sly.Api, task_id, context, state, app_logger):
             pass
         else:
             sly.fs.mkdir(g.project_dir)
-            download_progress = get_progress_cb(progress_index, "Download project", g.project_info.items_count * 2)
+            progress1.set_total(g.project_info.items_count * 2)
             sly.download_project(g.api, g.project_id, g.project_dir,
-                                 cache=g.my_app.cache, progress_cb=download_progress, save_image_info=True)
-            reset_progress(progress_index)
-
+                                 cache=g.my_app.cache, progress_cb=progress1.increment, save_image_info=True)
+            progress1.reset_and_update()
         global project_fs
         project_fs = sly.Project(g.project_dir, sly.OpenMode.READ)
     except Exception as e:
-        reset_progress(progress_index)
+        progress1.reset_and_update()
         raise e
 
     fields = [
@@ -54,6 +52,11 @@ def download(api: sly.Api, task_id, context, state, app_logger):
 
 
 def get_image_info_from_cache(dataset_name, item_name):
+    global project_fs
+    if project_fs is None:
+        # for debug step07 without running all previous steps
+        project_fs = sly.Project(g.project_dir, sly.OpenMode.READ)
+
     dataset_fs = project_fs.datasets.get(dataset_name)
     img_info_path = dataset_fs.get_img_info_path(item_name)
     image_info_dict = sly.json.load_json_file(img_info_path)

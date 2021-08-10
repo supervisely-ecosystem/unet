@@ -29,11 +29,20 @@
         <el-table-column prop="objectsCount" label="Objects count" sortable width="180"></el-table-column>
         <el-table-column prop="areaPercent" label="Area percent" sortable width="150"></el-table-column>
     </el-table>
+    <sly-field title="Background class"
+               description="Background class (name: __bg__, color: [0, 0, 0]) will be automatically added to cover
+               all unlabeled pixels"
+    >
+        <sly-icon slot="icon" :options="{ color: '#ea9d22', bgColor: '#fcefd9', rounded: false }">
+            <i class="zmdi zmdi-alert-triangle"></i>
+        </sly-icon>
+    </sly-field>
+
     <el-button type="primary" class="regular mt10"
                @click="command('use_classes')"
                :disabled="state.selectedClasses.length < 1"
                v-if="!data.done3">
-        Use {{state.selectedClasses.length}} selected classes
+        Use {{state.selectedClasses.length}} selected classes + BG
     </el-button>
     <div v-if="state.selectedClasses.length < 1" class="mt5">
         <i class="zmdi zmdi-help" style="color: orange"></i> Please select at least one class for training
