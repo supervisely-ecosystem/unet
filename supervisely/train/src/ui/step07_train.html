@@ -93,6 +93,11 @@
             <sly-grid-gallery v-if="data.gallery"
                               :content="data.gallery.content"
                               :options="data.gallery.options">
+                <template v-slot:card-footer="{ annotation }">
+                    <div class="mt5" style="text-align: center">
+                        <el-tag type="primary">{{annotation.title}}</el-tag>
+                    </div>
+                </template>
             </sly-grid-gallery>
         </sly-field>
         <div v-else

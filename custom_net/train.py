@@ -102,6 +102,8 @@ def main():
     parser.add_argument('--save-last', action='store_true', help='save last checkpoint')
     parser.add_argument('--save-best', action='store_true', help='save best checkpoint')
     parser.add_argument('--checkpoints-dir', default='', help='checkpoint dir')
+    parser.add_argument('--max-keep-ckpts', type=int, default=-1, help='save last X checkpoints')
+
 
     # visualization settings
     parser.add_argument('--train-vis-items-path', default='', help='predictions over time on images from TRAIN')
@@ -130,7 +132,7 @@ def main():
     if torch.cuda.is_available():
         #@TODO: later can be used for bulti GPU training, now it is disabled
         if args.gpu_id:
-            device_ids = [args.gpu_id] #list(map(int, args.gpu_id.split(',')))
+            device_ids = [args.gpu_id]  # list(map(int, args.gpu_id.split(',')))
         else:
             device_ids = None
         model = nn.DataParallel(model, device_ids=device_ids).cuda()

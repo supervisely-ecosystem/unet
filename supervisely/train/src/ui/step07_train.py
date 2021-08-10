@@ -224,6 +224,10 @@ def set_train_arguments(state):
     if state["saveBest"]:
         sys.argv.append("--save-best")
     sys.argv.extend(["--checkpoints-dir", g.checkpoints_dir])
+    if state["maxKeepCkptsEnabled"]:
+        sys.argv.extend(["--max-keep-ckpts", str(state["maxKeepCkpts"])])
+    else:
+        sys.argv.extend(["--max-keep-ckpts", str(-1)])
 
     # visualization settings
     sys.argv.extend(["--train-vis-items-path", train_vis_items_path])

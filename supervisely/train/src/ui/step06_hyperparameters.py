@@ -21,6 +21,8 @@ def init(data, state):
     state["checkpointInterval"] = 1
     state["saveLast"] = True
     state["saveBest"] = True
+    state["maxKeepCkptsEnabled"] = True
+    state["maxKeepCkpts"] = 3
 
     state["optimizer"] = "Adam" #"SGD"
     state["lr"] = 0.001
@@ -35,12 +37,6 @@ def init(data, state):
     state["gammaExp"] = 0.9
 
     state["lrPolicyEnabled"] = False
-
-    #@TODO: LR policy
-    # file_path = os.path.join(g.root_source_dir, "supervisely/train/configs/lr_policy.py")
-    # with open(file_path) as f:
-    #     state["lrPolicyPyConfig"] = f.read()
-    state["lrPolicyPyConfig"] = ""
 
     # visualization settings
     state["trainVisCount"] = 1
