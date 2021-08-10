@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import sys
 from dotenv import load_dotenv
+import supervisely_lib as sly
+
 
 root_source_dir = str(Path(sys.argv[0]).parents[3])
 print(f"Root source directory: {root_source_dir}")
@@ -25,11 +27,12 @@ secret_debug_env_path = os.path.join(root_source_dir, "supervisely/train", "secr
 load_dotenv(debug_env_path)
 load_dotenv(secret_debug_env_path, override=True)
 
-import supervisely_lib as sly
-
 my_app = sly.AppService()
 api = my_app.public_api
 task_id = my_app.task_id
+
+#@TODO: for debug
+sly.fs.clean_dir(my_app.data_dir)
 
 team_id = int(os.environ['context.teamId'])
 workspace_id = int(os.environ['context.workspaceId'])
