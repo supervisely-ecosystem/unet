@@ -4,6 +4,7 @@ import random
 
 import step02_splits
 import step04_augs
+import step05_models
 import supervisely_lib as sly
 from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
@@ -228,6 +229,9 @@ def set_train_arguments(state):
         sys.argv.extend(["--max-keep-ckpts", str(state["maxKeepCkpts"])])
     else:
         sys.argv.extend(["--max-keep-ckpts", str(-1)])
+
+    if state["weightsInitialization"] == "custom":
+        sys.argv.extend(["--custom-weights", step05_models.local_weights_path])
 
     # visualization settings
     sys.argv.extend(["--train-vis-items-path", train_vis_items_path])

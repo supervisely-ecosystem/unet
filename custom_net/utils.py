@@ -90,23 +90,19 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
     if args.sly:
         import sly_integration
 
-    lr = args.lr
-    n_epochs = args.epochs
-
-    #@TODO: implement
-    # if model_path:
-    #     state = torch.load(str(model_path))
-    #     model.load_state_dict(state)
-    #     sly.logger.info(f"Restored model: {model_path}")
+    if args.custom_weights != "" and sly.fs.file_exists(args.custom_weights):
+        state = torch.load(str(args.custom_weights))
+        model.load_state_dict(state)
+        sly.logger.info(f"Restored model: {args.custom_weights}")
 
     optimizer = get_optimizer(args, model)
     scheduler = get_scheduler(args, optimizer)
     report_each = args.metrics_period
     if args.sly:
-        sly_integration.init_progress_bars(n_epochs, len(train_loader), len(valid_loader))
+        sly_integration.init_progress_bars(args.epochs, len(train_loader), len(valid_loader))
 
     epoch = 1
-    for epoch in range(epoch, n_epochs + 1):
+    for epoch in range(epoch, args.epochs + 1):
         if args.sly:
             sly_integration.progress_set_epoch(epoch)
 

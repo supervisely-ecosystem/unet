@@ -103,7 +103,7 @@ def main():
     parser.add_argument('--save-best', action='store_true', help='save best checkpoint')
     parser.add_argument('--checkpoints-dir', default='', help='checkpoint dir')
     parser.add_argument('--max-keep-ckpts', type=int, default=-1, help='save last X checkpoints')
-
+    parser.add_argument('--custom-weights', default='', help='path to custom weights path')
 
     # visualization settings
     parser.add_argument('--train-vis-items-path', default='', help='predictions over time on images from TRAIN')
@@ -127,7 +127,7 @@ def main():
         model = model_name(num_classes=num_classes, pretrained=True)
     else:
         # vanilla uner with random weights
-        model = model_name(num_classes=num_classes, )
+        model = model_name(num_classes=num_classes)
 
     if torch.cuda.is_available():
         #@TODO: later can be used for bulti GPU training, now it is disabled
