@@ -12,7 +12,7 @@
         </sly-icon>
         <sly-field title="Experiment name"
                    description="Training artifacts will be saved to the following directory in team files: /unet/<task_id>_<experiment name>">
-            <el-input v-model="state.expName" :disabled="state.started" style="width: 400px;"></el-input>
+            <el-input v-model="state.expName" :disabled="data.done6" style="width: 400px;"></el-input>
         </sly-field>
         <sly-field title="Number of epochs">
             <el-input-number v-model="state.epochs" :min="1" :max="10000" :disabled="data.done6"></el-input-number>
@@ -157,12 +157,12 @@
             <div class="mb5">
                 <el-switch v-model="state.maxKeepCkptsEnabled"
                            on-color="#13ce66" off-color="#B8B8B8"
-                           :disabled="data.done7">
+                           :disabled="data.done6">
                 </el-switch>
             </div>
             <el-input-number v-if="state.maxKeepCkptsEnabled"
                              v-model="state.maxKeepCkpts"
-                             :disabled="!state.maxKeepCkptsEnabled || data.done7"
+                             :disabled="!state.maxKeepCkptsEnabled || data.done6"
                              :min="1">
             </el-input-number>
             <el-input v-if="!state.maxKeepCkptsEnabled" placeholder="unlimited" :disabled="true" style="width: 180px;">

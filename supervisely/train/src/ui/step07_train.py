@@ -181,7 +181,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         fields = [
             {"field": "data.outputUrl", "payload": g.api.file.get_url(file_info.id)},
             {"field": "data.outputName", "payload": remote_dir},
-            {"field": "state.done9", "payload": True},
+            {"field": "state.done7", "payload": True},
             {"field": "state.started", "payload": False},
         ]
         g.api.app.set_fields(g.task_id, fields)

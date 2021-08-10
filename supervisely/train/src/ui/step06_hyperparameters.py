@@ -5,12 +5,12 @@ import sly_globals as g
 
 def init(data, state):
     state["expName"] = g.project_info.name
-    state["epochs"] = 500  # @TODO: 50 for debug
+    state["epochs"] = 10  # @TODO: 50 for debug
     state["gpusId"] = '0'
 
     #state["imgSize"] = 256
     state["imgSize"] = {
-        "width": 512, #@TODO: 512 for debug 256 - for prod
+        "width": 256,
         "height": 256,
         "proportional": True
     }

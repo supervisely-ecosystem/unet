@@ -134,7 +134,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             if (i % report_each == 0 or i == len(train_loader) - 1) and args.sly:
                 sly_integration.report_train_metrics(epoch, len(train_loader), i, lr, loss_cpu)
 
-        if epoch % args.val_interval:
+        if epoch % args.val_interval == 0:
             metrics = validation(model, criterion, valid_loader, len(classes),
                                  progress_cb=sly_integration.progress_increment_iter)
             if args.save_best:
@@ -148,7 +148,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
                 sly_integration.vis_inference(epoch, model, classes,
                                               args.input_height, args.input_width,
                                               args.project_dir, args.val_vis_items_path, update=True)
-        if epoch % args.checkpoint_interval:
+        if epoch % args.checkpoint_interval == 0:
             save(args.checkpoints_dir, epoch, model, None, args.max_keep_ckpts)
 
     if args.save_last:

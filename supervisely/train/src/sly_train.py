@@ -20,7 +20,6 @@ def main():
 
 #@TODO: stop training by request
 #@TODO: check restart step for all steps
-#@TODO: save checkpoints strategy
 #@TODO: start train from custom checkpoint
 if __name__ == "__main__":
     #sly.main_wrapper("main", main)
