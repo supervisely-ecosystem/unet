@@ -7,7 +7,6 @@ import step02_splits
 import step04_augs
 import step05_models
 import supervisely_lib as sly
-#from sly_progress_utils import init_progress, get_progress_cb, reset_progress
 import sly_globals as g
 import step03_classes
 
