@@ -23,6 +23,10 @@ from torchvision.models.vgg import model_urls as vgg_urls
 from torchvision.models.resnet import model_urls as resnet_urls
 
 model_list = {
+    'UNet': {
+        "class": UNet,
+        "description": "Vanilla UNet with random weights"
+    },
     'UNet11': {
         "class": UNet11,
         "description": "Initialized from vgg-11 pretrained on ImageNet",
@@ -32,10 +36,6 @@ model_list = {
         "class": UNet16,
         "description": "Initialized from vgg-16 pretrained on ImageNet",
         "pretrained": vgg_urls['vgg16']
-    },
-    'UNet': {
-        "class": UNet,
-        "description": "Vanilla UNet with random weights"
     },
     'AlbuNet': {
         "class": AlbuNet,
@@ -120,7 +120,12 @@ def main():
     num_classes = len(classes)
 
     model_name = model_list[args.model]["class"]
-    model = model_name(num_classes=num_classes, pretrained=True)
+    pretrained = model_list[args.model].get("pretrained")
+    if pretrained is not None:
+        model = model_name(num_classes=num_classes, pretrained=True)
+    else:
+        # vanilla uner with random weights
+        model = model_name(num_classes=num_classes, )
 
     if torch.cuda.is_available():
         #@TODO: later can be used for bulti GPU training, now it is disabled
