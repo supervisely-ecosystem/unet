@@ -1,0 +1,15 @@
+<div>
+    <sly-field title="Choose Device" description="Cuda device number (i.e. 0, 1, 2 or 3) or cpu">
+        <el-select v-model="state.device">
+            <el-option-group key="GPU" label="GPU">
+                <el-option key="0" label="0" value="cuda:0"/>
+                <el-option key="1" label="1" value="cuda:1"/>
+                <el-option key="2" label="2" value="cuda:2"/>
+                <el-option key="3" label="3" value="cuda:3"/>
+            </el-option-group>
+            <el-option-group key="CPU" label="CPU">
+                <el-option key="cpu" label="cpu" value="cpu"/>
+            </el-option-group>
+        </el-select>
+    </sly-field>
+</div>

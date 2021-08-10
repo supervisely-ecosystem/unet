@@ -12,7 +12,7 @@
   "task_location": "workspace_tasks",
   "need_gpu": true,
   "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
-  "icon_cover": true,
+  "icon_background": "#FFFFFF",
   "context_menu": {
     "target": ["images_project"],
     "context_root": "Neural Networks",

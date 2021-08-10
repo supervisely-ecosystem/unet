@@ -1,0 +1,28 @@
+{
+  "name": "Serve UNet",
+  "type": "app",
+  "categories": [
+    "neural network",
+    "semantic segmentation"
+  ],
+  "description": "Deploy model as REST API service",
+  "docker_image": "supervisely/unet:1.0.0",
+  "main_script": "supervisely/serve/src/sly_serve.py",
+  "modal_template": "supervisely/serve/src/modal.html",
+  "modal_template_state": {
+    "device": "cuda:0"
+  },
+  "task_location": "application_sessions",
+  "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
+  "icon_background": "#FFFFFF",
+  "isolate": true,
+  "need_gpu": true,
+  "headless": true,
+  "instance_version": "6.4.24",
+  "session_tags": [
+    "deployed_nn"
+  ],
+  "context_menu": {
+    "target": ["files_file"]
+  }
+}
