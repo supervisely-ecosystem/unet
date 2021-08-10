@@ -125,6 +125,7 @@ def upload_artifacts_and_log_progress(experiment_name):
 
     remote_dir = f"/unet/{g.task_id}_{experiment_name}"
     res_dir = g.api.file.upload_directory(g.team_id, g.artifacts_dir, remote_dir, progress_size_cb=progress_cb)
+    progress_other.reset_and_update()
     return res_dir
 
 
