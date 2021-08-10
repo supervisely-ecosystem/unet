@@ -35,7 +35,7 @@ def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, mod
 ###############################################
 
 
-def vis_inference(time_index, model: nn.Module, classes, input_height, input_width, project_dir, items_path):
+def vis_inference(time_index, model: nn.Module, classes, input_height, input_width, project_dir, items_path, update=False):
     # do not modify it
     # used only in training dashboard to visualize predictions improvement over time
 
@@ -72,12 +72,14 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
         # sly.fs.ensure_base_path("/app_debug_data/debug")
         # sly.image.write(f"/app_debug_data/debug/{time_index:03d}.png", img_draw)
 
-        # if not gallery.has_item(item_name):
-        #     image_info = get_image_info_from_cache(dataset_name, item_name)
-        #     gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
-        #     gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
-        # gallery.add_prediction(item_name, time_index, pred_ann)
-    # gallery.update()
+        if not gallery.has_item(item_name):
+            image_info = get_image_info_from_cache(dataset_name, item_name)
+            gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
+            gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
+        gallery.add_prediction(item_name, time_index, pred_ann)
+
+    if update is True:
+        gallery.update()
 
 
 from step07_train import progress_epoch, progress_iter
@@ -86,7 +88,6 @@ from step07_train import progress_epoch, progress_iter
 def init_progress_bars(epochs, train_iters, val_iters):
     progress_epoch.set_total(epochs)
     progress_iter.set_total(train_iters + val_iters)
-
     progress_epoch.set(0)
     progress_iter.set(0)
 
