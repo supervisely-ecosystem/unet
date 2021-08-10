@@ -189,9 +189,9 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         raise e  # app will handle this error and show modal window
 
     # stop application
-    g.my_app.show_modal_window("Training is finished, app is still running and you can preview predictions dynamics over time."
-                               "Please stop app manually once you are finished with it.")
-    #g.my_app.stop()
+    #g.my_app.show_modal_window("Training is finished, app is still running and you can preview predictions dynamics over time."
+    #                           "Please stop app manually once you are finished with it.")
+    g.my_app.stop()
 
 
 def set_train_arguments(state):

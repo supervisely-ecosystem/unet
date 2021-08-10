@@ -1,26 +1,3 @@
-<!--<el-slider v-model="state.visEpoch"-->
-<!--           show-input-->
-<!--           show-stops-->
-<!--           :min="1"-->
-<!--           :max="data.finishedEpoch"-->
-<!--           :step="1"-->
-<!--           :disabled="state.visEpoch == 0"-->
-<!--&gt;-->
-<!--</el-slider>-->
-
-<!--<el-slider v-model="state.visEpoch"-->
-<!--           show-input-->
-<!--           show-stops-->
-<!--           :min="1"-->
-<!--           :max="data.finishedEpoch"-->
-<!--           :step="1"-->
-<!--           :disabled="state.visEpoch == 0"-->
-<!--           :debounce="700"-->
-<!--           style="width: 300px;"-->
-<!--&gt;-->
-<!--</el-slider>-->
-<!--           @input="state.setTimeIndexLoading = true; command('set_gallery_time_index')"-->
-
 <sly-card title="Training progress"
           subtitle="Task progress, detailed logs, metrics charts, and other visualizations"
           ref="step7"
@@ -113,7 +90,7 @@
                 <el-button size="small"
                            type="primary" class="regular action-icon-btn"
                            @click="state.setTimeIndexLoading = true; state.visEpoch -= 1; command('set_gallery_time_index')"
-                           :disabled="state.visEpoch <= 1 || data.finishedEpoch === 0"
+                           :disabled="state.visEpoch <= 1 || data.finishedEpoch === 0 || state.done7"
                            :loading="state.setTimeIndexLoading">
                     <i class="zmdi zmdi-arrow-left"></i>
                 </el-button>
@@ -121,7 +98,7 @@
                 <el-button size="small"
                            type="primary" class="regular action-icon-btn"
                            @click="state.setTimeIndexLoading = true; state.visEpoch += 1; command('set_gallery_time_index')"
-                           :disabled="state.visEpoch === data.finishedEpoch || data.finishedEpoch === 0"
+                           :disabled="state.visEpoch === data.finishedEpoch || data.finishedEpoch === 0  || state.done7"
                            :loading="state.setTimeIndexLoading">
                     <i class="zmdi zmdi-arrow-right"></i>
                 </el-button>
