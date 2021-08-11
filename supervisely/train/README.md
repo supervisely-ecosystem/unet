@@ -59,7 +59,7 @@ Watch [how-to video](https://youtu.be/R9sbH3biCmQ) for more details:
 Developers can use this app as a template to integrate their own custom Semantic 
 Segmentation models.
 
-We recommend to follow several tutorials and documentation to get the basics about 
+We recommend to follow several tutorials and documentation to get the basics before you start develop your custom app
 - Supervisely platform
 - Annotations in Supervisely format
 - Supervisely SDK for Python
@@ -127,7 +127,7 @@ That's it. Not you can start debug and testing.
 
 
 
-## Deep Integration
+## Deep Integration (for advanced users)
 For whom:
 - if you model has custom structure (complex input, several output branches, custom data preprocessing, ...)
 - if you want to change training dashboard UI
