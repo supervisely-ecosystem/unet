@@ -47,12 +47,44 @@ Supports following architectures:
 3. Run app from context menu of project with annotations: `Context menu` -> `Neural Networks` -> `UNet` -> `Train UNet`
 4. Open Training Dashboard (app UI) and follow instructions provided in the video above
 
-
 Watch [how-to video](https://youtu.be/R9sbH3biCmQ) for more details:
 
 <a data-key="sly-embeded-video-link" href="https://youtu.be/R9sbH3biCmQ" data-video-code="R9sbH3biCmQ">
     <img src="https://i.imgur.com/O47n1S1.png" alt="SLY_EMBEDED_VIDEO_LINK"  style="max-width:100%;">
 </a>
+
+Once training is finished, all artifacts are uploaded to Team Files:
+```
+.
+├── checkpoints
+│   ├── model_124.pth
+│   ├── model_125.pth
+│   ├── model_126_last.pth
+│   ├── model_80_best.pth
+│   └── train_args.json
+├── info
+│   ├── augs_config.json
+│   ├── augs_preview.py
+│   ├── model_classes.json
+│   ├── train_set.json
+│   ├── train_vis_items.json
+│   ├── ui_state.json
+│   ├── val_set.json
+│   └── val_vis_items.json
+└── open_app.lnk
+```
+
+- `info/augs_config.json` - serialized augmentations used during training
+- `info/augs_preview.py` - augs preview in python
+- `info/model_classes.json` - list of model classes (!!! order matters)
+- `info/ui_state.json` - state (values) of all widgets from UI, this file contains crucial information - model architecture, model input resolution and so on 
+- `train_set.json` - (saved for debug) list of images in train set
+- `train_vis_items.json` - (saved for debug) images used in predictions visualization from train
+- `val_set.json` - (saved for debug) list of images in val set
+- `val_vis_items.json` - (saved for debug) images used in predictions visualization from val
+- `checkpoints` - directory with checkpoints
+- `checkpoints/train_args.json` - arguments with values for training script (can be used to debug train loop without UI)
+- `open_app.lnk` - open this file and you will be redirected to finished training session, thus even if the app if finished you will be able to preview training dashboard with all settings and charts 
 
 # For Developers
 
