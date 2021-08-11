@@ -59,7 +59,7 @@ Once your computer is ready just add agent to your team and execute automaticall
 
 To learn more about how to use every app, please go to app's readme page (links are provided). Just add the apps to your team to start using them.
 
-Collection consists of the following apps: 
+Collection consists of the following apps (find more apps in Ecosystem): 
 
 ## Demo data and synthetic data
 
