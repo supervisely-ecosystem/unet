@@ -1,5 +1,5 @@
 <div align="center" markdown>
-<img src="https://i.imgur.com/ufxMDIH.png"/>
+<img src="https://i.imgur.com/XfzccQT.png"/>
 
 # Serve UNet
 
@@ -30,12 +30,6 @@ can be integrated into Supervisely. Once model is deployed, user gets the follow
 2. Apps from Supervisely Ecosystem can use NN predictions: for visualization, for analysis, performance evaluation, etc ...
 3. Communicate with NN in custom python script (see section <a href="#For-developers">for developers</a>)
 4. App illustrates how to use NN weights. For example: you can train model in Supervisely, download its weights and use them the way you want.
-
-Watch usage demo:
-
-<a data-key="sly-embeded-video-link" href="https://youtu.be/cMBhn1Erluk" data-video-code="cMBhn1Erluk">
-    <img src="https://i.imgur.com/UlEMeem.png" alt="SLY_EMBEDED_VIDEO_LINK"  style="max-width:100%;">
-</a>
 
 
 # How To Run
