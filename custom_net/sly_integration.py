@@ -2,8 +2,7 @@ import numpy as np
 from torch import nn
 import supervisely_lib as sly
 
-import sly_globals as g
-from inference import inference
+from inference import inference, convert_prediction_to_sly_format
 from step07_train import gallery, chart_lr, chart_loss, chart_acc
 from step01_input_project import get_image_info_from_cache
 
@@ -13,21 +12,6 @@ _project_fs = None
 _path_to_items = {}
 
 
-def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, model_classes: sly.ProjectMeta):
-    height, width = predicted_class_indices.shape[:2]
-    labels = []
-    for idx, class_info in enumerate(classes_json):  # curr_col2cls.items():
-        class_mask = predicted_class_indices == idx  # exact match (3-channel img & rgb color)
-        if not np.any(class_mask):
-            # 0 pixels for class
-            continue
-        bitmap = sly.Bitmap(data=class_mask)
-        obj_class = model_classes.get_obj_class(class_info["title"])
-        labels.append(sly.Label(bitmap, obj_class))
-    ann = sly.Annotation(img_size=(height, width), labels=labels)
-    return ann
-
-
 ###############################################
 ######## MODIFY METHODS BELOW ONLY IF #########
 ######## YOU PERFORM DEEP INTEGRATION #########
@@ -35,6 +19,7 @@ def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, mod
 
 
 def vis_inference(time_index, model: nn.Module, classes, input_height, input_width, project_dir, items_path, update=False):
+    import sly_globals as g
     # do not modify it
     # used only in training dashboard to visualize predictions improvement over time
 
@@ -57,7 +42,7 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
 
         image_path = dataset_fs.get_img_path(item_name)
         predicted_class_indices = inference(model, input_height, input_width, image_path)
-        pred_ann = _convert_prediction_to_sly_format(predicted_class_indices, classes, model_meta)
+        pred_ann = convert_prediction_to_sly_format(predicted_class_indices, classes, model_meta)
 
         # debug raw predictions
         # colors = np.array([cls.color for cls in model_meta.obj_classes])
@@ -105,6 +90,7 @@ def progress_increment_iter(count):
 
 
 def report_train_metrics(epoch, iters_in_epoch, iter, lr, loss):
+    import sly_globals as g
     x = epoch + iter / iters_in_epoch
     fields = [
         chart_lr.get_field(x, lr),
@@ -114,6 +100,7 @@ def report_train_metrics(epoch, iters_in_epoch, iter, lr, loss):
 
 
 def report_val_metrics(epoch, loss, avg_iou, agv_dice):
+    import sly_globals as g
     fields = [
         chart_loss.get_field(epoch, loss, "val"),
         chart_acc.get_field(epoch, avg_iou, "avg IoU"),

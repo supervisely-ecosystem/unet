@@ -29,12 +29,12 @@ def save(save_dir, epoch, model, val_loss=None, max_ckpts=-1):
             if best_model_path is not None:
                 sly.fs.silent_remove(best_model_path)
             best_model_path = os.path.join(save_dir, f'model_{epoch:03d}_best.pth')
-            torch.save(model.state_dict(), best_model_path)
+            torch.save(model.module.state_dict(), best_model_path)
             best_val_loss = val_loss
         return
 
     model_path = os.path.join(save_dir, f'model_{epoch:03d}.pth')
-    torch.save(model.state_dict(), model_path)
+    torch.save(model.module.state_dict(), model_path)
     if max_ckpts != -1:
         # save last N
         saved_models.append(model_path)
@@ -43,8 +43,11 @@ def save(save_dir, epoch, model, val_loss=None, max_ckpts=-1):
             sly.fs.silent_remove(path_to_remove)
 
 
-def cuda(x):
-    return x.cuda(non_blocking=True) if torch.cuda.is_available() else x
+def cuda(x, device=None):
+    if device is not None:
+        return x.to(device)
+    else:
+        return x.cuda(non_blocking=True) if torch.cuda.is_available() else x
 
 
 def get_optimizer(args, model):
@@ -152,4 +155,4 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
             save(args.checkpoints_dir, epoch, model, None, args.max_keep_ckpts)
 
     if args.save_last:
-        torch.save(model.state_dict(), os.path.join(args.checkpoints_dir, f'model_{epoch:03d}_last.pth'))
+        torch.save(model.module.state_dict(), os.path.join(args.checkpoints_dir, f'model_{epoch:03d}_last.pth'))

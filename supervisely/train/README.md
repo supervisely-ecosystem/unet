@@ -140,7 +140,7 @@ What to do:
     ```
 3. Already implemented, just check: how to apply model to a local image - function `inference` in `custom_net/inference.py`  
 4. Already implemented, just check: how to convert model predictions to annotations in Supervisely format - function 
-`_convert_prediction_to_sly_format` in `custom_net/sly_integration.py`
+`convert_prediction_to_sly_format` in `custom_net/inference.py`
 
 That's it. Not you can start debug and testing.   
 

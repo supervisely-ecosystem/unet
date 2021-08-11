@@ -1,3 +1,8 @@
+import os
+import supervisely_lib as sly
+import globals as g
+
+
 @sly.timeit
 def download_model_and_configs():
     if not g.remote_weights_path.endswith(".pth"):
@@ -32,13 +37,14 @@ def download_model_and_configs():
     _download_dir(g.remote_configs_dir, g.local_configs_dir)
     _download_dir(g.remote_info_dir, g.local_info_dir)
 
+    g.model_name = sly.json.load_json_file(os.path.join(g.local_info_dir, "ui_state.json"))["selectedModel"]
     sly.logger.info("Model has been successfully downloaded")
 
 
 def construct_model_meta():
-    g.model_classes = sly.json.load_json_file(g.local_model_classes_path)
+    g.model_classes_json = sly.json.load_json_file(g.local_model_classes_path)
 
     obj_classes = []
-    for obj_class_json in g.model_classes:
+    for obj_class_json in g.model_classes_json:
         obj_classes.append(sly.ObjClass.from_json(obj_class_json))
     g.meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
