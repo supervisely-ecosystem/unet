@@ -88,20 +88,46 @@ classes: lemons and kiwis
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/object-size-stats" src="https://i.imgur.com/1wx1G8F.png" width="380px"/>
 
+- [Classes co-occurrence matrix](https://ecosystem.supervise.ly/apps/classes-co-occurrence-matrix) - discover edge cases and find “suspicious annotations” 
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/classes-co-occurrence-matrix" src="https://i.imgur.com/O2O9J3k.png" width="380px"/>
+
+## Data Manipulation
+
+- [Convert class shape](https://ecosystem.supervise.ly/apps/convert-class-shape)
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/convert-class-shape" src="https://i.imgur.com/hFuVWOA.png" width="380px"/>
+
+- [Merge classes](https://ecosystem.supervise.ly/apps/merge-classes)
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/convert-class-shape" src="https://i.imgur.com/S7GUdYv.png" width="380px"/>
+
+- [Rasterize objects on images](https://ecosystem.supervise.ly/apps/rasterize-objects-on-images)
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/rasterize-objects-on-images" src="https://i.imgur.com/zoDWjP6.png" width="380px"/>
+
+- [Export as masks](https://ecosystem.supervise.ly/apps/export-as-masks)
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/export-as-masks" src="https://i.imgur.com/NcI3tTs.png" width="380px"/>
+
 
 ## UNet apps
 
-- [Train UNet](https://ecosystem.supervise.ly/projects/lemons-annotated) - training dashboard - customize hyperparameters and monitor metrics in real time
+- [ImgAug studio](https://ecosystem.supervise.ly/apps/imgaug-studio) - prepare and visualize custom augmentation pipeline for training, augs are applied on the fly during training
 
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/lemons-annotated" src="https://i.imgur.com/1as5W1L.png" width="350px"/>
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/imgaug-studio" src="https://i.imgur.com/l9kNWs9.png" width="380px"/>
 
-- [Serve UNet](https://ecosystem.supervise.ly/projects/lemons-annotated) - deploy your model as Rest-API service and connect it with other apps from Ecosystem
+- [Train UNet](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Funet%252Fsupervisely%252Ftrain) - training dashboard - customize hyperparameters and monitor metrics in real time
 
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/lemons-annotated" src="https://i.imgur.com/1as5W1L.png" width="350px"/>
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/unet/supervisely/train" src="https://i.imgur.com/GjgRJre.png" width="350px"/>
+
+- [Serve UNet](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Funet%252Fsupervisely%252Fserve) - deploy your model as Rest-API service and connect it with other apps from Ecosystem
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/unet/supervisely/serve" src="https://i.imgur.com/ATVxEk5.png" width="350px"/>
 
 ## Integration into labeling tool
 
-- [Apply NN to images project ](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fproject-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analise predictions and perform automatic data pre-labeling.   
+- [Apply NN to images project ](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fproject-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analyse predictions and perform automatic data pre-labeling.   
    
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/project-dataset" src="https://i.imgur.com/M2Tp8lE.png" width="350px"/> 
 
