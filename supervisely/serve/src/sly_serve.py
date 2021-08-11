@@ -35,7 +35,7 @@ def send_error_data(func):
 @send_error_data
 def get_output_classes_and_tags(api: sly.Api, task_id, context, state, app_logger):
     request_id = context["request_id"]
-    g.my_app.send_response(request_id, data=g.meta.to_json())
+    g.my_app.send_response(request_id, data=g.model_meta.to_json())
 
 
 # send information about deployed model and session, the structure is not defined,
@@ -49,7 +49,7 @@ def get_session_info(api: sly.Api, task_id, context, state, app_logger):
         "weights": g.remote_weights_path,
         "device": g.device,
         "session_id": task_id,
-        "classes_count": len(g.meta.obj_classes),
+        "classes_count": len(g.model_meta.obj_classes),
     }
     request_id = context["request_id"]
     g.my_app.send_response(request_id, data=info)
