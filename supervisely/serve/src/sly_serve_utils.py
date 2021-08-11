@@ -19,7 +19,6 @@ def download_model_and_configs():
         g.team_id,
         g.remote_weights_path,
         g.local_weights_path,
-        cache=g.my_app.cache,
         progress_cb=progress.iters_done_report
     )
 
@@ -37,7 +36,10 @@ def download_model_and_configs():
     _download_dir(g.remote_configs_dir, g.local_configs_dir)
     _download_dir(g.remote_info_dir, g.local_info_dir)
 
-    g.model_name = sly.json.load_json_file(os.path.join(g.local_info_dir, "ui_state.json"))["selectedModel"]
+    ui_state = sly.json.load_json_file(os.path.join(g.local_info_dir, "ui_state.json"))
+    g.model_name = ui_state["selectedModel"]
+    g.input_width = ui_state["imgSize"]["width"]
+    g.input_height = ui_state["imgSize"]["height"]
     sly.logger.info("Model has been successfully downloaded")
 
 
@@ -47,4 +49,4 @@ def construct_model_meta():
     obj_classes = []
     for obj_class_json in g.model_classes_json:
         obj_classes.append(sly.ObjClass.from_json(obj_class_json))
-    g.meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
+    g.model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))

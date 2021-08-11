@@ -135,12 +135,11 @@ def debug_inference():
     image_path = os.path.join(g.my_app.data_dir, sly.rand_str(10) + image_info.name)
     g.api.image.download_path(image_id, image_path)
     ann_json = inference_image_path(image_path, None, None, sly.logger)
-    sly.fs.silent_remove(image_path)
-
     ann = sly.Annotation.from_json(ann_json, g.model_meta)
     img = sly.image.read(image_path)
     ann.draw_pretty(img)
-    sly.image.write("/debug_inf.png")
+    sly.fs.silent_remove(image_path)
+    sly.image.write("/debug_inf.png", img)
 
 
 def main():
@@ -157,7 +156,7 @@ def main():
     sly.logger.info("Model has been successfully deployed")
 
     # debug
-    debug_inference()
+    #debug_inference()
 
     g.my_app.run()
 
