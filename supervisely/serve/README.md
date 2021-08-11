@@ -38,7 +38,7 @@ can be integrated into Supervisely. Once model is deployed, user gets the follow
    directory: `/unet/<session id>_<experiment_name>/checkpoints`. Then right click to weights `.pth` file,
    for example: `/unet/7777_lemons_demo/checkpoints/model_47_best.pth`
    
-<img src="https://i.imgur.com/cmEzYGr.gif"/>
+<img src="https://i.imgur.com/piS1r78.png"/>
 
 2. Run `Serve UNet` app from context menu
 
@@ -49,11 +49,11 @@ change what agent should be used for deploy.
 
 5. Wait until you see following message in logs: `Model has been successfully deployed`
 
-<img src="https://i.imgur.com/AAKToCb.png" width="800"/>
+<img src="https://i.imgur.com/rOa4Lo8.png"/>
 
 6. All deployed models are listed in `Team Apps`. You can view logs and stop them from this page.
 
-<img src="https://i.imgur.com/7eVkiIm.png"/>
+<img src="https://i.imgur.com/4B4qRh7.png"/>
 
 
 # For Developers
