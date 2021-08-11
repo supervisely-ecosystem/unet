@@ -65,12 +65,12 @@ change what agent should be used for deploy.
 # For Developers
 
 1. Serving app allows developers to send direct inference request to the deployed model from their python script. 
-Please, see YOLOv5 Serve app for more info (API is equal, the only difference is that yolo model produces rectangles in Supervisely 
+Please, see YOLOv5 Serve app (**for developers** section) for more info (API is equal, the only difference is that yolo model produces rectangles in Supervisely 
 format, but this model producess segmentation masks for every class in Supervisely format)
-2. also you can use serving app as an example - how to use downloaded NN weights and use them outside Supervisely 
-(how to load weights and how to get predictions from model).
+2. also you can use serving app as an example - how to use downloaded NN weights outside Supervisely 
+(how to load model and how to get predictions from it).
 3. Other apps can use serving app to communicate with NN and get predictions from it. Once you implemented it, apps 
 from multiple categories become available with zero codding: inference apps, model performance analysis and much more.
 Learn more in Ecosystem and in corresponding app collections.
-4. If you want to integrate custom segmentation model, you don't need to modify sources of this app. Please, learn more 
+4. If you want to integrate custom segmentation model, you don't need to modify sources of this serving app. Please, learn more 
 in UNet training app readme. If you implemented steps from `Light integration` secsion, this serving app will work out of the box
