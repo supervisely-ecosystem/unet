@@ -29,7 +29,8 @@ def _convert_prediction_to_sly_format(predicted_class_indices, classes_json, mod
 
 
 ###############################################
-######## DO NOT MODIFY METHODS BELOW ##########
+######## MODIFY METHODS BELOW ONLY IF #########
+######## YOU PERFORM DEEP INTEGRATION #########
 ###############################################
 
 
