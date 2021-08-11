@@ -15,7 +15,7 @@ def init(data, state):
         "proportional": True
     }
     state["batchSizePerGPU"] = 8
-    state["numWorkers"] = 0  #@TODO: 0 - for debug
+    state["numWorkers"] = 2  #@TODO: 0 - for debug
     state["valInterval"] = 1
     state["metricsPeriod"] = 10
     state["checkpointInterval"] = 1
