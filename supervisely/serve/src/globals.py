@@ -47,5 +47,7 @@ local_model_classes_path = os.path.join(local_info_dir, "classes.json")
 
 
 model = None
-model_classes = None
-meta: sly.ProjectMeta = None
+model_classes_json = None
+model_meta: sly.ProjectMeta = None # list of classes and tags in Supervisely format
+input_width = None
+input_height = None
