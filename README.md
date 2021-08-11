@@ -17,12 +17,10 @@ and how-to videos.
 3. [Apps Collection for Semantic Segmentation](#-apps-collection-for-semantic-segmentation)
     - [Demo data and synthetic data](#demo-data-and-synthetic-data)
     - [Data Exploration](#data-exploration)
-    - [Data manipulation](#data-manipulations) - convert, merge, rasterize
-    - [Neural Networks](#neural-networks)
+    - [Data manipulation](#data-manipulation) - convert, merge, rasterize
+    - [UNet](#unet-apps)
     - [Integration into labeling tool](#integration-into-labeling-tool)
-    - [Auxiliary apps](#auxiliary-apps)
-4. [For developers](#For-developers)
-5. [Contact & Questions & Suggestions](#contact--questions--suggestions)
+4. [Contact & Questions & Suggestions](#contact--questions--suggestions)
 
 # 🔥 About Supervisely
 
@@ -133,4 +131,11 @@ classes: lemons and kiwis
 
 - [NN Image Labeling](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fannotation-tool) - integrate any deployd NN to Supervisely Image Labeling UI. Configure inference settings and model output classes. Press `Apply` button (or use hotkey) and detections with their confidences will immediately appear on the image. 
    
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/annotation-tool" src="https://i.imgur.com/hYEucNt.png" width="350px"/> 
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/annotation-tool" src="https://i.imgur.com/hYEucNt.png" width="350px"/>
+  
+
+# Contact & Questions & Suggestions
+
+- for technical support please leave issues, questions or suggestions in our [repo](https://github.com/supervisely-ecosystem/unet). Our team will try to help.
+- also we can chat in community slack channel [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack) or in private workspaces if Enterprise Edition
+- if you are interested in Supervisely Enterprise Edition (EE) please send us a [request](https://supervise.ly/enterprise/?demo) or email Yuri Borisov at [sales@supervise.ly](sales@supervise.ly)
