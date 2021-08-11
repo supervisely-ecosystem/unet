@@ -42,10 +42,10 @@ local_model_config_path = os.path.join(local_configs_dir, "train_config.py")
 
 local_info_dir = os.path.join(my_app.data_dir, "info")
 sly.fs.mkdir(local_info_dir)
-local_gt_labels_path = os.path.join(local_info_dir, "gt_labels.json")
-local_labels_urls_path = os.path.join(local_info_dir, "tag2urls.json")
+#@TODO:
+local_model_classes_path = os.path.join(local_info_dir, "classes.json")
+
 
 model = None
+model_classes = None
 meta: sly.ProjectMeta = None
-gt_labels = None  # name -> index
-labels_urls = None

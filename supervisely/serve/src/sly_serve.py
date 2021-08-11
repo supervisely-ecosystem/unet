@@ -25,7 +25,13 @@ def send_error_data(func):
     return wrapper
 
 
-@g.my_app.callback("get_model_meta")
+# @my_app.callback("get_output_classes_and_tags")
+# @sly.timeit
+# def get_output_classes_and_tags(api: sly.Api, task_id, context, state, app_logger):
+#     request_id = context["request_id"]
+#     my_app.send_response(request_id, data=meta.to_json())
+
+@g.my_app.callback("get_output_classes_and_tags")
 @sly.timeit
 @send_error_data
 def get_model_meta(api: sly.Api, task_id, context, state, app_logger):
@@ -161,6 +167,15 @@ def main():
     g.my_app.run()
 
 
-#@TODO: readme + gif - how to replace tag2urls file + release another app
 if __name__ == "__main__":
+    sly.logger.info("Script arguments", extra={
+        "context.teamId": g.team_id,
+        "context.workspaceId": g.workspace_id,
+        "modal.state.slyFile": g.remote_weights_path,
+        "device": g.device
+    })
+
+    nn_utils.download_model_and_configs()
+    nn_utils.construct_model_meta()
+
     sly.main_wrapper("main", main)
