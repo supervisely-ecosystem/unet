@@ -94,7 +94,7 @@ apps will be able to communicate with your model within platform. For example: a
 or apply your model right in labeling interface.
 9. Apps for **model performance analysis** out of the box
 
-## How app is spawned in Supervisely Platform
+## How app is spawned in Supervisely Platform. High-level explanation
 1. You connect your computer with GPU to the platform by running Supervisely Agent on your machine ([how to video](https://youtu.be/aDqQiYycqyk)). 
 It is our task manager that recieves task messages from platform. You can run it almost on any computer even without 
 static IP address (it is a client, but works like server. Dropbox app works with the similar principles). This is a way 
@@ -105,7 +105,14 @@ how you can connect unlimited computational resources (servers) to the Platform
 4. Now you scripts has its own isolated environment and can communicate with the platform using REST API 
 (for 99.99% of cases you can use Supervisely Python SDK to do it in a convenient way)
 5. Once app is started, agent parces logs (`stdour` and `stderr`) from runnning docker container and submits them to the paltform. 
-It means if you has line `print('hello!!!')` in your script, you will see this message in task logs.
+It means that if you has line `print('hello!!!')` in your script, you will see this message in task logs.
+6. Also agent can stop or kill app by request.
+
+## Train dashboard: UI is separated from the main implementation
+UI is mostly separated from the training loop. When you press `Train` button in UI, the state (values) from all widgets 
+(selectors, sliders, input fields, ...) are added to the sys.args and your default `train.py` scripts is started. 
+It means that you can really quickly integrate scripts you use locally to the UI dashboard, because thay are 98% separated.
+
 
 ## Light integration (Recommended)
 For whom:
