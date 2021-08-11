@@ -1,0 +1,10 @@
+{
+  "name": "UNet collection",
+  "type": "collection",
+  "categories": [
+    "neural network"
+  ],
+  "description": "Training, inference, data exploration, synthetic data, and more",
+  "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
+  "icon_background": "#FFFFFF"
+}
