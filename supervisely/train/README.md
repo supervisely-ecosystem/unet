@@ -97,10 +97,10 @@ We recommend to follow several tutorials and documentation to get the basics bef
 - [Supervisely SDK for Python](https://sdk.docs.supervise.ly/)
 - [IPython notebooks](https://sdk.docs.supervise.ly/rst_templates/notebooks/notebooks.html) that explain how to communicate with the platform
 - [Quickstart APP development guide](https://github.com/supervisely-ecosystem/how-to-create-app) - how to create and add your custom apps to Supervisely Platfom
-  - explains basic principles (python examples + videos)
-  - shows how to configure development environment (PyCharm)
-  - shows how to debug apps
-  - how to add private repositories (in Enterprise Edition)
+    - explains basic principles (python examples + videos)
+    - shows how to configure development environment (PyCharm)
+    - shows how to debug apps
+    - how to add private repositories (in Enterprise Edition)
 - Use other apps as an examples - sources for all our Apps in Supervisely Ecosystem are available on [github](https://github.com/supervisely-ecosystem)
 
 **Notice**: Documentation is constantly improving, if you find some topics are missing or in case of questions, please 
