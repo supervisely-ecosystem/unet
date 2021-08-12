@@ -98,7 +98,7 @@ classes: lemons and kiwis
 
 - [Merge classes](https://ecosystem.supervise.ly/apps/merge-classes)
 
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/merge-classes" src="https://img.icons8.com/color/96/000000/merge-files.png" width="380px"/>
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/merge-classes" src="https://i.imgur.com/S7GUdYv.png" width="380px"/>
 
 - [Rasterize objects on images](https://ecosystem.supervise.ly/apps/rasterize-objects-on-images)
 
