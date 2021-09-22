@@ -49,3 +49,6 @@ info_dir = os.path.join(artifacts_dir, "info")
 sly.fs.mkdir(info_dir)
 checkpoints_dir = os.path.join(artifacts_dir, "checkpoints")
 sly.fs.mkdir(checkpoints_dir, remove_content_if_exists=True)  # remove content for debug, has no effect in production
+visualizations_dir = os.path.join(artifacts_dir, "visualizations")
+sly.fs.mkdir(visualizations_dir, remove_content_if_exists=True)  # remove content for debug, has no effect in production
+

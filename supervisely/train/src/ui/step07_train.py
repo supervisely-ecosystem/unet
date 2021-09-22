@@ -11,6 +11,7 @@ import sly_globals as g
 import step03_classes
 
 
+
 _open_lnk_name = "open_app.lnk"
 project_dir_seg = None
 model_classes_path = os.path.join(g.info_dir, "model_classes.json")
@@ -44,6 +45,8 @@ def init(data, state):
     data["outputUrl"] = None
 
     state["visEpoch"] = 0
+    state["visStep"] = 0
+
     data["finishedEpoch"] = 0
     state["setTimeIndexLoading"] = False
 
@@ -129,10 +132,20 @@ def upload_artifacts_and_log_progress(experiment_name):
     return res_dir
 
 
+def calc_visualization_step(epochs):
+    total_visualizations_count = 20
+
+    vis_step = int(epochs / total_visualizations_count) \
+        if int(epochs / total_visualizations_count) > 0 else 1
+    g.api.app.set_field(g.task_id, 'state.visStep', vis_step)
+
+    return vis_step
+
 @g.my_app.callback("train")
 @sly.timeit
-@g.my_app.ignore_errors_and_show_dialog_window()
+# @g.my_app.ignore_errors_and_show_dialog_window()
 def train(api: sly.Api, task_id, context, state, app_logger):
+    calc_visualization_step(state['epochs'])
     try:
         # convert project to segmentation masks
         global project_dir_seg

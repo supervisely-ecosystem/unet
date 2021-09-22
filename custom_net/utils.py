@@ -88,9 +88,12 @@ def prepare_image_input(image, input_width, input_height):
     return input
 
 
+
+
 def train(args, model, criterion, train_loader, valid_loader, validation, classes):
     if args.sly:
         import sly_integration
+
 
     if args.custom_weights != "" and sly.fs.file_exists(args.custom_weights):
         state = torch.load(str(args.custom_weights))
@@ -102,6 +105,8 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
     report_each = args.metrics_period
     if args.sly:
         sly_integration.init_progress_bars(args.epochs, len(train_loader), len(valid_loader))
+        visualizations_step = sly_integration.get_visualization_step(args.epochs)
+
 
     epoch = 1
     for epoch in range(epoch, args.epochs + 1):
@@ -145,12 +150,15 @@ def train(args, model, criterion, train_loader, valid_loader, validation, classe
 
             if args.sly:
                 sly_integration.report_val_metrics(epoch, metrics["loss"], metrics["avg iou"], metrics["avg dice"])
-                sly_integration.vis_inference(epoch, model, classes,
-                                              args.input_height, args.input_width,
-                                              args.project_dir, args.train_vis_items_path)
-                sly_integration.vis_inference(epoch, model, classes,
-                                              args.input_height, args.input_width,
-                                              args.project_dir, args.val_vis_items_path, update=True)
+
+        if args.sly and epoch % visualizations_step == 0:
+            sly_integration.vis_inference(epoch, model, classes,
+                                          args.input_height, args.input_width,
+                                          args.project_dir, args.train_vis_items_path)
+            sly_integration.vis_inference(epoch, model, classes,
+                                          args.input_height, args.input_width,
+                                          args.project_dir, args.val_vis_items_path, update=True)
+
         if epoch % args.checkpoint_interval == 0:
             save(args.checkpoints_dir, epoch, model, None, args.max_keep_ckpts)
 
