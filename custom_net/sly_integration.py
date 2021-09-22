@@ -17,6 +17,14 @@ _path_to_items = {}
 ######## YOU PERFORM DEEP INTEGRATION #########
 ###############################################
 
+def get_visualization_step(epochs):
+    total_visualizations_count = 20
+
+    vis_step = int(epochs / total_visualizations_count) \
+        if int(epochs / total_visualizations_count) > 0 else 1
+
+    return vis_step
+
 
 def vis_inference(time_index, model: nn.Module, classes, input_height, input_width, project_dir, items_path, update=False):
     import sly_globals as g
@@ -60,6 +68,7 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
             image_info = get_image_info_from_cache(dataset_name, item_name)
             gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
             gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
+        print(time_index, item_name)
         gallery.add_prediction(item_name, time_index, pred_ann)
 
     if update is True:

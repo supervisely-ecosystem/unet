@@ -95,6 +95,7 @@ def download_weights(api: sly.Api, task_id, context, state, app_logger):
                     response = requests.head(weights_url, allow_redirects=True)
                     sizeb = int(response.headers.get('content-length', 0))
                     progress5.set_total(sizeb)
+                    os.makedirs(os.path.dirname(local_weights_path), exist_ok=True)
                     sly.fs.download(weights_url, local_weights_path, g.my_app.cache, progress5.increment)
                     progress5.reset_and_update()
                 sly.logger.info("Pretrained weights has been successfully downloaded",
