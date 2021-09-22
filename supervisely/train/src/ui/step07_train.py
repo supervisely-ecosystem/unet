@@ -143,7 +143,7 @@ def calc_visualization_step(epochs):
 
 @g.my_app.callback("train")
 @sly.timeit
-# @g.my_app.ignore_errors_and_show_dialog_window()
+@g.my_app.ignore_errors_and_show_dialog_window()
 def train(api: sly.Api, task_id, context, state, app_logger):
     calc_visualization_step(state['epochs'])
     try:
