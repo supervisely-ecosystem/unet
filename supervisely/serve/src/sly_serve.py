@@ -1,7 +1,7 @@
 import os
 import functools
 from functools import lru_cache
-import supervisely_lib as sly
+import supervisely as sly
 import torch
 
 import globals as g
@@ -65,7 +65,8 @@ def get_custom_inference_settings(api: sly.Api, task_id, context, state, app_log
     g.my_app.send_response(request_id, data={"settings": {}})
 
 
-def inference_image_path(image_path, context, state, app_logger):
+@sly.process_image_roi
+def inference_image_path(image_path, project_meta, context, state, app_logger):
     app_logger.debug("Input path", extra={"path": image_path})
     pred = inference(g.model, g.input_height, g.input_width, image_path, device) # mask with class indices
     ann: sly.Annotation = convert_prediction_to_sly_format(pred, g.model_classes_json, g.model_meta)
@@ -85,7 +86,8 @@ def inference_image_url(api: sly.Api, task_id, context, state, app_logger):
     local_image_path = os.path.join(g.my_app.data_dir, sly.rand_str(15) + ext)
 
     sly.fs.download(image_url, local_image_path)
-    ann_json = inference_image_path(local_image_path, context, state, app_logger)
+    ann_json = inference_image_path(image_path=local_image_path, project_meta=g.model_meta,
+                                    context=context, state=state, app_logger=app_logger)
     sly.fs.silent_remove(local_image_path)
 
     request_id = context["request_id"]
@@ -101,7 +103,8 @@ def inference_image_id(api: sly.Api, task_id, context, state, app_logger):
     image_info = api.image.get_info_by_id(image_id)
     image_path = os.path.join(g.my_app.data_dir, sly.rand_str(10) + image_info.name)
     api.image.download_path(image_id, image_path)
-    ann_json = inference_image_path(image_path, context, state, app_logger)
+    ann_json = inference_image_path(image_path=image_path, project_meta=g.model_meta,
+                                    context=context, state=state, app_logger=app_logger)
     sly.fs.silent_remove(image_path)
     request_id = context["request_id"]
     if request_id is not None: # for debug
@@ -121,7 +124,8 @@ def inference_batch_ids(api: sly.Api, task_id, context, state, app_logger):
 
     results = []
     for image_path in paths:
-        ann_json = inference_image_path(image_path, context, state, app_logger)
+        ann_json = inference_image_path(image_path=image_path, project_meta=g.model_meta,
+                                    context=context, state=state, app_logger=app_logger)
         results.append(ann_json)
         sly.fs.silent_remove(image_path)
 
