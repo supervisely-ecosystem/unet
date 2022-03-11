@@ -1,7 +1,7 @@
 import os
 from collections import namedtuple
 import random
-import supervisely_lib as sly
+import supervisely as sly
 import sly_globals as g
 
 
@@ -10,7 +10,7 @@ _cache_base_filename = os.path.join(g.my_app.data_dir, "images_info")
 _cache_path = _cache_base_filename + ".db"
 project_fs: sly.Project = None
 _image_id_to_paths = {}
-progress1 = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progress1", "Download project from server")
+progress1 = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progress1", "Download project from server")
 
 
 def init(data, state):

@@ -3,10 +3,12 @@ import sys
 import random
 from functools import partial
 
+import supervisely.app.v1.widgets.predictions_dynamics_gallery
+
 import step02_splits
 import step04_augs
 import step05_models
-import supervisely_lib as sly
+import supervisely as sly
 import sly_globals as g
 import step03_classes
 
@@ -16,17 +18,18 @@ _open_lnk_name = "open_app.lnk"
 project_dir_seg = None
 model_classes_path = os.path.join(g.info_dir, "model_classes.json")
 
-chart_lr: sly.app.widgets.Chart = None
-chart_loss: sly.app.widgets.Chart = None
-chart_acc: sly.app.widgets.Chart = None
+chart_lr: sly.app.v1.widgets.chart.Chart = None
+chart_loss: sly.app.v1.widgets.chart.Chart = None
+chart_acc: sly.app.v1.widgets.chart.Chart = None
 
-gallery: sly.app.widgets.PredictionsDynamicsGallery = None
+
+gallery: sly.app.v1.widgets.predictions_dynamics_gallery.PredictionsDynamicsGallery = None
 train_vis_items_path = os.path.join(g.info_dir, "train_vis_items.json")
 val_vis_items_path = os.path.join(g.info_dir, "val_vis_items.json")
 
-progress_epoch: sly.app.widgets.ProgressBar = None
-progress_iter: sly.app.widgets.ProgressBar = None
-progress_other: sly.app.widgets.ProgressBar = None
+progress_epoch: sly.app.v1.widgets.progress_bar.ProgressBar = None
+progress_iter: sly.app.v1.widgets.progress_bar.ProgressBar = None
+progress_other: sly.app.v1.widgets.progress_bar.ProgressBar = None
 
 
 def init(data, state):
@@ -60,14 +63,14 @@ def restart(data, state):
 
 def init_charts(data, state):
     global chart_lr, chart_loss, chart_acc
-    chart_lr = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLR",
+    chart_lr = sly.app.v1.widgets.chart.Chart(g.task_id, g.api, "data.chartLR",
                                      title="LR", series_names=["LR"],
                                      yrange=[0, state["lr"] + state["lr"]],
                                      ydecimals=6, xdecimals=2)
-    chart_loss = sly.app.widgets.Chart(g.task_id, g.api, "data.chartLoss",
+    chart_loss = sly.app.v1.widgets.chart.Chart(g.task_id, g.api, "data.chartLoss",
                                       title="Loss", series_names=["train", "val"],
                                       smoothing=0.6, ydecimals=6, xdecimals=2)
-    chart_acc = sly.app.widgets.Chart(g.task_id, g.api, "data.chartAcc",
+    chart_acc = sly.app.v1.widgets.chart.Chart(g.task_id, g.api, "data.chartAcc",
                                       title="Val Acc", series_names=["avg IoU", "avg Dice"],
                                       yrange=[0, 1],
                                       smoothing=0.6, ydecimals=6, xdecimals=2)
@@ -80,11 +83,11 @@ def init_charts(data, state):
 
 def init_progress_bars(data):
     global progress_epoch
-    progress_epoch = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressEpoch", "Epoch")
+    progress_epoch = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progressEpoch", "Epoch")
     global progress_iter
-    progress_iter = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressIter", "Iterations (train + val)")
+    progress_iter = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progressIter", "Iterations (train + val)")
     global progress_other
-    progress_other = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressOther", "Progress")
+    progress_other = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progressOther", "Progress")
 
     progress_epoch.init_data(data)
     progress_iter.init_data(data)
@@ -113,7 +116,7 @@ def _save_link_to_ui(local_dir, app_url):
 def upload_artifacts_and_log_progress(experiment_name):
     _save_link_to_ui(g.artifacts_dir, g.my_app.app_url)
 
-    def upload_monitor(monitor, api: sly.Api, task_id, progress: sly.app.widgets.ProgressBar):
+    def upload_monitor(monitor, api: sly.Api, task_id, progress: sly.app.v1.widgets.progress_bar.ProgressBar):
         if progress.get_total() is None:
             progress.set_total(monitor.len)
         else:
@@ -121,7 +124,7 @@ def upload_artifacts_and_log_progress(experiment_name):
         progress.update()
 
     global progress_other
-    progress_other = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressOther",
+    progress_other = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progressOther",
                                                  "Upload directory with training artifacts to Team Files",
                                                  is_size=True, min_report_percent=5)
     progress_cb = partial(upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other)
@@ -154,7 +157,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
             sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
             global progress_other
-            progress_other = sly.app.widgets.ProgressBar(g.task_id, g.api, "data.progressOther",
+            progress_other = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progressOther",
                                                          "Convert SLY annotations to segmentation masks",
                                                          sly.Project(g.project_dir, sly.OpenMode.READ).total_items)
             sly.Project.to_segmentation_task(
@@ -173,7 +176,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
         # predictions improvement over time
         global gallery
-        gallery = sly.app.widgets.PredictionsDynamicsGallery(g.task_id, g.api, "data.gallery", project_seg.meta)
+        gallery = sly.app.v1.widgets.predictions_dynamics_gallery.PredictionsDynamicsGallery(g.task_id, g.api, "data.gallery", project_seg.meta)
         gallery.complete_update()
 
         sample_items_for_visualization(state)
