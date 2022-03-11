@@ -5,7 +5,9 @@ from pathlib import Path
 
 import sly_globals as g
 import supervisely as sly
-progress5 = sly.app.v1.widgets.progress_bar.ProgressBar(g.task_id, g.api, "data.progress5", "Download weights", is_size=True, min_report_percent=5)
+from supervisely.app.v1.widgets.progress_bar import ProgressBar
+
+progress5 = ProgressBar(g.task_id, g.api, "data.progress5", "Download weights", is_size=True, min_report_percent=5)
 
 local_weights_path = None
 
