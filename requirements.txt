@@ -1,5 +1,5 @@
-supervisely==6.7.14
-supervisely[apps]==6.7.14
+supervisely==6.7.21
+supervisely[apps]==6.7.21
 python-dotenv==0.19.2
 torch-summary==1.4.5
 #albumentations==0.0.10
