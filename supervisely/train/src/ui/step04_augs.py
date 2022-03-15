@@ -1,7 +1,7 @@
 import os
-import supervisely_lib as sly
+import supervisely as sly
 import sly_globals as g
-from supervisely_lib.app.widgets import CompareGallery
+from supervisely.app.v1.widgets.compare_gallery import CompareGallery
 import step01_input_project
 import step03_classes
 

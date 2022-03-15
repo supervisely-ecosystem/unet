@@ -2,7 +2,9 @@ import os
 import sys
 import pathlib
 from dotenv import load_dotenv
-import supervisely_lib as sly
+import supervisely as sly
+from supervisely.app.v1.app_service import AppService
+
 
 root_source_path = str(pathlib.Path(sys.argv[0]).parents[3])
 sly.logger.info(f"Root source directory: {root_source_path}")
@@ -22,7 +24,7 @@ secret_debug_env_path = os.path.join(root_source_path, "supervisely/serve", "sec
 load_dotenv(debug_env_path)
 load_dotenv(secret_debug_env_path, override=True)
 
-my_app = sly.AppService()
+my_app = AppService()
 api = my_app.public_api
 task_id = my_app.task_id
 
