@@ -14,9 +14,12 @@
   "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
   "icon_background": "#FFFFFF",
   "context_menu": {
-    "target": ["images_project"],
+    "target": [
+      "images_project"
+    ],
     "context_root": "Neural Networks",
     "context_category": "UNet"
   },
-  "instance_version": "6.4.24"
+  "instance_version": "6.4.24",
+  "poster": "https://i.imgur.com/vh6d26z.png"
 }
