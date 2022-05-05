@@ -23,6 +23,9 @@
     "deployed_nn"
   ],
   "context_menu": {
-    "target": ["files_file"]
-  }
+    "target": [
+      "files_file"
+    ]
+  },
+  "poster": "https://i.imgur.com/XfzccQT.png"
 }
