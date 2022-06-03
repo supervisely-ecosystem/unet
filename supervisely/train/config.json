@@ -3,7 +3,8 @@
   "type": "app",
   "categories": [
     "neural network",
-    "semantic segmentation"
+    "semantic segmentation",
+    "images"
   ],
   "description": "Dashboard to configure, start and monitor training",
   "docker_image": "supervisely/unet:1.0.0",
