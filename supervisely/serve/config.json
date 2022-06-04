@@ -3,7 +3,11 @@
   "type": "app",
   "categories": [
     "neural network",
-    "semantic segmentation"
+    "images",
+    "videos",
+    "semantic segmentation",
+    "segmentation & tracking",
+    "serve"
   ],
   "description": "Deploy model as REST API service",
   "docker_image": "supervisely/unet:1.0.0",
