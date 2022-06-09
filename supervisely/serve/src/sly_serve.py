@@ -25,8 +25,14 @@ def send_error_data(func):
         try:
             value = func(*args, **kwargs)
         except Exception as e:
+            sly.logger.error(f"Error while processing data: {e}")
             request_id = kwargs["context"]["request_id"]
-            g.my_app.send_response(request_id, data={"error": repr(e)})
+            # raise e
+            try:
+                g.my_app.send_response(request_id, data={"error": repr(e)})
+                print(traceback.format_exc())
+            except Exception as ex:
+                sly.logger.exception(f"Cannot send error response: {ex}")
         return value
     return wrapper
 
