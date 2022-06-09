@@ -7,6 +7,8 @@ import torch
 import globals as g
 from inference import inference, convert_prediction_to_sly_format, load_model
 import sly_serve_utils
+import sly_apply_nn_to_video as nn_to_video
+
 device = torch.device('cuda:0')
 
 
@@ -46,10 +48,12 @@ def get_output_classes_and_tags(api: sly.Api, task_id, context, state, app_logge
 def get_session_info(api: sly.Api, task_id, context, state, app_logger):
     info = {
         "app": "UNet Serve",
+        "type": "Semantic Segmentation",
         "weights": g.remote_weights_path,
         "device": g.device,
         "session_id": task_id,
         "classes_count": len(g.model_meta.obj_classes),
+        "videos_support": True
     }
     request_id = context["request_id"]
     g.my_app.send_response(request_id, data=info)
@@ -131,6 +135,31 @@ def inference_batch_ids(api: sly.Api, task_id, context, state, app_logger):
 
     request_id = context["request_id"]
     g.my_app.send_response(request_id, data=results)
+
+
+@g.my_app.callback("inference_video_id")
+@sly.timeit
+@send_error_data
+def inference_video_id(api: sly.Api, task_id, context, state, app_logger):
+    video_info = g.api.video.get_info_by_id(state['videoId'])
+
+    sly.logger.info(f'inference {video_info.id=} started')
+    inf_video_interface = nn_to_video.InferenceVideoInterface(api=g.api,
+                                                              start_frame_index=state.get('startFrameIndex', 0),
+                                                              frames_count=state.get('framesCount', video_info.frames_count - 1),
+                                                              frames_direction=state.get('framesDirection', 'forward'),
+                                                              video_info=video_info,
+                                                              imgs_dir=os.path.join(g.my_app.data_dir, 'videoInference'))
+
+    inf_video_interface.download_frames()
+
+    annotations = f.inference_images_dir(img_paths=inf_video_interface.images_paths,
+                                         context=context,
+                                         state=state,
+                                         app_logger=app_logger)
+
+    g.my_app.send_response(context["request_id"], data={'ann': annotations})
+    g.logger.info(f'inference {video_info.id=} done, {len(annotations)} annotations created')
 
 
 def debug_inference():
