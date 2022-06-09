@@ -34,7 +34,21 @@ def send_error_data(func):
             except Exception as ex:
                 sly.logger.exception(f"Cannot send error response: {ex}")
         return value
+
     return wrapper
+
+
+def inference_images_dir(img_paths, context, state, app_logger):
+    annotations = []
+    for image_path in img_paths:
+        ann_json = inference_image_path(image_path=image_path,
+                                        project_meta=g.meta,
+                                        context=context,
+                                        state=state,
+                                        app_logger=app_logger)
+        annotations.append(ann_json)
+        sly.fs.silent_remove(image_path)
+    return annotations
 
 
 # send model meta (classes and tags that model predicts / produces)
@@ -78,7 +92,7 @@ def get_custom_inference_settings(api: sly.Api, task_id, context, state, app_log
 @sly.process_image_roi
 def inference_image_path(image_path, project_meta, context, state, app_logger):
     app_logger.debug("Input path", extra={"path": image_path})
-    pred = inference(g.model, g.input_height, g.input_width, image_path, device) # mask with class indices
+    pred = inference(g.model, g.input_height, g.input_width, image_path, device)  # mask with class indices
     ann: sly.Annotation = convert_prediction_to_sly_format(pred, g.model_classes_json, g.model_meta)
     return ann.to_json()
 
@@ -117,7 +131,7 @@ def inference_image_id(api: sly.Api, task_id, context, state, app_logger):
                                     context=context, state=state, app_logger=app_logger)
     sly.fs.silent_remove(image_path)
     request_id = context["request_id"]
-    if request_id is not None: # for debug
+    if request_id is not None:  # for debug
         g.my_app.send_response(request_id, data=ann_json)
 
 
@@ -132,12 +146,7 @@ def inference_batch_ids(api: sly.Api, task_id, context, state, app_logger):
         paths.append(os.path.join(g.my_app.data_dir, sly.rand_str(10) + info.name))
     api.image.download_paths(infos[0].dataset_id, ids, paths)
 
-    results = []
-    for image_path in paths:
-        ann_json = inference_image_path(image_path=image_path, project_meta=g.model_meta,
-                                    context=context, state=state, app_logger=app_logger)
-        results.append(ann_json)
-        sly.fs.silent_remove(image_path)
+    results = inference_images_dir(img_paths=paths, context=context, state=state, app_logger=app_logger)
 
     request_id = context["request_id"]
     g.my_app.send_response(request_id, data=results)
@@ -152,17 +161,19 @@ def inference_video_id(api: sly.Api, task_id, context, state, app_logger):
     sly.logger.info(f'inference {video_info.id=} started')
     inf_video_interface = nn_to_video.InferenceVideoInterface(api=g.api,
                                                               start_frame_index=state.get('startFrameIndex', 0),
-                                                              frames_count=state.get('framesCount', video_info.frames_count - 1),
+                                                              frames_count=state.get('framesCount',
+                                                                                     video_info.frames_count - 1),
                                                               frames_direction=state.get('framesDirection', 'forward'),
                                                               video_info=video_info,
-                                                              imgs_dir=os.path.join(g.my_app.data_dir, 'videoInference'))
+                                                              imgs_dir=os.path.join(g.my_app.data_dir,
+                                                                                    'videoInference'))
 
     inf_video_interface.download_frames()
 
-    annotations = f.inference_images_dir(img_paths=inf_video_interface.images_paths,
-                                         context=context,
-                                         state=state,
-                                         app_logger=app_logger)
+    annotations = inference_images_dir(img_paths=inf_video_interface.images_paths,
+                                       context=context,
+                                       state=state,
+                                       app_logger=app_logger)
 
     g.my_app.send_response(context["request_id"], data={'ann': annotations})
     g.logger.info(f'inference {video_info.id=} done, {len(annotations)} annotations created')
@@ -195,7 +206,7 @@ def main():
     sly.logger.info("Model has been successfully deployed")
 
     # debug
-    #debug_inference()
+    # debug_inference()
 
     g.my_app.run()
 
