@@ -50,3 +50,4 @@ def construct_model_meta():
     for obj_class_json in g.model_classes_json:
         obj_classes.append(sly.ObjClass.from_json(obj_class_json))
     g.model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
+
