@@ -205,7 +205,7 @@ def main():
     sly_serve_utils.download_model_and_configs()
     sly_serve_utils.construct_model_meta()
     g.model = load_model(g.local_weights_path, len(g.model_classes_json), g.model_name, device)
-    sly.logger.info("Model has been successfully deployed")
+    sly.logger.info("🟩 Model has been successfully deployed")
 
     # debug
     # debug_inference()
