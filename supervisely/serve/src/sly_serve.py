@@ -3,6 +3,8 @@ import functools
 from functools import lru_cache
 import supervisely as sly
 import torch
+import traceback
+
 
 import globals as g
 from inference import inference, convert_prediction_to_sly_format, load_model
@@ -42,7 +44,7 @@ def inference_images_dir(img_paths, context, state, app_logger):
     annotations = []
     for image_path in img_paths:
         ann_json = inference_image_path(image_path=image_path,
-                                        project_meta=g.meta,
+                                        project_meta=g.model_meta,
                                         context=context,
                                         state=state,
                                         app_logger=app_logger)
