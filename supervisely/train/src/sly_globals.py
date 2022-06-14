@@ -1,10 +1,8 @@
 import os
 from pathlib import Path
 import sys
-from dotenv import load_dotenv
 import supervisely as sly
 from supervisely.app.v1.app_service import AppService
-
 
 root_source_dir = str(Path(sys.argv[0]).parents[3])
 print(f"Root source directory: {root_source_dir}")
@@ -23,17 +21,18 @@ print(f"UI source directory: {ui_sources_dir}")
 sys.path.append(ui_sources_dir)
 
 # only for convenient debug
-debug_env_path = os.path.join(root_source_dir, "supervisely/train", "debug.env")
-secret_debug_env_path = os.path.join(root_source_dir, "supervisely/train", "secret_debug.env")
-load_dotenv(debug_env_path)
-load_dotenv(secret_debug_env_path, override=True)
+# from dotenv import load_dotenv
+# debug_env_path = os.path.join(root_source_dir, "supervisely/train", "debug.env")
+# secret_debug_env_path = os.path.join(root_source_dir, "supervisely/train", "secret_debug.env")
+# load_dotenv(debug_env_path)
+# load_dotenv(secret_debug_env_path, override=True)
 
 my_app = AppService()
 api = my_app.public_api
 task_id = my_app.task_id
 
-#@TODO: for debug
-#sly.fs.clean_dir(my_app.data_dir)
+# @TODO: for debug
+# sly.fs.clean_dir(my_app.data_dir)
 
 team_id = int(os.environ['context.teamId'])
 workspace_id = int(os.environ['context.workspaceId'])
@@ -52,4 +51,3 @@ checkpoints_dir = os.path.join(artifacts_dir, "checkpoints")
 sly.fs.mkdir(checkpoints_dir, remove_content_if_exists=True)  # remove content for debug, has no effect in production
 visualizations_dir = os.path.join(artifacts_dir, "visualizations")
 sly.fs.mkdir(visualizations_dir, remove_content_if_exists=True)  # remove content for debug, has no effect in production
-

@@ -154,14 +154,14 @@ def preview_augs(api: sly.Api, task_id, context, state, app_logger):
     ann = sly.Annotation.load_json_file(ann_path, step01_input_project.project_fs.meta)
     ann = ann.filter_labels_by_classes(keep_classes=step03_classes.selected_classes)
 
-    gallery.set_left("before", image_info.full_storage_url, ann)
+    gallery.set_left("before", image_info.path_original, ann)
     _, res_img, res_ann = sly.imgaug_utils.apply(augs_ppl, g.project_meta, img, ann)
     local_image_path = os.path.join(g.my_app.data_dir, "preview_augs.jpg")
     sly.image.write(local_image_path, res_img)
     if api.file.exists(g.team_id, remote_preview_path):
         api.file.remove(g.team_id, remote_preview_path)
     file_info = api.file.upload(g.team_id, local_image_path, remote_preview_path)
-    gallery.set_right("after", file_info.full_storage_url, res_ann)
+    gallery.set_right("after", file_info.storage_path, res_ann)
     gallery.update(options=False)
 
 

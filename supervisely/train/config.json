@@ -11,6 +11,7 @@
   ],
   "description": "Dashboard to configure, start and monitor training",
   "docker_image": "supervisely/unet:1.0.0",
+  "instance_version": "6.4.57",
   "main_script": "supervisely/train/src/sly_train.py",
   "gui_template": "supervisely/train/src/gui.html",
   "task_location": "workspace_tasks",
@@ -24,6 +25,5 @@
     "context_root": "Neural Networks",
     "context_category": "UNet"
   },
-  "instance_version": "6.4.24",
   "poster": "https://i.imgur.com/vh6d26z.png"
 }
