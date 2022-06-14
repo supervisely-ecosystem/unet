@@ -3,7 +3,7 @@ import sys
 import pathlib
 import supervisely as sly
 from supervisely.app.v1.app_service import AppService
-# from dotenv import load_dotenv
+
 
 
 root_source_path = str(pathlib.Path(sys.argv[0]).parents[3])
@@ -19,6 +19,7 @@ sly.logger.info(f"Model source directory: {model_source_path}")
 sys.path.append(model_source_path)
 
 # only for convenient debug
+# from dotenv import load_dotenv
 # debug_env_path = os.path.join(root_source_path, "supervisely/serve", "debug.env")
 # secret_debug_env_path = os.path.join(root_source_path, "supervisely/serve", "secret_debug.env")
 # load_dotenv(debug_env_path)
@@ -53,4 +54,3 @@ model_classes_json = None
 model_meta: sly.ProjectMeta = None  # list of classes and tags in Supervisely format
 input_width = None
 input_height = None
-
