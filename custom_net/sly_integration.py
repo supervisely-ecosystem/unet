@@ -67,7 +67,7 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
         if not gallery.has_item(item_name):
             image_info = get_image_info_from_cache(dataset_name, item_name)
             gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
-            gallery.create_item(item_name, image_info.full_storage_url, gt_ann)
+            gallery.create_item(item_name, image_info.path_original, gt_ann)
         print(time_index, item_name)
         gallery.add_prediction(item_name, time_index, pred_ann)
 
