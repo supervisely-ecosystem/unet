@@ -1,5 +1,6 @@
 <div align="center" markdown>
-<img src="https://i.imgur.com/vh6d26z.png"/>
+<img src="https://user-images.githubusercontent.com/106374579/187425251-d652ae7b-6d4c-475a-b8e4-e5c3eee06885.png"/>
+
 
 # Semantic segmentation: Train UNet-based models 
 
