@@ -1,5 +1,6 @@
 <div align="center" markdown>
-<img src="https://i.imgur.com/XfzccQT.png"/>
+<img src="https://user-images.githubusercontent.com/106374579/187424999-e8044471-05ab-420e-8db4-05a13ac00cca.png"/>
+
 
 # Serve UNet
 
