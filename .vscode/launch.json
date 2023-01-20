@@ -5,18 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/supervisely/serve/src/main.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}",
-                // "ENV": "production"
-            }
-        },
-        {
             "name": "Advanced mode for Supervisely Team",
             "type": "python",
             "request": "launch",

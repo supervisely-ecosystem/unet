@@ -11,20 +11,16 @@ from torchvision import transforms
 
 from model_list import model_list
 
-load_dotenv("debug.env")
+root_source_path = str(Path(__file__).parents[3])
+app_source_path = str(Path(__file__).parents[1])
+load_dotenv(os.path.join(app_source_path, "local.env"))
 load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-api = sly.Api()
 
-if sly.is_production():
-    weights_path = os.environ['modal.state.weightsPath']
-    model_dir = Path(weights_path).parents[1]
-    ui_state_path = str(model_dir / "info" / "ui_state.json").replace('\\', '/')
-    model_classes_path = str(model_dir / "info" / "model_classes.json").replace('\\', '/')
-else:
-    weights_path = 'data/model/model_004_best.pth'
-    ui_state_path = 'data/model/ui_state.json'
-    model_classes_path = 'data/model/model_classes.json'
+weights_path = os.environ['modal.state.weightsPath']
+model_dir = Path(weights_path).parents[1]
+ui_state_path = str(model_dir / "info" / "ui_state.json").replace('\\', '/')
+model_classes_path = str(model_dir / "info" / "model_classes.json").replace('\\', '/')
 
 device = os.environ['modal.state.device'] if 'cuda' in os.environ['modal.state.device'] and torch.cuda.is_available() else 'cpu'
 
@@ -104,7 +100,7 @@ m.load_on_device(device)
 if sly.is_production():
     m.serve()
 else:
-    image_path = "demo/IMG_0748.jpeg"
+    image_path = "demo/image_01.jpg"
     results = m.predict(image_path, settings={})
     vis_path = "demo/image_01_prediction.jpg"
     m.visualize(results, image_path, vis_path)
