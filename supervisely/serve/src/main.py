@@ -1,32 +1,22 @@
-import supervisely
-import custom_net
-
 import os
 from typing_extensions import Literal
 from typing import List, Any, Dict
 from pathlib import Path
 import cv2
-import json
 from dotenv import load_dotenv
 import torch
 import supervisely as sly
 from pathlib import Path
+from torchvision import transforms
 
-os.chdir('supervisely_sly/serve')
-print(os.getcwd())
-import sys
-print(sys.path)
-
-import utils
+from model_list import model_list
 
 load_dotenv("debug.env")
 load_dotenv(os.path.expanduser("~/supervisely.env"))
 
 api = sly.Api()
 
-is_prod = os.environ['ENV'] == 'production'
-
-if is_prod:
+if sly.is_production():
     weights_path = os.environ['modal.state.weightsPath']
     model_dir = Path(weights_path).parents[1]
     ui_state_path = str(model_dir / "info" / "ui_state.json").replace('\\', '/')
@@ -40,6 +30,12 @@ device = os.environ['modal.state.device'] if 'cuda' in os.environ['modal.state.d
 
 
 class UNetModel(sly.nn.inference.SemanticSegmentation):
+    
+    transforms_img = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
+    ])
+
     def load_on_device(
         self,
         device: Literal["cpu", "cuda", "cuda:0", "cuda:1", "cuda:2", "cuda:3"] = "cpu",
@@ -56,8 +52,7 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
             obj_classes.append(sly.ObjClass.from_json(obj_class_json))
         self._model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
     
-        model = utils.load_model(weights_path, len(self.model_classes), self.model_name, device)
-        self.model = model
+        self.model = self.load_model(weights_path, device)
         self.class_names = [x['title'] for x in self.model_classes]
 
     def get_classes(self) -> List[str]:
@@ -75,27 +70,42 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
     def predict(
         self, image_path: str, settings: Dict[str, Any]
     ) -> List[sly.nn.PredictionSegmentation]:
-
-        ####### CUSTOM CODE FOR MY MODEL STARTS (e.g. DETECTRON2) #######
         image = sly.image.read(image_path)  # RGB
-        input = utils.prepare_image_input(image, self.input_width, self.input_height)
-        input = torch.unsqueeze(input, 0)
-        input = utils.cuda(input, device)
+        input = self.prepare_image_input(image, device)
         with torch.no_grad():
             output = self.model(input)
         image_height, image_width = image.shape[:2]
         predicted_classes_indices = output.data.cpu().numpy().argmax(axis=1)[0]
         result = cv2.resize(predicted_classes_indices, (image_width, image_height), interpolation=cv2.INTER_NEAREST)
-        ####### CUSTOM CODE FOR MY MODEL ENDS (e.g. DETECTRON2)  ########
-
         return [sly.nn.PredictionSegmentation(result)]
+    
+    def load_model(self, weights_path, device):
+        num_classes = len(self.model_classes)
+        model_class = model_list[self.model_name]["class"]
+        model = model_class(num_classes=num_classes)
+        state = torch.load(weights_path, map_location=device)
+        model.load_state_dict(state)
+        model.to(device)
+        model.eval()
+        return model
+
+    def prepare_image_input(self, image, device):
+        # RGB -> Normalized Tensor
+        input = cv2.resize(image, (self.input_width, self.input_height))
+        input = self.transforms_img(input)  # totensor + normalize
+        input = torch.unsqueeze(input, 0)
+        input = input.to(device)
+        return input
 
 
 m = UNetModel(location=[weights_path, ui_state_path, model_classes_path])
 m.load_on_device(device)
 
-image_path = "demo/IMG_0748.jpeg"
-results = m.predict(image_path, settings={})
-vis_path = "demo/image_01_prediction.jpg"
-m.visualize(results, image_path, vis_path)
-print(f"predictions and visualization have been saved: {vis_path}")
+if sly.is_production():
+    m.serve()
+else:
+    image_path = "demo/IMG_0748.jpeg"
+    results = m.predict(image_path, settings={})
+    vis_path = "demo/image_01_prediction.jpg"
+    m.visualize(results, image_path, vis_path)
+    print(f"predictions and visualization have been saved: {vis_path}")
