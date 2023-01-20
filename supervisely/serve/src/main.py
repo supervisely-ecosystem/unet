@@ -19,8 +19,8 @@ load_dotenv(os.path.expanduser("~/supervisely.env"))
 
 weights_path = os.environ['modal.state.weightsPath']
 model_dir = Path(weights_path).parents[1]
-ui_state_path = str(model_dir / "info" / "ui_state.json").replace('\\', '/')
-model_classes_path = str(model_dir / "info" / "model_classes.json").replace('\\', '/')
+ui_state_path = str(model_dir / "info" / "ui_state.json")
+model_classes_path = str(model_dir / "info" / "model_classes.json")
 
 device = os.environ['modal.state.device'] if 'cuda' in os.environ['modal.state.device'] and torch.cuda.is_available() else 'cpu'
 
