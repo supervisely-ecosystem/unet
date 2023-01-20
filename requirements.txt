@@ -1,7 +1,6 @@
-supervisely==6.36.0
-supervisely[apps]==6.36.0
-python-dotenv==0.19.2
+supervisely==6.69.5
 torch-summary==1.4.5
-ffmpeg-python==0.2.0
-tqdm==4.62.3
+# python-dotenv==0.19.2
+# ffmpeg-python==0.2.0
+# tqdm==4.62.3
 #albumentations==0.0.10

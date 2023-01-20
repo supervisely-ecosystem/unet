@@ -1,4 +1,5 @@
 {
+  "version": "2.0.0",
   "name": "Serve UNet",
   "type": "app",
   "categories": [
@@ -11,8 +12,7 @@
   ],
   "description": "Deploy model as REST API service",
   "docker_image": "supervisely/unet:1.0.1",
-  "instance_version": "6.4.57",
-  "main_script": "supervisely/serve/src/sly_serve.py",
+  "entrypoint": "python -m uvicorn main:m.app --app-dir ./supervisely/serve/src --host 0.0.0.0 --port 8000 --ws websockets",
   "modal_template": "supervisely/serve/src/modal.html",
   "modal_template_state": {
     "device": "cuda:0"
@@ -32,5 +32,6 @@
     ]
   },
   "poster": "https://user-images.githubusercontent.com/106374579/187424999-e8044471-05ab-420e-8db4-05a13ac00cca.png",
-  "community_agent": false
+  "community_agent": false,
+  "instance_version": "6.6.7"
 }

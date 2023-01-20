@@ -1,3 +1,9 @@
 .idea
 /supervisely/train/secret_debug.env
 /supervisely_lib
+todo.txt
+*.pth
+/info
+__pycache__
+/supervisely/serve/data
+/results
