@@ -17,7 +17,7 @@ load_dotenv(os.path.join(app_source_path, "local.env"))
 load_dotenv(os.path.expanduser("~/supervisely.env"))
 
 
-weights_path = os.environ['modal.state.weightsPath']
+weights_path = os.environ['modal.state.slyFile']
 model_dir = Path(weights_path).parents[1]
 ui_state_path = str(model_dir / "info" / "ui_state.json")
 model_classes_path = str(model_dir / "info" / "model_classes.json")
