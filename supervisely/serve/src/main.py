@@ -34,9 +34,10 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
 
     def load_on_device(
         self,
+        location,
         device: Literal["cpu", "cuda", "cuda:0", "cuda:1", "cuda:2", "cuda:3"] = "cpu",
     ):
-        weights_path, ui_state_path, model_classes_path = self.location
+        weights_path, ui_state_path, model_classes_path = location
         ui_state = sly.json.load_json_file(ui_state_path)
         self.model_classes = sly.json.load_json_file(model_classes_path)
         self.model_name = ui_state["selectedModel"]
@@ -93,9 +94,14 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         input = input.to(device)
         return input
 
+    def get_models(self) -> List[Dict[str, str]]:
+        return [{"a":"b"}]
 
-m = UNetModel(location=[weights_path, ui_state_path, model_classes_path])
-m.load_on_device(device)
+
+paths = ["model/model_048.pth", "model/ui_state.json", "model/model_classes.json"]
+m = UNetModel(paths, use_gui=True)
+m.load_on_device(paths, device)
+# m.load_on_device([weights_path, ui_state_path, model_classes_path], device)
 
 if sly.is_production():
     m.serve()
