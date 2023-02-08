@@ -6,4 +6,5 @@ todo.txt
 /info
 __pycache__
 /supervisely/serve/data
+/supervisely/data
 /results
