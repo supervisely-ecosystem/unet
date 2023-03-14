@@ -22,8 +22,10 @@ model_dir = Path(weights_path).parents[1]
 ui_state_path = str(model_dir / "info" / "ui_state.json")
 model_classes_path = str(model_dir / "info" / "model_classes.json")
 
-device = os.environ['modal.state.device'] if 'cuda' in os.environ['modal.state.device'] and torch.cuda.is_available() else 'cpu'
+remote_files = (weights_path, ui_state_path, model_classes_path)
 
+device = os.environ['modal.state.device'] if 'cuda' in os.environ['modal.state.device'] and torch.cuda.is_available() else 'cpu'
+print("Using device:", device)
 
 class UNetModel(sly.nn.inference.SemanticSegmentation):
     
@@ -34,9 +36,10 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
 
     def load_on_device(
         self,
+        model_dir: str = None,
         device: Literal["cpu", "cuda", "cuda:0", "cuda:1", "cuda:2", "cuda:3"] = "cpu",
     ):
-        weights_path, ui_state_path, model_classes_path = self.location
+        weights_path, ui_state_path, model_classes_path = [self.download(p) for p in remote_files]
         ui_state = sly.json.load_json_file(ui_state_path)
         self.model_classes = sly.json.load_json_file(model_classes_path)
         self.model_name = ui_state["selectedModel"]
@@ -94,8 +97,8 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         return input
 
 
-m = UNetModel(location=[weights_path, ui_state_path, model_classes_path])
-m.load_on_device(device)
+m = UNetModel()
+m.load_on_device(device=device)
 
 if sly.is_production():
     m.serve()
