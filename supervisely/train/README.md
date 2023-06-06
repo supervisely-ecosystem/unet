@@ -209,5 +209,5 @@ or contact tech support.
 
 # References
 
-- implementation of model architectures is from [this repo](https://github.com/ternaus/robot-surgery-segmentation)
+- implementation of model architectures is from [this repo](https://github.com/ternaus/robot-surgery-segmentation). Code in this repository is distributed under the MIT license.
 - Image credits: [link1](https://arxiv.org/abs/1505.04597) and [link2](https://tariq-hasan.github.io/concepts/computer-vision-semantic-segmentation/)
