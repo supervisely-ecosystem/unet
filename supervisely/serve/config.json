@@ -18,7 +18,7 @@
     "device": "cuda:0"
   },
   "task_location": "application_sessions",
-  "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
+  "icon": "media/icon.png",
   "icon_background": "#FFFFFF",
   "isolate": true,
   "gpu": "required",
