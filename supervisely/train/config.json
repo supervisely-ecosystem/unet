@@ -16,7 +16,7 @@
   "gui_template": "supervisely/train/src/gui.html",
   "task_location": "workspace_tasks",
   "gpu": "required",
-  "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
+  "icon": "media/icon.png",
   "icon_background": "#FFFFFF",
   "context_menu": {
     "target": [
