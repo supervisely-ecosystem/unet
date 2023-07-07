@@ -50,7 +50,7 @@ Supports following architectures:
 Watch [how-to video](https://youtu.be/R9sbH3biCmQ) for more details:
 
 <a data-key="sly-embeded-video-link" href="https://youtu.be/Bfe_ulHCkSo" data-video-code="Bfe_ulHCkSo">
-    <img src="https://i.imgur.com/cTEPL5U.png" alt="SLY_EMBEDED_VIDEO_LINK"  style="max-width:100%;">
+    <img src="media/htr1.png" alt="SLY_EMBEDED_VIDEO_LINK"  style="max-width:100%;">
 </a>
 
 Once training is finished, all artifacts are uploaded to Team Files:
