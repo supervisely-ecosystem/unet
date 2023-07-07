@@ -42,13 +42,13 @@ You can use served model in next Supervisely Applications ⬇️
   
 
 - [Apply NN to Images Project](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fproject-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analyse predictions and perform automatic data pre-labeling.   
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/project-dataset" src="https://i.imgur.com/M2Tp8lE.png" height="70px" margin-bottom="20px"/>  
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/project-dataset" src="media/r1.png" height="70px" margin-bottom="20px"/>  
 
 - [Apply NN to Videos Project](https://ecosystem.supervise.ly/apps/apply-nn-to-videos-project) - app allows to label your videos using served Supervisely models.  
-  <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/apply-nn-to-videos-project" src="https://imgur.com/LDo8K1A.png" height="70px" margin-bottom="20px" />
+  <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/apply-nn-to-videos-project" src="media/r2.png" height="70px" margin-bottom="20px" />
 
 - [NN Image Labeling](https://ecosystem.supervise.ly/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fannotation-tool) - integrate any deployd NN to Supervisely Image Labeling UI. Configure inference settings and model output classes. Press `Apply` button (or use hotkey) and detections with their confidences will immediately appear on the image.   
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/annotation-tool" src="https://i.imgur.com/hYEucNt.png" height="70px" margin-bottom="20px"/>
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/annotation-tool" src="media/r3.png" height="70px" margin-bottom="20px"/>
 
 
 
@@ -58,7 +58,7 @@ You can use served model in next Supervisely Applications ⬇️
    directory: `/unet/<session id>_<experiment_name>/checkpoints`. Then right click to weights `.pth` file,
    for example: `/unet/7777_lemons_demo/checkpoints/model_47_best.pth`
    
-<img src="https://i.imgur.com/piS1r78.png"/>
+<img src="media/htr1.png"/>
 
 2. Run `Serve UNet` app from context menu
 
@@ -69,11 +69,11 @@ change what agent should be used for deploy.
 
 5. Wait until you see following message in logs: `Model has been successfully deployed`
 
-<img src="https://i.imgur.com/rOa4Lo8.png"/>
+<img src="media/htr2.png"/>
 
 6. All deployed models are listed in `Team Apps`. You can view logs and stop them from this page.
 
-<img src="https://i.imgur.com/4B4qRh7.png"/>
+<img src="media/htr3.png"/>
 
 
 # For Developers
