@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: train UI",
+            "type": "python",
+            "request": "launch",
+            "program": "supervisely/train/src/sly_train.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}"
+            }
+        },
+        {
             "name": "Advanced mode for Supervisely Team",
             "type": "python",
             "request": "launch",
