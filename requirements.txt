@@ -1,0 +1,2 @@
+imagecorruptions==1.1.2
+supervisely==6.72.66
