@@ -21,7 +21,7 @@
   "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
   "icon_background": "#FFFFFF",
   "isolate": true,
-  "need_gpu": true,
+  "need_gpu": false,
   "gpu": "preferred",
   "headless": true,
   "session_tags": [
