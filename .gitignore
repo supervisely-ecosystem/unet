@@ -8,4 +8,5 @@ __pycache__
 /supervisely/serve/data
 /supervisely/data
 /model
+/my_model
 /results

@@ -7,7 +7,8 @@
 <p align="center">
   <a href="#Overview">Overview</a> •
     <a href="#Related-Apps">Related Apps</a> •
-  <a href="#How-To-Use">How To Use</a> •
+  <a href="#How-To-Run">How To Run</a> •
+  <a href="#How-To-Use-Your-Trained-Model-Outside-Supervisely">How To Use Your Trained Model Outside Supervisely</a> •
   <a href="#For-Developers">For Developers</a>
 </p>
 
@@ -74,6 +75,11 @@ change what agent should be used for deploy.
 6. All deployed models are listed in `Team Apps`. You can view logs and stop them from this page.
 
 <img src="https://i.imgur.com/4B4qRh7.png"/>
+
+
+# How To Use Your Trained Model Outside Supervisely
+
+You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. You just need to download model weights (.pth) and two additional json files from Team Files, and then you can build and use the model as a normal pytorch model. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/unet/blob/master/inference_outside_supervisely.ipynb) for details.
 
 
 # For Developers

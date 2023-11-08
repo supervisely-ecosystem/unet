@@ -7,6 +7,7 @@
 <p align="center">
   <a href="#Overview">Overview</a> •
   <a href="#How-To-Run">How To Run</a> •
+  <a href="#How-To-Use-Your-Trained-Model-Outside-Supervisely">How To Use Your Trained Model Outside Supervisely</a> •
   <a href="#For-Developers">For developers</a> •
   <a href="#References">References</a>
 </p>
@@ -85,6 +86,12 @@ Once training is finished, all artifacts are uploaded to Team Files:
 - `checkpoints` - directory with checkpoints
 - `checkpoints/train_args.json` - arguments with values for training script (can be used to debug train loop without UI)
 - `open_app.lnk` - open this file and you will be redirected to finished training session, thus even if the app if finished you will be able to preview training dashboard with all settings and charts 
+
+
+# How To Use Your Trained Model Outside Supervisely
+
+You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. You just need to download model weights (.pth) and two additional json files from Team Files, and then you can build and use the model as a normal pytorch model. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/unet/blob/master/inference_outside_supervisely.ipynb) for details.
+
 
 # For Developers
 
