@@ -69,15 +69,15 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
             gt_ann_path = dataset_fs.get_ann_path(item_name)
             gt_ann_json = sly.json.load_json_file(gt_ann_path)
             for label in gt_ann_json["objects"]:
-                label['id'] = local_labels_id
-                local_labels_id += 1
+                label['id'] = label_id
+                label_id += 1
             gt_ann = sly.Annotation.from_json(gt_ann_json, project_fs.meta)
             gallery.create_item(item_name, image_info.path_original, gt_ann)
 
         pred_ann_json = pred_ann.to_json()
         for label in pred_ann_json["objects"]:
-            label['id'] = local_labels_id
-            local_labels_id += 1
+            label['id'] = label_id
+            label_id += 1
         pred_ann = sly.Annotation.from_json(pred_ann_json, model_meta)
         print(time_index, item_name)
         gallery.add_prediction(item_name, time_index, pred_ann)
