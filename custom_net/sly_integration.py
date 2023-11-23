@@ -10,7 +10,7 @@ from step01_input_project import get_image_info_from_cache
 _model_classes = None
 _project_fs = None
 _path_to_items = {}
-
+label_id = 1
 
 ###############################################
 ######## MODIFY METHODS BELOW ONLY IF #########
@@ -32,7 +32,7 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
     # used only in training dashboard to visualize predictions improvement over time
 
     # small optimization for debug
-    global _model_classes, _project_fs, _path_to_items
+    global _model_classes, _project_fs, _path_to_items, label_id
     if _model_classes is None:
         model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection.from_json(classes))
     if _project_fs is None:
@@ -66,8 +66,19 @@ def vis_inference(time_index, model: nn.Module, classes, input_height, input_wid
 
         if not gallery.has_item(item_name):
             image_info = get_image_info_from_cache(dataset_name, item_name)
-            gt_ann = sly.Annotation.load_json_file(dataset_fs.get_ann_path(item_name), project_fs.meta)
+            gt_ann_path = dataset_fs.get_ann_path(item_name)
+            gt_ann_json = sly.json.load_json_file(gt_ann_path)
+            for label in gt_ann_json["objects"]:
+                label['id'] = label_id
+                label_id += 1
+            gt_ann = sly.Annotation.from_json(gt_ann_json, project_fs.meta)
             gallery.create_item(item_name, image_info.path_original, gt_ann)
+
+        pred_ann_json = pred_ann.to_json()
+        for label in pred_ann_json["objects"]:
+            label['id'] = label_id
+            label_id += 1
+        pred_ann = sly.Annotation.from_json(pred_ann_json, model_meta)
         print(time_index, item_name)
         gallery.add_prediction(item_name, time_index, pred_ann)
 
