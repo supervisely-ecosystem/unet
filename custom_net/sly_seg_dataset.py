@@ -45,7 +45,7 @@ class SlySegDataset(Dataset):
         seg_mask = self._colors_to_indices(color_mask)
 
         if self.sly_augs is not None:
-            image, mask = sly.imgaug_utils.apply_to_image_and_mask(self.sly_augs, image, seg_mask)
+            image, seg_mask = sly.imgaug_utils.apply_to_image_and_mask(self.sly_augs, image, seg_mask)
 
         # prepare tensor for image
         input = prepare_image_input(image, self.input_width, self.input_height)
