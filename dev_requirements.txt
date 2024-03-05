@@ -1,4 +1,4 @@
-supervisely==6.72.55
+supervisely==6.73.45
 torch-summary==1.4.5
 # python-dotenv==0.19.2
 # ffmpeg-python==0.2.0
