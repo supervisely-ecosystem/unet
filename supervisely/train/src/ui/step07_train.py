@@ -163,7 +163,7 @@ def upload_artifacts_and_log_progress(experiment_name):
     model_dir = g.checkpoint.get_model_dir()
     remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
     remote_weights_dir = os.path.join(remote_artifacts_dir, g.checkpoint.weights_dir)
-    remote_config_path = os.path.join(remote_weights_dir, g.checkpoint.config_name)
+    remote_config_path = os.path.join(remote_weights_dir, g.checkpoint.config_file)
     
     
     res_dir = g.api.file.upload_directory(
@@ -175,7 +175,7 @@ def upload_artifacts_and_log_progress(experiment_name):
         app_name=g.checkpoint.app_name,
         session_id=g.task_id,
         session_path=remote_artifacts_dir,
-        weights_dir=remote_weights_dir,
+        weights_path=remote_weights_dir,
         training_project_name=g.project_info.name,
         task_type=g.checkpoint.task_type,
         config_path=remote_config_path,
