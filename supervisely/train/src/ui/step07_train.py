@@ -160,9 +160,9 @@ def upload_artifacts_and_log_progress(experiment_name):
         upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other
     )
 
-    model_dir = g.sly_unet.framework_dir
+    model_dir = g.sly_unet.framework_folder
     remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
-    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_dir)
+    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_folder)
     remote_config_path = os.path.join(remote_weights_dir, g.sly_unet.config_file)
 
     res_dir = g.api.file.upload_directory(
@@ -170,7 +170,7 @@ def upload_artifacts_and_log_progress(experiment_name):
     )
 
     # generate metadata
-    g.sly_unet.generate_sly_metadata(
+    g.sly_unet.generate_metadata(
         app_name=g.sly_unet.app_name,
         session_id=g.task_id,
         session_path=remote_artifacts_dir,

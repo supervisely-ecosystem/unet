@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import supervisely as sly
 from supervisely.app.v1.app_service import AppService
-from supervisely.nn.models.unet import UNet
+from supervisely.nn.artifacts.unet import UNet
 
 root_source_dir = str(Path(sys.argv[0]).parents[3])
 print(f"Root source directory: {root_source_dir}")
