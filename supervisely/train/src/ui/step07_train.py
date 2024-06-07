@@ -172,10 +172,11 @@ def upload_artifacts_and_log_progress(experiment_name):
     # generate metadata
     g.sly_unet.generate_metadata(
         app_name=g.sly_unet.app_name,
-        session_id=g.task_id,
-        session_path=remote_artifacts_dir,
-        weights_path=remote_weights_dir,
-        training_project_name=g.project_info.name,
+        task_id=g.task_id,
+        artifacts_folder=remote_artifacts_dir,
+        weights_folder=remote_weights_dir,
+        weights_ext=g.sly_unet.weights_ext,
+        project_name=g.project_info.name,
         task_type=g.sly_unet.task_type,
         config_path=remote_config_path,
     )
