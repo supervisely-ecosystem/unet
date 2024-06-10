@@ -1,5 +1,9 @@
-supervisely==6.73.96
+# git+https://github.com/supervisely/supervisely.git@some-test-branch
+
+supervisely==6.73.100
 torch-summary==1.4.5
+imagecorruptions==1.1.2
+
 # python-dotenv==0.19.2
 # ffmpeg-python==0.2.0
 # tqdm==4.62.3
