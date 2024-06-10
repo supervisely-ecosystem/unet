@@ -9,10 +9,11 @@ import step05_models
 import supervisely as sly
 from supervisely.app.v1.widgets.progress_bar import ProgressBar
 from supervisely.app.v1.widgets.chart import Chart
-from supervisely.app.v1.widgets.predictions_dynamics_gallery import PredictionsDynamicsGallery
+from supervisely.app.v1.widgets.predictions_dynamics_gallery import (
+    PredictionsDynamicsGallery,
+)
 import sly_globals as g
 import step03_classes
-
 
 
 _open_lnk_name = "open_app.lnk"
@@ -64,17 +65,37 @@ def restart(data, state):
 
 def init_charts(data, state):
     global chart_lr, chart_loss, chart_acc
-    chart_lr = Chart(g.task_id, g.api, "data.chartLR",
-                                     title="LR", series_names=["LR"],
-                                     yrange=[0, state["lr"] + state["lr"]],
-                                     ydecimals=6, xdecimals=2)
-    chart_loss = Chart(g.task_id, g.api, "data.chartLoss",
-                                      title="Loss", series_names=["train", "val"],
-                                      smoothing=0.6, ydecimals=6, xdecimals=2)
-    chart_acc = Chart(g.task_id, g.api, "data.chartAcc",
-                                      title="Val Acc", series_names=["avg IoU", "avg Dice"],
-                                      yrange=[0, 1],
-                                      smoothing=0.6, ydecimals=6, xdecimals=2)
+    chart_lr = Chart(
+        g.task_id,
+        g.api,
+        "data.chartLR",
+        title="LR",
+        series_names=["LR"],
+        yrange=[0, state["lr"] + state["lr"]],
+        ydecimals=6,
+        xdecimals=2,
+    )
+    chart_loss = Chart(
+        g.task_id,
+        g.api,
+        "data.chartLoss",
+        title="Loss",
+        series_names=["train", "val"],
+        smoothing=0.6,
+        ydecimals=6,
+        xdecimals=2,
+    )
+    chart_acc = Chart(
+        g.task_id,
+        g.api,
+        "data.chartAcc",
+        title="Val Acc",
+        series_names=["avg IoU", "avg Dice"],
+        yrange=[0, 1],
+        smoothing=0.6,
+        ydecimals=6,
+        xdecimals=2,
+    )
     state["smoothing"] = 0.6
 
     chart_lr.init_data(data)
@@ -86,7 +107,9 @@ def init_progress_bars(data):
     global progress_epoch
     progress_epoch = ProgressBar(g.task_id, g.api, "data.progressEpoch", "Epoch")
     global progress_iter
-    progress_iter = ProgressBar(g.task_id, g.api, "data.progressIter", "Iterations (train + val)")
+    progress_iter = ProgressBar(
+        g.task_id, g.api, "data.progressIter", "Iterations (train + val)"
+    )
     global progress_other
     progress_other = ProgressBar(g.task_id, g.api, "data.progressOther", "Progress")
 
@@ -99,8 +122,8 @@ def sample_items_for_visualization(state):
     train_set = sly.json.load_json_file(step02_splits.train_set_path)
     val_set = sly.json.load_json_file(step02_splits.val_set_path)
 
-    train_vis_items = random.sample(train_set, state['trainVisCount'])
-    val_vis_items = random.sample(val_set, state['valVisCount'])
+    train_vis_items = random.sample(train_set, state["trainVisCount"])
+    val_vis_items = random.sample(val_set, state["valVisCount"])
 
     sly.json.dump_json_file(train_vis_items, train_vis_items_path)
     sly.json.dump_json_file(val_vis_items, val_vis_items_path)
@@ -125,13 +148,39 @@ def upload_artifacts_and_log_progress(experiment_name):
         progress.update()
 
     global progress_other
-    progress_other = ProgressBar(g.task_id, g.api, "data.progressOther",
-                                                 "Upload directory with training artifacts to Team Files",
-                                                 is_size=True, min_report_percent=5)
-    progress_cb = partial(upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other)
+    progress_other = ProgressBar(
+        g.task_id,
+        g.api,
+        "data.progressOther",
+        "Upload directory with training artifacts to Team Files",
+        is_size=True,
+        min_report_percent=5,
+    )
+    progress_cb = partial(
+        upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other
+    )
 
-    remote_dir = f"/unet/{g.task_id}_{experiment_name}"
-    res_dir = g.api.file.upload_directory(g.team_id, g.artifacts_dir, remote_dir, progress_size_cb=progress_cb)
+    model_dir = g.sly_unet.framework_folder
+    remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
+    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_folder)
+    remote_config_path = os.path.join(remote_weights_dir, g.sly_unet.config_file)
+
+    res_dir = g.api.file.upload_directory(
+        g.team_id, g.artifacts_dir, remote_artifacts_dir, progress_size_cb=progress_cb
+    )
+
+    # generate metadata
+    g.sly_unet.generate_metadata(
+        app_name=g.sly_unet.app_name,
+        task_id=g.task_id,
+        artifacts_folder=remote_artifacts_dir,
+        weights_folder=remote_weights_dir,
+        weights_ext=g.sly_unet.weights_ext,
+        project_name=g.project_info.name,
+        task_type=g.sly_unet.task_type,
+        config_path=remote_config_path,
+    )
+
     progress_other.reset_and_update()
     return res_dir
 
@@ -139,32 +188,43 @@ def upload_artifacts_and_log_progress(experiment_name):
 def calc_visualization_step(epochs):
     total_visualizations_count = 20
 
-    vis_step = int(epochs / total_visualizations_count) \
-        if int(epochs / total_visualizations_count) > 0 else 1
-    g.api.app.set_field(g.task_id, 'state.visStep', vis_step)
+    vis_step = (
+        int(epochs / total_visualizations_count)
+        if int(epochs / total_visualizations_count) > 0
+        else 1
+    )
+    g.api.app.set_field(g.task_id, "state.visStep", vis_step)
 
     return vis_step
+
 
 @g.my_app.callback("train")
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()
 def train(api: sly.Api, task_id, context, state, app_logger):
-    calc_visualization_step(state['epochs'])
+    calc_visualization_step(state["epochs"])
     try:
         # convert project to segmentation masks
         global project_dir_seg
         project_dir_seg = os.path.join(g.my_app.data_dir, g.project_info.name + "_seg")
 
-        if sly.fs.dir_exists(project_dir_seg) is False: # for debug, has no effect in production
+        if (
+            sly.fs.dir_exists(project_dir_seg) is False
+        ):  # for debug, has no effect in production
             sly.fs.mkdir(project_dir_seg, remove_content_if_exists=True)
             global progress_other
-            progress_other = ProgressBar(g.task_id, g.api, "data.progressOther",
-                                                         "Convert SLY annotations to segmentation masks",
-                                                         sly.Project(g.project_dir, sly.OpenMode.READ).total_items)
+            progress_other = ProgressBar(
+                g.task_id,
+                g.api,
+                "data.progressOther",
+                "Convert SLY annotations to segmentation masks",
+                sly.Project(g.project_dir, sly.OpenMode.READ).total_items,
+            )
             sly.Project.to_segmentation_task(
-                g.project_dir, project_dir_seg,
+                g.project_dir,
+                project_dir_seg,
                 target_classes=step03_classes.selected_classes,
-                progress_cb=progress_other.increment
+                progress_cb=progress_other.increment,
             )
             progress_other.reset_and_update()
 
@@ -177,7 +237,9 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
         # predictions improvement over time
         global gallery
-        gallery = PredictionsDynamicsGallery(g.task_id, g.api, "data.gallery", project_seg.meta)
+        gallery = PredictionsDynamicsGallery(
+            g.task_id, g.api, "data.gallery", project_seg.meta
+        )
         gallery.complete_update()
 
         sample_items_for_visualization(state)
@@ -185,13 +247,16 @@ def train(api: sly.Api, task_id, context, state, app_logger):
 
         set_train_arguments(state)
         import train
+
         train.main()
 
         progress_epoch.reset_and_update()
         progress_iter.reset_and_update()
 
         remote_dir = upload_artifacts_and_log_progress(experiment_name=state["expName"])
-        file_info = api.file.get_info_by_path(g.team_id, os.path.join(remote_dir, _open_lnk_name))
+        file_info = api.file.get_info_by_path(
+            g.team_id, os.path.join(remote_dir, _open_lnk_name)
+        )
         api.task.set_output_directory(task_id, file_info.id, remote_dir)
 
         # show result directory in UI
@@ -207,7 +272,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
         raise e  # app will handle this error and show modal window
 
     # stop application
-    #g.my_app.show_modal_window("Training is finished, app is still running and you can preview predictions dynamics over time."
+    # g.my_app.show_modal_window("Training is finished, app is still running and you can preview predictions dynamics over time."
     #                           "Please stop app manually once you are finished with it.")
     g.my_app.stop()
 
@@ -216,7 +281,7 @@ def set_train_arguments(state):
     # model
     sys.argv.extend(["--model", state["selectedModel"]])
 
-    #for data loader
+    # for data loader
     sys.argv.extend(["--project-dir", project_dir_seg])
     sys.argv.extend(["--classes-path", model_classes_path])
     sys.argv.extend(["--train-set-path", step02_splits.train_set_path])
@@ -224,11 +289,11 @@ def set_train_arguments(state):
     if state["useAugs"]:
         sys.argv.extend(["--sly-augs-path", step04_augs.augs_config_path])
     else:
-        sys.argv.extend(["--sly-augs-path", ''])
+        sys.argv.extend(["--sly-augs-path", ""])
 
     # basic hyperparameters
     sys.argv.extend(["--epochs", str(state["epochs"])])
-    #sys.argv.extend(["--input-size", str(state["imgSize"])])
+    # sys.argv.extend(["--input-size", str(state["imgSize"])])
     sys.argv.extend(["--input-height", str(state["imgSize"]["height"])])
     sys.argv.extend(["--input-width", str(state["imgSize"]["width"])])
     sys.argv.extend(["--batch-size", str(state["batchSizePerGPU"])])
@@ -249,18 +314,18 @@ def set_train_arguments(state):
         sys.argv.extend(["--milestones", str(state["milestones"])])
         sys.argv.extend(["--gamma-exp", str(state["gammaExp"])])
     else:
-        sys.argv.extend(["--lr-schedule", ''])
+        sys.argv.extend(["--lr-schedule", ""])
 
     # system
     sys.argv.extend(["--gpu-id", f"cuda:{state['gpusId']}"])
-    sys.argv.extend(["--num-workers", str(state['numWorkers'])])
+    sys.argv.extend(["--num-workers", str(state["numWorkers"])])
 
     # logging
-    sys.argv.extend(["--metrics-period", str(state['metricsPeriod'])])
+    sys.argv.extend(["--metrics-period", str(state["metricsPeriod"])])
 
     # checkpoints
-    sys.argv.extend(["--val-interval", str(state['valInterval'])])
-    sys.argv.extend(["--checkpoint-interval", str(state['checkpointInterval'])])
+    sys.argv.extend(["--val-interval", str(state["valInterval"])])
+    sys.argv.extend(["--checkpoint-interval", str(state["checkpointInterval"])])
     if state["saveLast"]:
         sys.argv.append("--save-last")
     if state["saveBest"]:
