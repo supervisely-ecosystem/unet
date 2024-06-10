@@ -4,8 +4,8 @@ supervisely==6.73.100
 torch-summary==1.4.5
 imagecorruptions==1.1.2
 
-RUN pip install urllib3>=1.26.15
-RUN pip install requests-toolbelt==1.0.0
+urllib3>=1.26.15
+requests-toolbelt==1.0.0
 
 # python-dotenv==0.19.2
 # ffmpeg-python==0.2.0
