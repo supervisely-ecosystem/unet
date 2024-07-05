@@ -1,5 +1,6 @@
 # git+https://github.com/supervisely/supervisely.git@some-test-branch
 
+cachetools==4.2.4
 supervisely==6.73.119
 torch-summary==1.4.5
 imagecorruptions==1.1.2
