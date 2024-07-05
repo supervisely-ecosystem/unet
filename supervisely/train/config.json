@@ -10,7 +10,7 @@
     "train"
   ],
   "description": "Dashboard to configure, start and monitor training",
-  "docker_image": "supervisely/unet:1.0.7",
+  "docker_image": "supervisely/unet:1.0.8",
   "instance_version": "6.4.57",
   "main_script": "supervisely/train/src/sly_train.py",
   "gui_template": "supervisely/train/src/gui.html",
