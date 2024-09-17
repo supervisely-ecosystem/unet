@@ -1,7 +1,9 @@
 # git+https://github.com/supervisely/supervisely.git@some-test-branch
 
+supervisely==6.73.189
+setuptools==69.5.1
+
 cachetools==4.2.4
-supervisely==6.73.124
 torch-summary==1.4.5
 imagecorruptions==1.1.2
 
@@ -11,4 +13,4 @@ requests-toolbelt==1.0.0
 # python-dotenv==0.19.2
 # ffmpeg-python==0.2.0
 # tqdm==4.62.3
-#albumentations==0.0.10
+# albumentations==0.0.10
