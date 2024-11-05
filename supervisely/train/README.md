@@ -13,11 +13,11 @@
 </p>
 
 
-[![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/unet/supervisely/train)
-[![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack)
+[![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervisely.com/apps/supervisely-ecosystem/unet/supervisely/train)
+[![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervisely.com/slack)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/unet)
-[![views](https://app.supervise.ly/img/badges/views/supervisely-ecosystem/unet/supervisely/train.png)](https://supervise.ly)
-[![runs](https://app.supervise.ly/img/badges/runs/supervisely-ecosystem/unet/supervisely/train.png)](https://supervise.ly)
+[![views](https://app.supervisely.com/img/badges/views/supervisely-ecosystem/unet/supervisely/train.png)](https://supervisely.com)
+[![runs](https://app.supervisely.com/img/badges/runs/supervisely-ecosystem/unet/supervisely/train.png)](https://supervisely.com)
 
 </div>
 
@@ -99,10 +99,10 @@ Developers can use this app as a template to integrate their own custom Semantic
 Segmentation models.
 
 We recommend to follow several tutorials and documentation to get the basics before you start develop your custom app
-- [Supervisely platform general docs](https://docs.supervise.ly/)
-- Annotations in [Supervisely format](https://docs.supervise.ly/data-organization/00_ann_format_navi)
-- [Supervisely SDK for Python](https://sdk.docs.supervise.ly/)
-- [IPython notebooks](https://sdk.docs.supervise.ly/rst_templates/notebooks/notebooks.html) that explain how to communicate with the platform
+- [Supervisely platform general docs](https://docs.supervisely.com/)
+- Annotations in [Supervisely format](https://docs.supervisely.com/data-organization/00_ann_format_navi)
+- [Supervisely SDK for Python](https://sdk.docs.supervisely.com/)
+- [IPython notebooks](https://sdk.docs.supervisely.com/rst_templates/notebooks/notebooks.html) that explain how to communicate with the platform
 - [Quickstart APP development guide](https://github.com/supervisely-ecosystem/how-to-create-app) - how to create and add your custom apps to Supervisely Platfom
     - explains basic principles (python examples + videos)
     - shows how to configure development environment (PyCharm)
@@ -112,7 +112,7 @@ We recommend to follow several tutorials and documentation to get the basics bef
 
 **Notice**: Documentation is constantly improving, if you find some topics are missing or in case of questions, please 
 contact our tech support, we will update them and help you with integration: 
-- for Community Edition (CE) we have public Slack [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack)
+- for Community Edition (CE) we have public Slack [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervisely.com/slack)
 - for Enterprise Edition (EE) use your private Slack workspace
 
 **Benefits for developers**:
