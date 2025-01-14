@@ -22,6 +22,7 @@ def init(data, state):
     data["projectPreviewUrl"] = g.api.image.preview_url(g.project_info.reference_image_url, 100, 100)
     progress1.init_data(data)
     data["done1"] = False
+    data['downloadInProgress'] = False
     state["collapsed1"] = False
 
 
@@ -29,6 +30,10 @@ def init(data, state):
 @sly.timeit
 @g.my_app.ignore_errors_and_show_dialog_window()
 def download(api: sly.Api, task_id, context, state, app_logger):
+    if g.download_in_progress:
+        return
+    g.download_in_progress = True
+    g.api.app.set_fields(g.task_id, [{"field": "data.downloadInProgress", "payload": True}])
     try:
         if sly.fs.dir_exists(g.project_dir):
             pass
@@ -46,11 +51,13 @@ def download(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.done1", "payload": True},
+        {"field": "data.downloadInProgress", "payload": False},
         {"field": "state.collapsed2", "payload": False},
         {"field": "state.disabled2", "payload": False},
         {"field": "state.activeStep", "payload": 2},
     ]
     g.api.app.set_fields(g.task_id, fields)
+    g.download_in_progress = False
 
 
 def get_image_info_from_cache(dataset_name, item_name):

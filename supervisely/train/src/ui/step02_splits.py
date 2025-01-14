@@ -17,15 +17,21 @@ def init(project_info, project_meta: sly.ProjectMeta, data, state):
         {"name": "val", "type": "primary"},
         {"name": "total", "type": "gray"},
     ]
-    data["totalImagesCount"] = project_info.items_count
+
+    img_cnt = project_info.items_count
+    if img_cnt is None:
+        raise RuntimeError("Project has no items")
+    
+    data["totalImagesCount"] = img_cnt
 
     train_percent = 80
-    train_count = int(project_info.items_count / 100 * train_percent)
+
+    train_count = int(img_cnt / 100 * train_percent)
     state["randomSplit"] = {
         "count": {
-            "total": project_info.items_count,
+            "total": img_cnt,
             "train": train_count,
-            "val": project_info.items_count - train_count
+            "val": img_cnt - train_count
         },
         "percent": {
             "total": 100,

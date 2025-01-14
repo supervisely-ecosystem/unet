@@ -36,6 +36,9 @@ class SlySegDataset(Dataset):
 
         dataset_fs = self.project_fs.datasets.get(dataset_name)
         dataset_fs: sly.Dataset
+        if dataset_fs is None:
+            sly.logger.error("Dataset {!r} not found in project".format(dataset_name), extra={"input_json": self.input_items[idx]})
+            raise RuntimeError(f"Dataset {dataset_name} not found in project")
 
         image_path = dataset_fs.get_img_path(item_name)
         mask_path = dataset_fs.get_seg_path(item_name)
