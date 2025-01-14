@@ -15,6 +15,7 @@
             type="primary"
             class="regular"
             :loading="!!data.progress1.message"
+            :disabled="data.downloadInProgress"
             @click="command('download_project')"
             v-if="!data.done1">
         Download
