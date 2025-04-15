@@ -35,7 +35,7 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         model_dir = Path(checkpoint_url).parents[1]
         ui_state_path = str(model_dir / "info" / "ui_state.json")
         model_classes_path = str(model_dir / "info" / "model_classes.json")
-        remote_files = (weights_path, ui_state_path, model_classes_path)
+        remote_files = (checkpoint_url, ui_state_path, model_classes_path)
 
         weights_path, ui_state_path, model_classes_path = [self.download(p) for p in remote_files]
         ui_state = sly.json.load_json_file(ui_state_path)
