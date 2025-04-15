@@ -242,10 +242,10 @@ def create_experiment(
     model_name, remote_dir, report_id=None, eval_metrics=None, primary_metric_name=None
 ):
     train_info = TrainInfo(**g.sly_unet_generated_metadata)
-    experiment_info = g.sly_mmseg.convert_train_to_experiment_info(train_info)
+    experiment_info = g.sly_unet.convert_train_to_experiment_info(train_info)
     experiment_info.experiment_name = f"{g.task_id}_{g.project_info.name}_{model_name}"
     experiment_info.model_name = model_name
-    experiment_info.framework_name = f"{g.sly_mmseg.framework_name}"
+    experiment_info.framework_name = f"{g.sly_unet.framework_name}"
     experiment_info.train_size = g.train_size
     experiment_info.val_size = g.val_size
     experiment_info.evaluation_report_id = report_id

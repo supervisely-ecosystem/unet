@@ -2,15 +2,11 @@ import sys
 import os
 from pathlib import Path
 
-# Add parent directory to path to find serve module
-root_dir = Path(__file__).absolute().parents[3]  # Navigate up to the project root
-serve_dir = os.path.join(root_dir, "supervisely", "serve")
-sys.path.append(str(serve_dir))
+root_dir = Path(__file__).absolute().parents[3]
+serve_src_dir = os.path.join(root_dir, "supervisely", "serve", "src")
+sys.path.append(str(serve_src_dir))
 
-# Import directly from the src directory
-from src.unet_model import UNetModel
-# from serve.src.unet_model import UNetModel
+import unet_model
 
-
-class UNetModelBench(UNetModel):
+class UNetModelBench(unet_model.UNetModel):
     in_train = True
