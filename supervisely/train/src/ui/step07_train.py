@@ -123,9 +123,13 @@ def init_progress_bars(data):
     global progress_other
     progress_other = ProgressBar(g.task_id, g.api, "data.progressOther", "Progress")
 
+    global progress_bm
+    progress_bm = ProgressBar(g.task_id, g.api, "data.progressBenchmark", "Progress")
+
     progress_epoch.init_data(data)
     progress_iter.init_data(data)
     progress_other.init_data(data)
+    progress_bm.init_data(data)
 
 
 def external_update_callback(progress: sly.tqdm_sly, progress_name: str):
@@ -498,17 +502,8 @@ def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
         )
 
         # 9. Stop the server
-        try:
-            m.app.stop()
-        except Exception as e:
-            api.app.set_field(task_id, "state.benchmarkInProgress", False)
-            sly.logger.warning(f"Failed to stop the model app: {e}")
-        try:
-            thread.join()
-        except Exception as e:
-            api.app.set_field(task_id, "state.benchmarkInProgress", False)
-            sly.logger.warning(f"Failed to stop the server: {e}")
     except Exception as e:
+        benchmark_report_template, report_id, eval_metrics, primary_metric_name = None, None, None, None
         api.app.set_field(task_id, "state.benchmarkInProgress", False)
         sly.logger.error(f"Model benchmark failed. {repr(e)}", exc_info=True)
         try:
@@ -600,7 +595,7 @@ def train(api: sly.Api, task_id, context, state, app_logger):
             None,
         )
     
-    # sly.logger.info(f"Run benchmark: {state['runBenchmark']}")
+    sly.logger.info(f"Run benchmark: {state['runBenchmark']}")
     if state["runBenchmark"]:
         classes = [obj_cls.name for obj_cls in project_seg.meta.obj_classes]
         benchmark_report_template, report_id, eval_metrics, primary_metric_name = run_benchmark(
