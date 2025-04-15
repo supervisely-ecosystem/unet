@@ -21,7 +21,7 @@ checkpoint_url = os.environ['modal.state.slyFile']
 device = os.environ['modal.state.device'] if 'cuda' in os.environ['modal.state.device'] and torch.cuda.is_available() else 'cpu'
 
 m = UNetModel()
-m.load_on_device(
+m.load_model(
     device=device,
     model_source=ModelSource.CUSTOM,
     task_type=TaskType.SEMANTIC_SEGMENTATION,

@@ -348,7 +348,7 @@ def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
                 checkpoint_name=best_filename,
                 checkpoint_url=checkpoint_path,
             )
-            m._load_model(**deploy_params)
+            m._load_model(deploy_params)
             asyncio.set_event_loop(asyncio.new_event_loop())
             m.serve()
 
