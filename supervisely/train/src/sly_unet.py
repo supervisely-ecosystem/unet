@@ -1,8 +1,14 @@
 import sys
+import os
+from pathlib import Path
 
-sys.path.insert(0, "../")
+root_dir = Path(__file__).absolute().parents[3]  # Navigate up to the 'unet' directory
+sys.path.append(str(root_dir))
 
-from serve.src.unet_model import UNetModel
+from supervisely.serve.src.unet_model import UNetModel
+
+# For local debug
+# from serve.src.unet_model import UNetModel
 
 
 class UNetModelBench(UNetModel):

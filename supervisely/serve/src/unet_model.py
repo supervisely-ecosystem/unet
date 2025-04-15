@@ -31,6 +31,8 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
     ):
         
         self.device = device
+        self.task_type = task_type
+        
         model_dir = Path(checkpoint_url).parents[1]
         ui_state_path = str(model_dir / "info" / "ui_state.json")
         model_classes_path = str(model_dir / "info" / "model_classes.json")
