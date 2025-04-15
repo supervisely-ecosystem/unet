@@ -197,24 +197,25 @@ def upload_artifacts_and_log_progress(experiment_name):
             progress.set(monitor.bytes_read)
         progress.update()
 
+    model_dir = g.sly_unet.framework_folder
+    remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
+    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_folder)
+    remote_config_path = os.path.join(remote_weights_dir, g.sly_unet.config_file)
+
+    total_size = sly.fs.get_directory_size(g.artifacts_dir)
     global progress_other
     progress_other = ProgressBar(
-        g.task_id,
-        g.api,
-        "data.progressOther",
-        "Upload directory with training artifacts to Team Files",
+        task_id=g.task_id,
+        api=g.api,
+        v_model="data.progressOther",
+        message="Upload directory with training artifacts to Team Files",
+        total=total_size,
         is_size=True,
         min_report_percent=5,
     )
     progress_cb = partial(
         upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other
     )
-
-    model_dir = g.sly_unet.framework_folder
-    remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
-    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_folder)
-    remote_config_path = os.path.join(remote_weights_dir, g.sly_unet.config_file)
-
     res_dir = g.api.file.upload_directory(
         g.team_id, g.artifacts_dir, remote_artifacts_dir, progress_size_cb=progress_cb
     )
