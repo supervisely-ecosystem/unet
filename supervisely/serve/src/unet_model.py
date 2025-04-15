@@ -10,8 +10,7 @@ from pathlib import Path
 from torchvision import transforms
 from supervisely.nn.artifacts.unet import UNet
 
-
-from .model_list import model_list
+from model_list import model_list
 
 team_id = sly.env.team_id()
 

@@ -501,12 +501,15 @@ def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
         try:
             m.app.stop()
         except Exception as e:
+            api.app.set_field(task_id, "state.benchmarkInProgress", False)
             sly.logger.warning(f"Failed to stop the model app: {e}")
         try:
             thread.join()
         except Exception as e:
+            api.app.set_field(task_id, "state.benchmarkInProgress", False)
             sly.logger.warning(f"Failed to stop the server: {e}")
     except Exception as e:
+        api.app.set_field(task_id, "state.benchmarkInProgress", False)
         sly.logger.error(f"Model benchmark failed. {repr(e)}", exc_info=True)
         try:
             if bm.dt_project_info:
