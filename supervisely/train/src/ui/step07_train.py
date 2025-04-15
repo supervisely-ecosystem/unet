@@ -275,7 +275,7 @@ def calc_visualization_step(epochs):
 
     return vis_step
 
-def run_benchmark(api: sly.Api, task_id, classes, cfg, state, remote_dir):
+def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
     global m
 
     api.app.set_field(task_id, "state.benchmarkInProgress", True)
