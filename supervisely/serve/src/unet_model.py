@@ -11,8 +11,10 @@ from torchvision import transforms
 from supervisely.nn.artifacts.unet import UNet
 
 from model_list import model_list
+import workflow as w
 
 team_id = sly.env.team_id()
+api = sly.Api.from_env()
 
 class UNetModel(sly.nn.inference.SemanticSegmentation):
     transforms_img = transforms.Compose([
@@ -30,7 +32,10 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
     ):
         
         self.device = device
+        self.model_source = model_source
         self.task_type = task_type
+        self.checkpoint_name = checkpoint_name
+        self.checkpoint_url = checkpoint_url
         
         model_dir = Path(checkpoint_url).parents[1]
         ui_state_path = str(model_dir / "info" / "ui_state.json")
@@ -83,9 +88,29 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         state = torch.load(weights_path, map_location=device)
         model.load_state_dict(state)
         model.to(device)
+        
+        # -------------------------------------- Add Workflow Input -------------------------------------- #
+        if not self.in_train:
+            sly.logger.debug("Workflow: Start processing Input")
+            if self.model_source == "Custom models":
+                sly.logger.debug("Workflow: Custom model detected")
+                w.workflow_input(api, self.checkpoint_url)
+            else:
+                sly.logger.debug("Workflow: Pretrained model detected. No need to set Input")
+            sly.logger.debug("Workflow: Finish processing Input")
+        # ----------------------------------------------- - ---------------------------------------------- #
+        
         model.eval()
+        self.checkpoint_info = sly.nn.inference.CheckpointInfo(
+            checkpoint_name=self.checkpoint_name,
+            model_name=self.model_name,
+            architecture=None,
+            checkpoint_url=self.checkpoint_url,
+            custom_checkpoint_path=self.checkpoint_url,
+            model_source=self.model_source,
+        )
         return model
-
+    
     def prepare_image_input(self, image, device):
         # RGB -> Normalized Tensor
         input = cv2.resize(image, (self.input_width, self.input_height))
