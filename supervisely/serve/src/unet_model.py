@@ -17,6 +17,7 @@ team_id = sly.env.team_id()
 api = sly.Api.from_env()
 
 class UNetModel(sly.nn.inference.SemanticSegmentation):
+    in_train = False
     transforms_img = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
