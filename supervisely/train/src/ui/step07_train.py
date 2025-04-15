@@ -64,6 +64,9 @@ def init(data, state):
 
     data["gallery"] = gallery
     state["visSets"] = ["train", "val"]
+    
+    data["benchmarkUrl"] = None
+    state["benchmarkInProgress"] = False
 
 
 def restart(data, state):
@@ -238,7 +241,7 @@ def upload_artifacts_and_log_progress(experiment_name):
 def create_experiment(
     model_name, remote_dir, report_id=None, eval_metrics=None, primary_metric_name=None
 ):
-    train_info = TrainInfo(**g.sly_mmseg_generated_metadata)
+    train_info = TrainInfo(**g.sly_unet_generated_metadata)
     experiment_info = g.sly_mmseg.convert_train_to_experiment_info(train_info)
     experiment_info.experiment_name = f"{g.task_id}_{g.project_info.name}_{model_name}"
     experiment_info.model_name = model_name
