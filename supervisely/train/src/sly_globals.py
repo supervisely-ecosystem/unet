@@ -40,6 +40,7 @@ workspace_id = int(os.environ['context.workspaceId'])
 project_id = int(os.environ['modal.state.slyProjectId'])
 
 sly_unet = UNet(team_id)
+sly_unet_generated_metadata = None
 
 project_info = api.project.get_info_by_id(project_id)
 if project_info is None:  # for debug
@@ -58,3 +59,5 @@ visualizations_dir = os.path.join(artifacts_dir, "visualizations")
 sly.fs.mkdir(visualizations_dir, remove_content_if_exists=True)  # remove content for debug, has no effect in production
 
 download_in_progress = False
+
+train_size, val_size = None, None

@@ -1,6 +1,5 @@
 import torch
 from torch.utils.data import Dataset
-from torchvision import transforms
 import supervisely_lib as sly
 import numpy as np
 import cv2

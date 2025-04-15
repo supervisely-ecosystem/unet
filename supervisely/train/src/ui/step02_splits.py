@@ -101,13 +101,14 @@ def create_splits(api: sly.Api, task_id, context, state, app_logger):
     try:
         api.task.set_field(task_id, "state.splitInProgress", True)
         train_set, val_set = get_train_val_sets(g.project_dir, state)
+        g.train_size, g.val_size = len(train_set), len(val_set)
         sly.logger.info(f"Train set: {len(train_set)} images")
         sly.logger.info(f"Val set: {len(val_set)} images")
         verify_train_val_sets(train_set, val_set)
         step_done = True
     except Exception as e:
-        train_set = None
-        val_set = None
+        train_set, val_set = None, None
+        g.train_size, g.val_size = None, None
         step_done = False
         raise e
     finally:
