@@ -123,13 +123,9 @@ def init_progress_bars(data):
     global progress_other
     progress_other = ProgressBar(g.task_id, g.api, "data.progressOther", "Progress")
 
-    global progress_bm
-    progress_bm = ProgressBar(g.task_id, g.api, "data.progressBenchmark", "Progress")
-
     progress_epoch.init_data(data)
     progress_iter.init_data(data)
     progress_other.init_data(data)
-    progress_bm.init_data(data)
 
 
 def external_update_callback(progress: sly.tqdm_sly, progress_name: str):
