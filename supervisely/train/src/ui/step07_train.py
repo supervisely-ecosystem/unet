@@ -348,7 +348,7 @@ def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
                 checkpoint_name=best_filename,
                 checkpoint_url=checkpoint_path,
             )
-            m.load_on_device(**deploy_params)
+            m._load_model(**deploy_params)
             asyncio.set_event_loop(asyncio.new_event_loop())
             m.serve()
 
@@ -607,8 +607,13 @@ def train(api: sly.Api, task_id, context, state, app_logger):
             api, task_id, classes, state, remote_dir
         )
 
-    sly.logger.info("Creating experiment info")
-    create_experiment(state["selectedModel"], remote_dir, report_id, eval_metrics, primary_metric_name)
+    try:
+        sly.logger.info("Creating experiment info")
+        create_experiment(state["selectedModel"], remote_dir, report_id, eval_metrics, primary_metric_name)
+    except Exception as e:
+        sly.logger.warning(
+            f"Couldn't create experiment, this training session will not appear in experiments table. Error: {e}"
+        )
     
     w.workflow_input(api, g.project_info, state)
     w.workflow_output(api, g.sly_unet_generated_metadata, state, benchmark_report_template)
