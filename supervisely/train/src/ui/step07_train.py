@@ -302,11 +302,11 @@ def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
                 for file_name in files:
                     path = os.path.join(root, file_name)
                     if file_name.endswith(".pth"):
-                        if file_name.startswith("best_"):
+                        if file_name.endswith("best.pth"):
                             best_checkpoints.append(path)
-                        elif file_name == "latest.pth":
+                        elif file_name.endswith("last.pth"):
                             latest_checkpoint = path
-                        elif file_name.startswith("epoch_"):
+                        elif file_name.startswith("model_"):
                             other_checkpoints.append(path)
 
             if len(best_checkpoints) > 1:
