@@ -23,7 +23,7 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),  # imagenet
     ])
 
-    def load_on_device(
+    def load_model(
         self,
         device: Literal["cpu", "cuda", "cuda:0", "cuda:1", "cuda:2", "cuda:3"],
         model_source: Literal["Pretrained models", "Custom models"],
@@ -31,7 +31,6 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         checkpoint_name: str,
         checkpoint_url: str,
     ):
-        
         self.device = device
         self.model_source = model_source
         self.task_type = task_type
@@ -54,9 +53,35 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         for obj_class_json in self.model_classes:
             obj_classes.append(sly.ObjClass.from_json(obj_class_json))
         self._model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
-    
-        self.model = self.load_model(weights_path, self.device)
+        
+        num_classes = len(self.model_classes)
         self.class_names = [x['title'] for x in self.model_classes]
+        model_class = model_list[self.model_name]["class"]
+        self.model = model_class(num_classes=num_classes)
+        state = torch.load(weights_path, map_location=device)
+        self.model.load_state_dict(state)
+        self.model.to(device)
+        
+        # -------------------------------------- Add Workflow Input -------------------------------------- #
+        if not self.in_train:
+            sly.logger.debug("Workflow: Start processing Input")
+            if self.model_source == "Custom models":
+                sly.logger.debug("Workflow: Custom model detected")
+                w.workflow_input(api, self.checkpoint_url)
+            else:
+                sly.logger.debug("Workflow: Pretrained model detected. No need to set Input")
+            sly.logger.debug("Workflow: Finish processing Input")
+        # ----------------------------------------------- - ---------------------------------------------- #
+        
+        self.model.eval()
+        self.checkpoint_info = sly.nn.inference.CheckpointInfo(
+            checkpoint_name=self.checkpoint_name,
+            model_name=self.model_name,
+            architecture=None,
+            checkpoint_url=self.checkpoint_url,
+            custom_checkpoint_path=self.checkpoint_url,
+            model_source=self.model_source,
+        )
 
     def get_classes(self) -> List[str]:
         return self.class_names  # e.g. ["cat", "dog", ...]
@@ -81,36 +106,6 @@ class UNetModel(sly.nn.inference.SemanticSegmentation):
         predicted_classes_indices = output.data.cpu().numpy().argmax(axis=1)[0]
         result = cv2.resize(predicted_classes_indices, (image_width, image_height), interpolation=cv2.INTER_NEAREST)
         return [sly.nn.PredictionSegmentation(result)]
-    
-    def load_model(self, weights_path, device):
-        num_classes = len(self.model_classes)
-        model_class = model_list[self.model_name]["class"]
-        model = model_class(num_classes=num_classes)
-        state = torch.load(weights_path, map_location=device)
-        model.load_state_dict(state)
-        model.to(device)
-        
-        # -------------------------------------- Add Workflow Input -------------------------------------- #
-        if not self.in_train:
-            sly.logger.debug("Workflow: Start processing Input")
-            if self.model_source == "Custom models":
-                sly.logger.debug("Workflow: Custom model detected")
-                w.workflow_input(api, self.checkpoint_url)
-            else:
-                sly.logger.debug("Workflow: Pretrained model detected. No need to set Input")
-            sly.logger.debug("Workflow: Finish processing Input")
-        # ----------------------------------------------- - ---------------------------------------------- #
-        
-        model.eval()
-        self.checkpoint_info = sly.nn.inference.CheckpointInfo(
-            checkpoint_name=self.checkpoint_name,
-            model_name=self.model_name,
-            architecture=None,
-            checkpoint_url=self.checkpoint_url,
-            custom_checkpoint_path=self.checkpoint_url,
-            model_source=self.model_source,
-        )
-        return model
     
     def prepare_image_input(self, image, device):
         # RGB -> Normalized Tensor
