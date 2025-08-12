@@ -243,7 +243,7 @@ def create_experiment(
 ):
     train_info = TrainInfo(**g.sly_unet_generated_metadata)
     experiment_info = g.sly_unet.convert_train_to_experiment_info(train_info)
-    experiment_info.experiment_name = f"{g.task_id}_{g.project_info.name}_{model_name}"
+    experiment_info.experiment_name = f"{g.task_id} {g.project_info.name} {model_name}"
     experiment_info.model_name = model_name
     experiment_info.framework_name = f"{g.sly_unet.framework_name}"
     experiment_info.train_size = g.train_size
