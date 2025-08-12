@@ -249,6 +249,7 @@ def create_experiment(
     experiment_info.train_size = g.train_size
     experiment_info.val_size = g.val_size
     experiment_info.evaluation_report_id = report_id
+    experiment_info.experiment_report_id = None
     if report_id is not None:
         experiment_info.evaluation_report_link = f"/model-benchmark?id={str(report_id)}"
     experiment_info.evaluation_metrics = eval_metrics
