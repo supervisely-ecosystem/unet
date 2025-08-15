@@ -6,5 +6,14 @@
   ],
   "description": "Training, inference, data exploration, synthetic data, and more",
   "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
-  "icon_background": "#FFFFFF"
+  "icon_background": "#FFFFFF",
+  "framework": {
+    "name": "UNet",
+    "tags": [],
+    "export": [],
+    "conference": null,
+    "released": "2015",
+    "description": "Pioneering architecture for semantic segmentation.",
+    "github": "https://github.com/supervisely-ecosystem/unet"
+  }
 }
