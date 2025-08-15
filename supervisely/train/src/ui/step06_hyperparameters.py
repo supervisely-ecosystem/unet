@@ -7,6 +7,9 @@ def init(data, state):
     state["expName"] = g.project_info.name
     state["epochs"] = 10  # @TODO: 50 for debug
     state["gpusId"] = '0'
+    
+    state["runBenchmark"] = True
+    state["runSpeedTest"] = True
 
     #state["imgSize"] = 256
     state["imgSize"] = {
