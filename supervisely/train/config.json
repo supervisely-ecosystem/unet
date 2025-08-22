@@ -11,7 +11,7 @@
   ],
   "description": "Dashboard to configure, start and monitor training",
   "docker_image": "supervisely/unet:1.0.11",
-  "instance_version": "6.14.4",
+  "instance_version": "6.15.0",
   "main_script": "supervisely/train/src/sly_train.py",
   "gui_template": "supervisely/train/src/gui.html",
   "task_location": "workspace_tasks",
