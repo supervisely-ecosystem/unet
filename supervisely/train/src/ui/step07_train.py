@@ -1,7 +1,10 @@
 import os
 import sys
+import math
 import random
 from functools import partial
+from dataclasses import asdict
+from supervisely.nn.inference import SessionJSON
 
 import step02_splits
 import step04_augs
@@ -12,9 +15,13 @@ from supervisely.app.v1.widgets.chart import Chart
 from supervisely.app.v1.widgets.predictions_dynamics_gallery import (
     PredictionsDynamicsGallery,
 )
+from supervisely.nn.artifacts.artifacts import TrainInfo
 import sly_globals as g
 import step03_classes
-
+from step02_splits import get_train_val_sets
+import workflow as w
+from sly_functions import get_bg_class_name, get_eval_results_dir_name
+from supervisely.nn.utils import ModelSource
 
 _open_lnk_name = "open_app.lnk"
 project_dir_seg = None
@@ -57,6 +64,9 @@ def init(data, state):
 
     data["gallery"] = gallery
     state["visSets"] = ["train", "val"]
+    
+    data["benchmarkUrl"] = None
+    state["benchmarkInProgress"] = False
 
 
 def restart(data, state):
@@ -118,6 +128,49 @@ def init_progress_bars(data):
     progress_other.init_data(data)
 
 
+def external_update_callback(progress: sly.tqdm_sly, progress_name: str):
+    percent = math.floor(progress.n / progress.total * 100)
+    fields = []
+    if hasattr(progress, "desc"):
+        fields.append({"field": f"data.progress{progress_name}", "payload": progress.desc})
+    elif hasattr(progress, "message"):
+        fields.append({"field": f"data.progress{progress_name}", "payload": progress.message})
+    fields += [
+        {"field": f"data.progressCurrent{progress_name}", "payload": progress.n},
+        {"field": f"data.progressTotal{progress_name}", "payload": progress.total},
+        {"field": f"data.progressPercent{progress_name}", "payload": percent},
+    ]
+    g.api.app.set_fields(g.task_id, fields)
+
+
+def external_close_callback(progress: sly.tqdm_sly, progress_name: str):
+    fields = [
+        {"field": f"data.progress{progress_name}", "payload": None},
+        {"field": f"data.progressCurrent{progress_name}", "payload": None},
+        {"field": f"data.progressTotal{progress_name}", "payload": None},
+        {"field": f"data.progressPercent{progress_name}", "payload": None},
+    ]
+    g.api.app.set_fields(g.task_id, fields)
+
+class TqdmBenchmark(sly.tqdm_sly):
+    def update(self, n=1):
+        super().update(n)
+        external_update_callback(self, "Benchmark")
+
+    def close(self):
+        super().close()
+        external_close_callback(self, "Benchmark")
+
+
+class TqdmProgress(sly.tqdm_sly):
+    def update(self, n=1):
+        super().update(n)
+        external_update_callback(self, "Tqdm")
+
+    def close(self):
+        super().close()
+        external_close_callback(self, "Tqdm")
+
 def sample_items_for_visualization(state):
     train_set = sly.json.load_json_file(step02_splits.train_set_path)
     val_set = sly.json.load_json_file(step02_splits.val_set_path)
@@ -147,30 +200,31 @@ def upload_artifacts_and_log_progress(experiment_name):
             progress.set(monitor.bytes_read)
         progress.update()
 
+    model_dir = g.sly_unet.framework_folder
+    remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
+    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_folder)
+    remote_config_path = os.path.join(remote_weights_dir, g.sly_unet.config_file)
+
+    total_size = sly.fs.get_directory_size(g.artifacts_dir)
     global progress_other
     progress_other = ProgressBar(
-        g.task_id,
-        g.api,
-        "data.progressOther",
-        "Upload directory with training artifacts to Team Files",
+        task_id=g.task_id,
+        api=g.api,
+        v_model="data.progressOther",
+        message="Upload directory with training artifacts to Team Files",
+        total=total_size,
         is_size=True,
         min_report_percent=5,
     )
     progress_cb = partial(
         upload_monitor, api=g.api, task_id=g.task_id, progress=progress_other
     )
-
-    model_dir = g.sly_unet.framework_folder
-    remote_artifacts_dir = f"{model_dir}/{g.task_id}_{experiment_name}"
-    remote_weights_dir = os.path.join(remote_artifacts_dir, g.sly_unet.weights_folder)
-    remote_config_path = os.path.join(remote_weights_dir, g.sly_unet.config_file)
-
     res_dir = g.api.file.upload_directory(
         g.team_id, g.artifacts_dir, remote_artifacts_dir, progress_size_cb=progress_cb
     )
 
     # generate metadata
-    g.sly_unet.generate_metadata(
+    g.sly_unet_generated_metadata = g.sly_unet.generate_metadata(
         app_name=g.sly_unet.app_name,
         task_id=g.task_id,
         artifacts_folder=remote_artifacts_dir,
@@ -184,6 +238,34 @@ def upload_artifacts_and_log_progress(experiment_name):
     progress_other.reset_and_update()
     return res_dir
 
+def create_experiment(
+    model_name, remote_dir, report_id=None, eval_metrics=None, primary_metric_name=None
+):
+    train_info = TrainInfo(**g.sly_unet_generated_metadata)
+    experiment_info = g.sly_unet.convert_train_to_experiment_info(train_info)
+    experiment_info.experiment_name = f"{g.task_id} {g.project_info.name} {model_name}"
+    experiment_info.model_name = model_name
+    experiment_info.framework_name = f"{g.sly_unet.framework_name}"
+    experiment_info.train_size = g.train_size
+    experiment_info.val_size = g.val_size
+    experiment_info.evaluation_report_id = report_id
+    experiment_info.experiment_report_id = None
+    if report_id is not None:
+        experiment_info.evaluation_report_link = f"/model-benchmark?id={str(report_id)}"
+    experiment_info.evaluation_metrics = eval_metrics
+
+    experiment_info_json = asdict(experiment_info)
+    experiment_info_json["project_preview"] = g.project_info.image_preview_url
+    experiment_info_json["primary_metric"] = primary_metric_name
+
+    g.api.task.set_output_experiment(g.task_id, experiment_info_json)
+    experiment_info_json.pop("project_preview")
+    experiment_info_json.pop("primary_metric")
+
+    experiment_info_path = os.path.join(g.artifacts_dir, "experiment_info.json")
+    remote_experiment_info_path = os.path.join(remote_dir, "experiment_info.json")
+    sly.json.dump_json_file(experiment_info_json, experiment_info_path)
+    g.api.file.upload(g.team_id, experiment_info_path, remote_experiment_info_path)
 
 def calc_visualization_step(epochs):
     total_visualizations_count = 20
@@ -197,6 +279,237 @@ def calc_visualization_step(epochs):
 
     return vis_step
 
+def run_benchmark(api: sly.Api, task_id, classes, state, remote_dir):
+    global m
+
+    api.app.set_field(task_id, "state.benchmarkInProgress", True)
+    benchmark_report_template, report_id, eval_metrics, primary_metric_name = None, None, None, None
+    try:
+        from sly_unet import UNetModelBench
+        import torch
+        from pathlib import Path
+        import asyncio
+
+        dataset_infos = api.dataset.get_list(g.project_id, recursive=True)
+
+        dummy_pbar = TqdmProgress
+        with dummy_pbar(message="Preparing trained model for benchmark", total=1) as p:
+            # 0. Find the best checkpoint
+            best_filename = None
+            best_checkpoints = []
+            latest_checkpoint = None
+            other_checkpoints = []
+            for root, dirs, files in os.walk(g.checkpoints_dir):
+                for file_name in files:
+                    path = os.path.join(root, file_name)
+                    if file_name.endswith(".pth"):
+                        if file_name.endswith("best.pth"):
+                            best_checkpoints.append(path)
+                        elif file_name.endswith("last.pth"):
+                            latest_checkpoint = path
+                        elif file_name.startswith("model_"):
+                            other_checkpoints.append(path)
+
+            if len(best_checkpoints) > 1:
+                best_checkpoints = sorted(best_checkpoints, key=lambda x: x, reverse=True)
+            elif len(best_checkpoints) == 0:
+                sly.logger.info("Best model checkpoint not found in the checkpoints directory.")
+                if latest_checkpoint is not None:
+                    best_checkpoints = [latest_checkpoint]
+                    sly.logger.info(
+                        f"Using latest checkpoint for evaluation: {latest_checkpoint!r}"
+                    )
+                elif len(other_checkpoints) > 0:
+                    parse_epoch = lambda x: int(x.split("_")[-1].split(".")[0])
+                    best_checkpoints = sorted(other_checkpoints, key=parse_epoch, reverse=True)
+                    sly.logger.info(
+                        f"Using the last epoch checkpoint for evaluation: {best_checkpoints[0]!r}"
+                    )
+
+            if len(best_checkpoints) == 0:
+                raise ValueError("No checkpoints found for evaluation.")
+            best_checkpoint = Path(best_checkpoints[0])
+            sly.logger.info(f"Starting model benchmark with the checkpoint: {best_checkpoint!r}")
+            best_filename = best_checkpoint.name
+            workdir = best_checkpoint.parent
+
+            # 1. Serve trained model
+            m = UNetModelBench(model_dir=str(workdir), use_gui=False)
+
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            sly.logger.info(f"Using device: {device}")
+
+            checkpoint_path = g.sly_unet.get_weights_path(remote_dir) + "/" + best_filename
+            sly.logger.info(f"Checkpoint path: {checkpoint_path}")
+
+            deploy_params = dict(
+                device=device,
+                model_source=ModelSource.CUSTOM,
+                task_type=sly.nn.TaskType.SEMANTIC_SEGMENTATION,
+                checkpoint_name=best_filename,
+                checkpoint_url=checkpoint_path,
+            )
+            m._load_model(deploy_params)
+            asyncio.set_event_loop(asyncio.new_event_loop())
+            m.serve()
+
+            import requests
+            import uvicorn
+            import time
+            from threading import Thread
+
+            def run_app():
+                uvicorn.run(m.app, host="localhost", port=8000)
+
+            thread = Thread(target=run_app, daemon=True)
+            thread.start()
+
+            while True:
+                try:
+                    requests.get("http://localhost:8000")
+                    print("✅ Local server is ready")
+                    break
+                except requests.exceptions.ConnectionError:
+                    print("Waiting for the server to be ready")
+                    time.sleep(0.1)
+
+            session = SessionJSON(api, session_url="http://localhost:8000")
+            if sly.fs.dir_exists(g.data_dir + "/benchmark"):
+                sly.fs.remove_dir(g.data_dir + "/benchmark")
+
+            # 1. Init benchmark (todo: auto-detect task type)
+            benchmark_dataset_ids = None
+            benchmark_images_ids = None
+            train_dataset_ids = None
+            train_images_ids = None
+
+            split_method = state["splitMethod"]
+
+            if split_method == "datasets":
+                train_datasets = state["trainDatasets"]
+                val_datasets = state["valDatasets"]
+                benchmark_dataset_ids = [ds.id for ds in dataset_infos if ds.name in val_datasets]
+                train_dataset_ids = [ds.id for ds in dataset_infos if ds.name in train_datasets]
+                train_set, val_set = get_train_val_sets(g.project_dir, state)
+            else:
+
+                def get_image_infos_by_split(split: list):
+                    ds_infos_dict = {ds_info.name: ds_info for ds_info in dataset_infos}
+                    image_names_per_dataset = {}
+                    for item in split:
+                        name = item.name
+                        if name[1] == "_":
+                            name = name[2:]
+                        image_names_per_dataset.setdefault(item.dataset_name, []).append(name)
+                    image_infos = []
+                    for dataset_name, image_names in image_names_per_dataset.items():
+                        if "/" in dataset_name:
+                            dataset_name = dataset_name.split("/")[-1]
+                        ds_info = ds_infos_dict[dataset_name]
+                        for batched_names in sly.batched(image_names, 200):
+                            batch_infos = api.image.get_list(
+                                ds_info.id,
+                                filters=[
+                                    {
+                                        "field": "name",
+                                        "operator": "in",
+                                        "value": batched_names,
+                                    }
+                                ],
+                            )
+                            image_infos.extend(batch_infos)
+                    return image_infos
+
+                train_set, val_set = get_train_val_sets(g.project_dir, state)
+
+                val_image_infos = get_image_infos_by_split(val_set)
+                train_image_infos = get_image_infos_by_split(train_set)
+                benchmark_images_ids = [img_info.id for img_info in val_image_infos]
+                train_images_ids = [img_info.id for img_info in train_image_infos]
+
+                p.update(1)
+
+        pbar = TqdmBenchmark
+        bm = sly.nn.benchmark.SemanticSegmentationBenchmark(
+            api,
+            g.project_info.id,
+            output_dir=g.data_dir + "/benchmark",
+            gt_dataset_ids=benchmark_dataset_ids,
+            gt_images_ids=benchmark_images_ids,
+            progress=pbar,
+            progress_secondary=pbar,
+            classes_whitelist=classes,
+        )
+
+        train_info = {
+            "app_session_id": sly.env.task_id(),
+            "train_dataset_ids": train_dataset_ids,
+            "train_images_ids": train_images_ids,
+            "images_count": len(train_set),
+        }
+        bm.train_info = train_info
+
+        # 2. Run inference
+        bm.run_inference(session)
+
+        # 3. Pull results from the server
+        gt_project_path, pred_project_path = bm.download_projects(save_images=False)
+
+        # 4. Evaluate
+        bm._evaluate(gt_project_path, pred_project_path)
+        bm._dump_eval_inference_info(bm._eval_inference_info)
+
+        # 5. Upload evaluation results
+        eval_res_dir = get_eval_results_dir_name(api, sly.env.task_id(), g.project_info)
+        bm.upload_eval_results(eval_res_dir + "/evaluation/")
+
+        # # 6. Speed test
+        if state["runSpeedTest"]:
+            try:
+                session_info = session.get_session_info()
+                support_batch_inference = session_info.get("batch_inference_support", False)
+                max_batch_size = session_info.get("max_batch_size")
+                batch_sizes = (1, 8, 16)
+                if not support_batch_inference:
+                    batch_sizes = (1,)
+                elif max_batch_size is not None:
+                    batch_sizes = tuple([bs for bs in batch_sizes if bs <= max_batch_size])
+                bm.run_speedtest(session, g.project_info.id, batch_sizes=batch_sizes)
+                bm.upload_speedtest_results(eval_res_dir + "/speedtest/")
+            except Exception as e:
+                sly.logger.warning(f"Speedtest failed. Skipping. {e}")
+
+        # 7. Prepare visualizations, report and
+        bm.visualize()
+        remote_dir = bm.upload_visualizations(eval_res_dir + "/visualizations/")
+        report_id = bm.report.id
+        eval_metrics = bm.key_metrics
+        primary_metric_name = bm.primary_metric_name
+
+        # 8. UI updates
+        benchmark_report_template = bm.report
+
+        fields = [
+            {"field": f"state.benchmarkInProgress", "payload": False},
+            {"field": f"data.benchmarkUrl", "payload": bm.get_report_link()},
+        ]
+        api.app.set_fields(g.task_id, fields)
+        sly.logger.info(
+            f"Predictions project name: {bm.dt_project_info.name}. Workspace_id: {bm.dt_project_info.workspace_id}"
+        )
+
+        # 9. Stop the server
+    except Exception as e:
+        benchmark_report_template, report_id, eval_metrics, primary_metric_name = None, None, None, None
+        api.app.set_field(task_id, "state.benchmarkInProgress", False)
+        sly.logger.error(f"Model benchmark failed. {repr(e)}", exc_info=True)
+        try:
+            if bm.dt_project_info:
+                api.project.remove(bm.dt_project_info.id)
+        except Exception as re:
+            pass
+
+    return benchmark_report_template, report_id, eval_metrics, primary_metric_name
 
 @g.my_app.callback("train")
 @sly.timeit
@@ -270,6 +583,31 @@ def train(api: sly.Api, task_id, context, state, app_logger):
     except Exception as e:
         api.app.set_field(task_id, "state.started", False)
         raise e  # app will handle this error and show modal window
+    
+    # run benchmark
+    benchmark_report_template, report_id, eval_metrics, primary_metric_name = (
+            None,
+            None,
+            None,
+            None,
+        )
+    
+    sly.logger.info(f"Run benchmark: {state['runBenchmark']}")
+    if state["runBenchmark"]:
+        classes = [obj_cls.name for obj_cls in project_seg.meta.obj_classes]
+        benchmark_report_template, report_id, eval_metrics, primary_metric_name = run_benchmark(
+            api, task_id, classes, state, remote_dir
+        )
+
+    try:
+        sly.logger.info("Creating experiment info")
+        create_experiment(state["selectedModel"], remote_dir, report_id, eval_metrics, primary_metric_name)
+    except Exception as e:
+        sly.logger.error(f"Couldn't create experiment, this training session will not appear in the experiments table. Error: {e}")
+
+    w.workflow_input(api, g.project_info, state)
+    w.workflow_output(api, g.sly_unet_generated_metadata, state, benchmark_report_template)
+
 
     # stop application
     # g.my_app.show_modal_window("Training is finished, app is still running and you can preview predictions dynamics over time."

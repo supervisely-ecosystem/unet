@@ -25,6 +25,15 @@
             <span style="color: #5a6772;">Training has been successfully finished</span>
         </div>
     </div>
+    <div v-if="data.benchmarkUrl">
+        <sly-field title="" description="Open the Model Benchmark evaluation report.">
+            <a slot="title" target="_blank" :href="data.benchmarkUrl">Evaluation Report</a>
+            <sly-icon
+                slot="icon"
+                :options="{ color: '#dcb0ff', bgColor: '#faebff', className: 'zmdi zmdi-assignment' }"
+            />
+        </sly-field>
+    </div>
     <div v-if="data.progressEpoch.message && !data.outputUrl" class="mt10">
         <div style="color: #20a0ff">
             {{data.progressEpoch.message}}: {{data.progressEpoch.current}} / {{data.progressEpoch.total}}
@@ -43,6 +52,26 @@
         </div>
         <el-progress :percentage="data.progressOther.percent"></el-progress>
     </div>
+    <div v-if="state.benchmarkInProgress">
+        <i class="zmdi zmdi-info mr5" style="color: #20a0ff"></i>
+        <span style="color: #5a6772"
+            >Model Benchmark evaluation is in progress...</span
+        >
+    </div>
+    <div v-if="state.benchmarkInProgress && data.progressBenchmark" class="mt10">
+		<div style="color: #20a0ff">
+			{{data.progressBenchmark}}: {{data.progressCurrentBenchmark}} /
+			{{data.progressTotalBenchmark}}
+		</div>
+		<el-progress :percentage="data.progressPercentBenchmark"></el-progress>
+	</div>
+    <div v-if="data.progressTqdm" class="mt10">
+		<div style="color: #20a0ff">
+			{{data.progressTqdm}}: {{data.progressCurrentTqdm}} /
+			{{data.progressTotalTqdm}}
+		</div>
+		<el-progress :percentage="data.progressPercentTqdm"></el-progress>
+	</div>
     <div class="mt15" v-if="state.started === true || state.done7">
         <hr class="mt10 mb10" style="border: 0; border-top: 1px solid rgba(0,0,0,.12);"/>
         <sly-field title="Smoothing" description="Change the smoothing of line charts">

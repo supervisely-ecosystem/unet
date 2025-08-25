@@ -205,6 +205,19 @@
         </sly-field>
     </sly-field>
 
+    <sly-field title="Run Model Benchmark evaluation">
+        <el-switch v-model="state.runBenchmark"
+                   on-color="#13ce66" off-color="#B8B8B8"
+                   :disabled="data.done6">
+        </el-switch>
+    </sly-field>
+    <sly-field title="Run Speed test">
+        <el-switch v-model="state.runSpeedTest"
+                   on-color="#13ce66" off-color="#B8B8B8"
+                   :disabled="data.done6">
+        </el-switch>
+    </sly-field>
+
     <el-button type="primary" class="regular"
                @click="command('use_hyp')"
                v-if="!data.done6">
