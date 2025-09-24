@@ -10,3 +10,4 @@ __pycache__
 /model
 /my_model
 /results
+/docker/dev_requirements.txt
