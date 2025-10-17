@@ -71,65 +71,65 @@ classes: lemons and kiwis
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/lemons-test" src="https://i.imgur.com/DsO08qM.png" width="350px"/>
 
-- [Flying objects](../../../../supervisely-ecosystem/flying-objects) - 
+- [Flying objects](https://ecosystem.supervisely.com/apps/flying-objects) - 
   app generates synthetic images for segmentation / detection / instance segmentation tasks from labeled examples 
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/flying-objects" src="https://i.imgur.com/i5rCve6.png" width="380px"/>
 
 ## Data Exploration
 
-- [Classes stats for images](../../../../supervisely-ecosystem/classes-stats-for-images) - classes stats and detailed per image stats 
+- [Classes stats for images](https://ecosystem.supervisely.com/apps/classes-stats-for-images) - classes stats and detailed per image stats 
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/classes-stats-for-images" src="https://i.imgur.com/ltTtIKT.png" width="380px"/>
 
-- [Object size stats](../../../../supervisely-ecosystem/object-size-stats) - classes stats and detailed per image stats 
+- [Object size stats](https://ecosystem.supervisely.com/apps/object-size-stats) - classes stats and detailed per image stats 
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/object-size-stats" src="https://i.imgur.com/1wx1G8F.png" width="380px"/>
 
-- [Classes co-occurrence matrix](../../../../supervisely-ecosystem/classes-co-occurrence-matrix) - discover edge cases and find “suspicious annotations” 
+- [Classes co-occurrence matrix](https://ecosystem.supervisely.com/apps/classes-co-occurrence-matrix) - discover edge cases and find “suspicious annotations” 
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/classes-co-occurrence-matrix" src="https://i.imgur.com/O2O9J3k.png" width="380px"/>
 
 ## Data Manipulation
 
-- [Convert class shape](../../../../supervisely-ecosystem/convert-class-shape)
+- [Convert class shape](https://ecosystem.supervisely.com/apps/convert-class-shape)
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/convert-class-shape" src="https://i.imgur.com/hFuVWOA.png" width="380px"/>
 
-- [Merge classes](../../../../supervisely-ecosystem/merge-classes)
+- [Merge classes](https://ecosystem.supervisely.com/apps/merge-classes)
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/merge-classes" src="https://i.imgur.com/S7GUdYv.png" width="380px"/>
 
-- [Rasterize objects on images](../../../../supervisely-ecosystem/rasterize-objects-on-images)
+- [Rasterize objects on images](https://ecosystem.supervisely.com/apps/rasterize-objects-on-images)
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/rasterize-objects-on-images" src="https://i.imgur.com/zoDWjP6.png" width="380px"/>
 
-- [Export as masks](../../../../supervisely-ecosystem/export-as-masks)
+- [Export as masks](https://ecosystem.supervisely.com/apps/export-as-masks)
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/export-as-masks" src="https://i.imgur.com/NcI3tTs.png" width="380px"/>
 
 
 ## UNet apps
 
-- [ImgAug studio](../../../../supervisely-ecosystem/imgaug-studio) - prepare and visualize custom augmentation pipeline for training, augs are applied on the fly during training
+- [ImgAug studio](https://ecosystem.supervisely.com/apps/imgaug-studio) - prepare and visualize custom augmentation pipeline for training, augs are applied on the fly during training
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/imgaug-studio" src="https://i.imgur.com/l9kNWs9.png" width="380px"/>
 
-- [Train UNet](../../../../supervisely-ecosystem/supervisely-ecosystem%252Funet%252Fsupervisely%252Ftrain) - training dashboard - customize hyperparameters and monitor metrics in real time
+- [Train UNet](https://ecosystem.supervisely.com/apps/supervisely-ecosystem%252Funet%252Fsupervisely%252Ftrain) - training dashboard - customize hyperparameters and monitor metrics in real time
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/unet/supervisely/train" src="https://i.imgur.com/GjgRJre.png" width="350px"/>
 
-- [Serve UNet](../../../../supervisely-ecosystem/supervisely-ecosystem%252Funet%252Fsupervisely%252Fserve) - deploy your model as Rest-API service and connect it with other apps from Ecosystem
+- [Serve UNet](https://ecosystem.supervisely.com/apps/supervisely-ecosystem%252Funet%252Fsupervisely%252Fserve) - deploy your model as Rest-API service and connect it with other apps from Ecosystem
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/unet/supervisely/serve" src="https://i.imgur.com/ATVxEk5.png" width="350px"/>
 
 ## Integration into labeling tool
 
-- [Apply NN to images project ](../../../../supervisely-ecosystem/supervisely-ecosystem%252Fnn-image-labeling%252Fproject-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analyse predictions and perform automatic data pre-labeling.   
+- [Apply NN to images project ](https://ecosystem.supervisely.com/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fproject-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analyse predictions and perform automatic data pre-labeling.   
    
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/project-dataset" src="https://i.imgur.com/M2Tp8lE.png" width="350px"/> 
 
-- [NN Image Labeling](../../../../supervisely-ecosystem/supervisely-ecosystem%252Fnn-image-labeling%252Fannotation-tool) - integrate any deployd NN to Supervisely Image Labeling UI. Configure inference settings and model output classes. Press `Apply` button (or use hotkey) and detections with their confidences will immediately appear on the image. 
+- [NN Image Labeling](https://ecosystem.supervisely.com/apps/supervisely-ecosystem%252Fnn-image-labeling%252Fannotation-tool) - integrate any deployd NN to Supervisely Image Labeling UI. Configure inference settings and model output classes. Press `Apply` button (or use hotkey) and detections with their confidences will immediately appear on the image. 
    
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/nn-image-labeling/annotation-tool" src="https://i.imgur.com/hYEucNt.png" width="350px"/>
   
