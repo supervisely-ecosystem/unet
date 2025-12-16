@@ -6,3 +6,5 @@ COPY dev_requirements.txt dev_requirements.txt
 
 RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip install -r dev_requirements.txt
+
+LABEL python_sdk_version="6.73.486"

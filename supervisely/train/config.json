@@ -1,31 +1,31 @@
 {
-  "name": "Train UNet",
-  "type": "app",
-  "categories": [
-    "neural network",
-    "images",
-    "videos",
-    "semantic segmentation",
-    "segmentation & tracking",
-    "train"
-  ],
-  "description": "Dashboard to configure, start and monitor training",
-  "docker_image": "supervisely/unet:1.0.12",
-  "instance_version": "6.15.5",
-  "main_script": "supervisely/train/src/sly_train.py",
-  "gui_template": "supervisely/train/src/gui.html",
-  "task_location": "workspace_tasks",
-  "need_gpu": true,
-  "gpu": "required",
-  "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
-  "icon_background": "#FFFFFF",
-  "context_menu": {
-    "target": [
-      "images_project"
+    "name": "Train UNet",
+    "type": "app",
+    "categories": [
+        "neural network",
+        "images",
+        "videos",
+        "semantic segmentation",
+        "segmentation & tracking",
+        "train"
     ],
-    "context_root": "Neural Networks",
-    "context_category": "UNet"
-  },
-  "poster": "https://user-images.githubusercontent.com/106374579/187425251-d652ae7b-6d4c-475a-b8e4-e5c3eee06885.png",
-  "community_agent": false
+    "description": "Dashboard to configure, start and monitor training",
+    "docker_image": "supervisely/unet:1.0.13",
+    "instance_version": "6.15.35",
+    "main_script": "supervisely/train/src/sly_train.py",
+    "gui_template": "supervisely/train/src/gui.html",
+    "task_location": "workspace_tasks",
+    "need_gpu": true,
+    "gpu": "required",
+    "icon": "https://img.icons8.com/fluency/100/000000/u-shaped-style.png",
+    "icon_background": "#FFFFFF",
+    "context_menu": {
+        "target": [
+            "images_project"
+        ],
+        "context_root": "Neural Networks",
+        "context_category": "UNet"
+    },
+    "poster": "https://user-images.githubusercontent.com/106374579/187425251-d652ae7b-6d4c-475a-b8e4-e5c3eee06885.png",
+    "community_agent": false
 }
